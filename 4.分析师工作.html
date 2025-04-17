@@ -1,0 +1,773 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>数据分析师的日常工作</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            200: '#bae6fd',
+                            300: '#7dd3fc',
+                            400: '#38bdf8',
+                            500: '#0ea5e9',
+                            600: '#0284c7',
+                            700: '#0369a1',
+                            800: '#075985',
+                            900: '#0c4a6e',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            line-height: 1.6;
+            transition: all 0.3s ease;
+        }
+        .content-block {
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .content-block:hover {
+            transform: translateY(-2px);
+        }
+        .dark .content-block {
+            background-color: #1e293b;
+        }
+        .dark .content-block:hover {
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+        }
+        .light .content-block:hover {
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        .workflow-step {
+            border-left: 4px solid;
+            padding-left: 1rem;
+            margin-bottom: 1.5rem;
+        }
+    </style>
+</head>
+<body class="light bg-gray-50 text-gray-800 dark:bg-gray-900 dark:text-gray-100">
+    <div class="container mx-auto px-4 py-8 max-w-6xl">
+        <!-- Header -->
+        <header class="mb-12">
+            <div class="flex justify-between items-center mb-6">
+                <h1 class="text-3xl md:text-4xl font-bold text-primary-700 dark:text-primary-400">数据分析师的日常工作</h1>
+                <button id="themeToggle" class="p-2 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200">
+                    <i class="fas fa-moon dark:hidden"></i>
+                    <i class="fas fa-sun hidden dark:inline"></i>
+                </button>
+            </div>
+            <div class="bg-primary-50 dark:bg-gray-800 p-4 rounded-lg border-l-4 border-primary-500">
+                <p class="text-primary-800 dark:text-primary-200"><i class="fas fa-info-circle mr-2"></i>本文详细介绍了数据分析师的三大主要工作模块：数据全生命周期体系建设、基于业务的探索分析以及处理业务方的数据需求。</p>
+            </div>
+        </header>
+
+        <!-- Navigation -->
+        <div class="sticky top-0 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm z-10 py-4 mb-8 border-b border-gray-200 dark:border-gray-700">
+            <div class="flex overflow-x-auto space-x-4 pb-2">
+                <a href="#intro" class="whitespace-nowrap px-3 py-1 rounded-full bg-primary-100 dark:bg-primary-900 text-primary-700 dark:text-primary-300">引言</a>
+                <a href="#jd" class="whitespace-nowrap px-3 py-1 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300">岗位职责</a>
+                <a href="#modules" class="whitespace-nowrap px-3 py-1 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300">三大模块</a>
+                <a href="#workflow" class="whitespace-nowrap px-3 py-1 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300">工作流程</a>
+                <a href="#conclusion" class="whitespace-nowrap px-3 py-1 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300">总结</a>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <main class="fade-in">
+            <!-- Introduction Section -->
+            <section id="intro" class="mb-12">
+                <h2 class="text-2xl font-semibold mb-6 text-primary-600 dark:text-primary-400 border-b pb-2 border-gray-200 dark:border-gray-700">引言</h2>
+                
+                <div class="content-block bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm">
+                    <div class="flex items-start">
+                        <div class="bg-primary-100 dark:bg-primary-900 text-primary-700 dark:text-primary-300 rounded-full w-8 h-8 flex items-center justify-center flex-shrink-0 mr-4">
+                            <i class="fas fa-door-open"></i>
+                        </div>
+                        <div>
+                            <p class="mb-4">很多对数据分析感兴趣的人常常好奇：数据分析师平时都做些什么工作？不同公司的数据分析师职责有很大差异：</p>
+                            <div class="grid md:grid-cols-2 gap-4">
+                                <div class="bg-blue-50 dark:bg-blue-900/20 p-4 rounded border border-blue-200 dark:border-blue-800">
+                                    <h4 class="font-medium text-blue-700 dark:text-blue-300 mb-2">大公司</h4>
+                                    <p class="text-sm text-blue-600 dark:text-blue-400">职责更加细化，分工明确</p>
+                                </div>
+                                <div class="bg-green-50 dark:bg-green-900/20 p-4 rounded border border-green-200 dark:border-green-800">
+                                    <h4 class="font-medium text-green-700 dark:text-green-300 mb-2">初创公司</h4>
+                                    <p class="text-sm text-green-600 dark:text-green-400">要求成为多面手，各方面都要掌握</p>
+                                </div>
+                            </div>
+                            <div class="bg-yellow-50 dark:bg-yellow-900/20 border-l-4 border-yellow-400 dark:border-yellow-600 p-4 mt-4 rounded">
+                                <p class="text-yellow-700 dark:text-yellow-300"><i class="fas fa-lightbulb mr-2"></i>了解数据分析师日常工作最好的方式是查看招聘岗位描述(JD)，从中可以清楚地看到具体职责和要求。</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Job Description Section -->
+            <section id="jd" class="mb-12">
+                <h2 class="text-2xl font-semibold mb-6 text-primary-600 dark:text-primary-400 border-b pb-2 border-gray-200 dark:border-gray-700">数据分析师岗位职责</h2>
+                
+                <div class="content-block bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm mb-8">
+                    <div class="flex items-start">
+                        <div class="bg-primary-100 dark:bg-primary-900 text-primary-700 dark:text-primary-300 rounded-full w-8 h-8 flex items-center justify-center flex-shrink-0 mr-4">
+                            <i class="fas fa-briefcase"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-medium mb-3">以字节跳动数据分析师为例</h3>
+                            <div class="space-y-4">
+                                <div class="bg-gray-100 dark:bg-gray-700 p-4 rounded">
+                                    <h4 class="font-medium mb-2">1. 业务量化分析支持</h4>
+                                    <p class="text-sm text-gray-600 dark:text-gray-400">为内容审核等业务提供量化分析支持</p>
+                                </div>
+                                <div class="bg-gray-100 dark:bg-gray-700 p-4 rounded">
+                                    <h4 class="font-medium mb-2">2. 业务数据监控及分析</h4>
+                                    <p class="text-sm text-gray-600 dark:text-gray-400">通过数据监控主导专项分析，发现问题并提出解决方案，进行跨部门协调沟通</p>
+                                </div>
+                                <div class="bg-gray-100 dark:bg-gray-700 p-4 rounded">
+                                    <h4 class="font-medium mb-2">3. 支持业务决策及改进</h4>
+                                    <p class="text-sm text-gray-600 dark:text-gray-400">深入理解业务，多维度拆解业务，发现问题和价值洼地，通过数据服务驱动业务迭代</p>
+                                </div>
+                                <div class="bg-gray-100 dark:bg-gray-700 p-4 rounded">
+                                    <h4 class="font-medium mb-2">4. 平台用户分析</h4>
+                                    <p class="text-sm text-gray-600 dark:text-gray-400">用户行为分析，包括埋点收集用户数据</p>
+                                </div>
+                            </div>
+                            <div class="bg-blue-50 dark:bg-blue-900/20 border-l-4 border-blue-500 dark:border-blue-600 p-4 mt-4 rounded">
+                                <p class="text-blue-700 dark:text-blue-300"><i class="fas fa-info-circle mr-2"></i>关键点：深入业务非常重要，数据分析师必须理解所支持的业务领域。</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Work Modules Section -->
+            <section id="modules" class="mb-12">
+                <h2 class="text-2xl font-semibold mb-6 text-primary-600 dark:text-primary-400 border-b pb-2 border-gray-200 dark:border-gray-700">三大工作模块</h2>
+                
+                <div class="grid md:grid-cols-3 gap-6 mb-8">
+                    <!-- 数据全生命周期体系建设 -->
+                    <div class="content-block bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm">
+                        <h3 class="text-xl font-medium mb-3 text-primary-600 dark:text-primary-400">
+                            <i class="fas fa-circle-notch mr-2"></i>数据全生命周期体系建设
+                        </h3>
+                        <p class="mb-4">覆盖从数据获取到展示的完整流程：</p>
+                        <div class="space-y-3">
+                            <div class="bg-blue-50 dark:bg-blue-900/10 p-3 rounded">
+                                <h4 class="font-medium text-blue-700 dark:text-blue-300 mb-1">埋点设计</h4>
+                                <p class="text-xs text-blue-600 dark:text-blue-400">指定哪些用户行为需要被记录，如何记录，记录哪些信息</p>
+                            </div>
+                            <div class="bg-purple-50 dark:bg-purple-900/10 p-3 rounded">
+                                <h4 class="font-medium text-purple-700 dark:text-purple-300 mb-1">指标设计</h4>
+                                <p class="text-xs text-purple-600 dark:text-purple-400">设计能够监控业务状态的指标体系</p>
+                            </div>
+                            <div class="bg-green-50 dark:bg-green-900/10 p-3 rounded">
+                                <h4 class="font-medium text-green-700 dark:text-green-300 mb-1">报表设计</h4>
+                                <p class="text-xs text-green-600 dark:text-green-400">使用SQL函数从原始数据计算指标，涉及大量数据清洗工作</p>
+                            </div>
+                            <div class="bg-yellow-50 dark:bg-yellow-900/10 p-3 rounded">
+                                <h4 class="font-medium text-yellow-700 dark:text-yellow-300 mb-1">可视化展示</h4>
+                                <p class="text-xs text-yellow-600 dark:text-yellow-400">将数据以图表形式直观展示给业务方</p>
+                            </div>
+                        </div>
+                        <div class="bg-gray-100 dark:bg-gray-700 p-3 rounded mt-4">
+                            <p class="text-xs text-gray-600 dark:text-gray-400"><i class="fas fa-info-circle mr-1"></i>埋点由开发完成，但分析师需要验证数据准确性</p>
+                        </div>
+                    </div>
+                    
+                    <!-- 基于业务的探索和分析 -->
+                    <div class="content-block bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm">
+                        <h3 class="text-xl font-medium mb-3 text-primary-600 dark:text-primary-400">
+                            <i class="fas fa-search mr-2"></i>基于业务的探索和分析
+                        </h3>
+                        <p class="mb-4">针对业务问题的专题分析：</p>
+                        <div class="bg-green-50 dark:bg-green-900/20 p-4 rounded border border-green-200 dark:border-green-800 mb-4">
+                            <p class="text-green-700 dark:text-green-300"><i class="fas fa-quote-left mr-2 opacity-70"></i>示例：产品经理发现留存率突然下跌，需要分析原因并提出改进方案</p>
+                        </div>
+                        <ul class="list-disc pl-5 space-y-2 text-sm">
+                            <li>定位问题原因</li>
+                            <li>提供改进建议</li>
+                            <li>帮助业务回升</li>
+                        </ul>
+                        <div class="bg-blue-50 dark:bg-blue-900/20 p-3 rounded mt-4">
+                            <p class="text-xs text-blue-600 dark:text-blue-400"><i class="fas fa-lightbulb mr-1"></i>这类分析需要深入理解业务，发现业务中的问题和价值洼地</p>
+                        </div>
+                    </div>
+                    
+                    <!-- 业务方提供的数据需求 -->
+                    <div class="content-block bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm">
+                        <h3 class="text-xl font-medium mb-3 text-primary-600 dark:text-primary-400">
+                            <i class="fas fa-tasks mr-2"></i>业务方的数据需求
+                        </h3>
+                        <p class="mb-4">处理来自产品和运营的各种数据提取需求：</p>
+                        <div class="bg-red-50 dark:bg-red-900/20 p-4 rounded border border-red-200 dark:border-red-800 mb-4">
+                            <p class="text-red-700 dark:text-red-300"><i class="fas fa-exclamation-triangle mr-2"></i>分析师每天会收到大量"我想看某某数据"的请求</p>
+                        </div>
+                        <h4 class="font-medium mb-2">应对策略：</h4>
+                        <ul class="list-disc pl-5 space-y-2 text-sm">
+                            <li>收敛需求：询问为什么需要这个数据，能否合并相似需求</li>
+                            <li>建设可视化看板：将常用数据做成自助查询看板</li>
+                            <li>统一收集：让业务方先内部收敛需求，定期统一提出</li>
+                        </ul>
+                        <div class="bg-yellow-50 dark:bg-yellow-900/20 p-3 rounded mt-4">
+                            <p class="text-xs text-yellow-600 dark:text-yellow-400"><i class="fas fa-info-circle mr-1"></i>目标是提高效率，在有限精力内做最有价值的事</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Workflow Section -->
+            <section id="workflow" class="mb-12">
+                <h2 class="text-2xl font-semibold mb-6 text-primary-600 dark:text-primary-400 border-b pb-2 border-gray-200 dark:border-gray-700">数据分析工作流程</h2>
+                
+                <div class="content-block bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm">
+                    <div class="space-y-8">
+                        <!-- Step 1 -->
+                        <div class="workflow-step border-primary-500">
+                            <div class="flex items-center mb-2">
+                                <div class="bg-primary-100 dark:bg-primary-900 text-primary-700 dark:text-primary-300 rounded-full w-6 h-6 flex items-center justify-center flex-shrink-0 mr-3 text-sm font-bold">1</div>
+                                <h3 class="text-lg font-medium">获取数据</h3>
+                            </div>
+                            <div class="pl-9">
+                                <p>从公司数据库提取数据，或通过爬虫等工具收集外部数据</p>
+                                <div class="bg-gray-100 dark:bg-gray-700 p-2 rounded mt-2">
+                                    <p class="text-xs text-gray-600 dark:text-gray-400"><i class="fas fa-info-circle mr-1"></i>大部分情况下直接从公司数据库提取</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Step 2 -->
+                        <div class="workflow-step border-purple-500">
+                            <div class="flex items-center mb-2">
+                                <div class="bg-purple-100 dark:bg-purple-900 text-purple-700 dark:text-purple-300 rounded-full w-6 h-6 flex items-center justify-center flex-shrink-0 mr-3 text-sm font-bold">2</div>
+                                <h3 class="text-lg font-medium">数据清洗</h3>
+                            </div>
+                            <div class="pl-9">
+                                <p>将杂乱无章的原始数据整理为有序、无错误的数据</p>
+                                <div class="bg-yellow-50 dark:bg-yellow-900/20 p-2 rounded mt-2">
+                                    <p class="text-xs text-yellow-600 dark:text-yellow-400"><i class="fas fa-exclamation-circle mr-1"></i>非常繁琐但至关重要，是分析的基石</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Step 3 -->
+                        <div class="workflow-step border-green-500">
+                            <div class="flex items-center mb-2">
+                                <div class="bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300 rounded-full w-6 h-6 flex items-center justify-center flex-shrink-0 mr-3 text-sm font-bold">3</div>
+                                <h3 class="text-lg font-medium">分析与建模</h3>
+                            </div>
+                            <div class="pl-9">
+                                <p>根据分析目标设计指标体系，或使用模型进行预测分析</p>
+                            </div>
+                        </div>
+                        
+                        <!-- Step 4 -->
+                        <div class="workflow-step border-blue-500">
+                            <div class="flex items-center mb-2">
+                                <div class="bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 rounded-full w-6 h-6 flex items-center justify-center flex-shrink-0 mr-3 text-sm font-bold">4</div>
+                                <h3 class="text-lg font-medium">结果呈现</h3>
+                            </div>
+                            <div class="pl-9">
+                                <p>制作数据分析报告，作为企业决策依据</p>
+                                <div class="bg-blue-50 dark:bg-blue-900/20 p-2 rounded mt-2">
+                                    <p class="text-xs text-blue-600 dark:text-blue-400"><i class="fas fa-lightbulb mr-1"></i>好的数据分析报告是分析师职场价值的体现</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Conclusion Section -->
+            <section id="conclusion" class="mb-12">
+                <h2 class="text-2xl font-semibold mb-6 text-primary-600 dark:text-primary-400 border-b pb-2 border-gray-200 dark:border-gray-700">总结</h2>
+                
+                <div class="content-block bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm">
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div>
+                            <h3 class="text-xl font-medium mb-3">数据分析师的核心能力</h3>
+                            <ul class="list-disc pl-5 space-y-2">
+                                <li><strong>技术能力：</strong>数据收集、清洗、分析、可视化</li>
+                                <li><strong>业务理解：</strong>深入理解所支持的行业和业务</li>
+                                <li><strong>沟通协调：</strong>跨部门协作，理解并收敛需求</li>
+                                <li><strong>报告撰写：</strong>清晰呈现分析结果和建议</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-medium mb-3">高效工作建议</h3>
+                            <ul class="list-disc pl-5 space-y-2">
+                                <li>建立标准化数据体系，减少重复工作</li>
+                                <li>建设自助查询看板，减少临时数据需求</li>
+                                <li>定期与业务方沟通，主动发现问题</li>
+                                <li>持续学习新的分析方法和工具</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-primary-50 dark:bg-primary-900/20 border-l-4 border-primary-500 dark:border-primary-600 p-6 rounded-lg shadow-sm mt-6">
+                        <p class="text-primary-700 dark:text-primary-300 font-medium"><i class="fas fa-quote-left mr-2 opacity-70"></i>数据分析师的工作不仅仅是处理数字，更重要的是通过数据理解业务，发现问题，并为决策提供可靠依据。这需要技术能力、业务洞察力和沟通能力的完美结合。</p>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Footer -->
+        <footer class="mt-12 pt-8 border-t border-gray-200 dark:border-gray-700 text-center text-gray-500 dark:text-gray-400 text-sm">
+            <p>© 2025 数据分析实战课程. 保留所有权利.</p>
+            <p class="mt-2">最后更新: 2025年4月15日</p>
+        </footer>
+    </div>
+
+    <script>
+        // Theme toggle
+        const themeToggle = document.getElementById('themeToggle');
+        const html = document.documentElement;
+        
+        // Check for saved theme preference or use system preference
+        const savedTheme = localStorage.getItem('theme') || 
+                          (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+        html.classList.add(savedTheme);
+        
+        themeToggle.addEventListener('click', () => {
+            html.classList.toggle('dark');
+            const theme = html.classList.contains('dark') ? 'dark' : 'light';
+            localStorage.setItem('theme', theme);
+        });
+        
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                const targetId = this.getAttribute('href');
+                const targetElement = document.querySelector(targetId);
+                if (targetElement) {
+                    targetElement.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+        
+        // Add fade-in animation to content blocks when they come into view
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('fade-in');
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, {
+            threshold: 0.1
+        });
+        
+        document.querySelectorAll('.content-block').forEach(block => {
+            observer.observe(block);
+        });
+    </script>
+</body>
+</html><!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>数据分析师的日常工作</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            200: '#bae6fd',
+                            300: '#7dd3fc',
+                            400: '#38bdf8',
+                            500: '#0ea5e9',
+                            600: '#0284c7',
+                            700: '#0369a1',
+                            800: '#075985',
+                            900: '#0c4a6e',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            line-height: 1.6;
+            transition: all 0.3s ease;
+        }
+        .content-block {
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .content-block:hover {
+            transform: translateY(-2px);
+        }
+        .dark .content-block {
+            background-color: #1e293b;
+        }
+        .dark .content-block:hover {
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+        }
+        .light .content-block:hover {
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        .workflow-step {
+            border-left: 4px solid;
+            padding-left: 1rem;
+            margin-bottom: 1.5rem;
+        }
+    </style>
+</head>
+<body class="light bg-gray-50 text-gray-800 dark:bg-gray-900 dark:text-gray-100">
+    <div class="container mx-auto px-4 py-8 max-w-6xl">
+        <!-- Header -->
+        <header class="mb-12">
+            <div class="flex justify-between items-center mb-6">
+                <h1 class="text-3xl md:text-4xl font-bold text-primary-700 dark:text-primary-400">数据分析师的日常工作</h1>
+                <button id="themeToggle" class="p-2 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200">
+                    <i class="fas fa-moon dark:hidden"></i>
+                    <i class="fas fa-sun hidden dark:inline"></i>
+                </button>
+            </div>
+            <div class="bg-primary-50 dark:bg-gray-800 p-4 rounded-lg border-l-4 border-primary-500">
+                <p class="text-primary-800 dark:text-primary-200"><i class="fas fa-info-circle mr-2"></i>本文详细介绍了数据分析师的三大主要工作模块：数据全生命周期体系建设、基于业务的探索分析以及处理业务方的数据需求。</p>
+            </div>
+        </header>
+
+        <!-- Navigation -->
+        <div class="sticky top-0 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm z-10 py-4 mb-8 border-b border-gray-200 dark:border-gray-700">
+            <div class="flex overflow-x-auto space-x-4 pb-2">
+                <a href="#intro" class="whitespace-nowrap px-3 py-1 rounded-full bg-primary-100 dark:bg-primary-900 text-primary-700 dark:text-primary-300">引言</a>
+                <a href="#jd" class="whitespace-nowrap px-3 py-1 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300">岗位职责</a>
+                <a href="#modules" class="whitespace-nowrap px-3 py-1 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300">三大模块</a>
+                <a href="#workflow" class="whitespace-nowrap px-3 py-1 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300">工作流程</a>
+                <a href="#conclusion" class="whitespace-nowrap px-3 py-1 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300">总结</a>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <main class="fade-in">
+            <!-- Introduction Section -->
+            <section id="intro" class="mb-12">
+                <h2 class="text-2xl font-semibold mb-6 text-primary-600 dark:text-primary-400 border-b pb-2 border-gray-200 dark:border-gray-700">引言</h2>
+                
+                <div class="content-block bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm">
+                    <div class="flex items-start">
+                        <div class="bg-primary-100 dark:bg-primary-900 text-primary-700 dark:text-primary-300 rounded-full w-8 h-8 flex items-center justify-center flex-shrink-0 mr-4">
+                            <i class="fas fa-door-open"></i>
+                        </div>
+                        <div>
+                            <p class="mb-4">很多对数据分析感兴趣的人常常好奇：数据分析师平时都做些什么工作？不同公司的数据分析师职责有很大差异：</p>
+                            <div class="grid md:grid-cols-2 gap-4">
+                                <div class="bg-blue-50 dark:bg-blue-900/20 p-4 rounded border border-blue-200 dark:border-blue-800">
+                                    <h4 class="font-medium text-blue-700 dark:text-blue-300 mb-2">大公司</h4>
+                                    <p class="text-sm text-blue-600 dark:text-blue-400">职责更加细化，分工明确</p>
+                                </div>
+                                <div class="bg-green-50 dark:bg-green-900/20 p-4 rounded border border-green-200 dark:border-green-800">
+                                    <h4 class="font-medium text-green-700 dark:text-green-300 mb-2">初创公司</h4>
+                                    <p class="text-sm text-green-600 dark:text-green-400">要求成为多面手，各方面都要掌握</p>
+                                </div>
+                            </div>
+                            <div class="bg-yellow-50 dark:bg-yellow-900/20 border-l-4 border-yellow-400 dark:border-yellow-600 p-4 mt-4 rounded">
+                                <p class="text-yellow-700 dark:text-yellow-300"><i class="fas fa-lightbulb mr-2"></i>了解数据分析师日常工作最好的方式是查看招聘岗位描述(JD)，从中可以清楚地看到具体职责和要求。</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Job Description Section -->
+            <section id="jd" class="mb-12">
+                <h2 class="text-2xl font-semibold mb-6 text-primary-600 dark:text-primary-400 border-b pb-2 border-gray-200 dark:border-gray-700">数据分析师岗位职责</h2>
+                
+                <div class="content-block bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm mb-8">
+                    <div class="flex items-start">
+                        <div class="bg-primary-100 dark:bg-primary-900 text-primary-700 dark:text-primary-300 rounded-full w-8 h-8 flex items-center justify-center flex-shrink-0 mr-4">
+                            <i class="fas fa-briefcase"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-medium mb-3">以字节跳动数据分析师为例</h3>
+                            <div class="space-y-4">
+                                <div class="bg-gray-100 dark:bg-gray-700 p-4 rounded">
+                                    <h4 class="font-medium mb-2">1. 业务量化分析支持</h4>
+                                    <p class="text-sm text-gray-600 dark:text-gray-400">为内容审核等业务提供量化分析支持</p>
+                                </div>
+                                <div class="bg-gray-100 dark:bg-gray-700 p-4 rounded">
+                                    <h4 class="font-medium mb-2">2. 业务数据监控及分析</h4>
+                                    <p class="text-sm text-gray-600 dark:text-gray-400">通过数据监控主导专项分析，发现问题并提出解决方案，进行跨部门协调沟通</p>
+                                </div>
+                                <div class="bg-gray-100 dark:bg-gray-700 p-4 rounded">
+                                    <h4 class="font-medium mb-2">3. 支持业务决策及改进</h4>
+                                    <p class="text-sm text-gray-600 dark:text-gray-400">深入理解业务，多维度拆解业务，发现问题和价值洼地，通过数据服务驱动业务迭代</p>
+                                </div>
+                                <div class="bg-gray-100 dark:bg-gray-700 p-4 rounded">
+                                    <h4 class="font-medium mb-2">4. 平台用户分析</h4>
+                                    <p class="text-sm text-gray-600 dark:text-gray-400">用户行为分析，包括埋点收集用户数据</p>
+                                </div>
+                            </div>
+                            <div class="bg-blue-50 dark:bg-blue-900/20 border-l-4 border-blue-500 dark:border-blue-600 p-4 mt-4 rounded">
+                                <p class="text-blue-700 dark:text-blue-300"><i class="fas fa-info-circle mr-2"></i>关键点：深入业务非常重要，数据分析师必须理解所支持的业务领域。</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Work Modules Section -->
+            <section id="modules" class="mb-12">
+                <h2 class="text-2xl font-semibold mb-6 text-primary-600 dark:text-primary-400 border-b pb-2 border-gray-200 dark:border-gray-700">三大工作模块</h2>
+                
+                <div class="grid md:grid-cols-3 gap-6 mb-8">
+                    <!-- 数据全生命周期体系建设 -->
+                    <div class="content-block bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm">
+                        <h3 class="text-xl font-medium mb-3 text-primary-600 dark:text-primary-400">
+                            <i class="fas fa-circle-notch mr-2"></i>数据全生命周期体系建设
+                        </h3>
+                        <p class="mb-4">覆盖从数据获取到展示的完整流程：</p>
+                        <div class="space-y-3">
+                            <div class="bg-blue-50 dark:bg-blue-900/10 p-3 rounded">
+                                <h4 class="font-medium text-blue-700 dark:text-blue-300 mb-1">埋点设计</h4>
+                                <p class="text-xs text-blue-600 dark:text-blue-400">指定哪些用户行为需要被记录，如何记录，记录哪些信息</p>
+                            </div>
+                            <div class="bg-purple-50 dark:bg-purple-900/10 p-3 rounded">
+                                <h4 class="font-medium text-purple-700 dark:text-purple-300 mb-1">指标设计</h4>
+                                <p class="text-xs text-purple-600 dark:text-purple-400">设计能够监控业务状态的指标体系</p>
+                            </div>
+                            <div class="bg-green-50 dark:bg-green-900/10 p-3 rounded">
+                                <h4 class="font-medium text-green-700 dark:text-green-300 mb-1">报表设计</h4>
+                                <p class="text-xs text-green-600 dark:text-green-400">使用SQL函数从原始数据计算指标，涉及大量数据清洗工作</p>
+                            </div>
+                            <div class="bg-yellow-50 dark:bg-yellow-900/10 p-3 rounded">
+                                <h4 class="font-medium text-yellow-700 dark:text-yellow-300 mb-1">可视化展示</h4>
+                                <p class="text-xs text-yellow-600 dark:text-yellow-400">将数据以图表形式直观展示给业务方</p>
+                            </div>
+                        </div>
+                        <div class="bg-gray-100 dark:bg-gray-700 p-3 rounded mt-4">
+                            <p class="text-xs text-gray-600 dark:text-gray-400"><i class="fas fa-info-circle mr-1"></i>埋点由开发完成，但分析师需要验证数据准确性</p>
+                        </div>
+                    </div>
+                    
+                    <!-- 基于业务的探索和分析 -->
+                    <div class="content-block bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm">
+                        <h3 class="text-xl font-medium mb-3 text-primary-600 dark:text-primary-400">
+                            <i class="fas fa-search mr-2"></i>基于业务的探索和分析
+                        </h3>
+                        <p class="mb-4">针对业务问题的专题分析：</p>
+                        <div class="bg-green-50 dark:bg-green-900/20 p-4 rounded border border-green-200 dark:border-green-800 mb-4">
+                            <p class="text-green-700 dark:text-green-300"><i class="fas fa-quote-left mr-2 opacity-70"></i>示例：产品经理发现留存率突然下跌，需要分析原因并提出改进方案</p>
+                        </div>
+                        <ul class="list-disc pl-5 space-y-2 text-sm">
+                            <li>定位问题原因</li>
+                            <li>提供改进建议</li>
+                            <li>帮助业务回升</li>
+                        </ul>
+                        <div class="bg-blue-50 dark:bg-blue-900/20 p-3 rounded mt-4">
+                            <p class="text-xs text-blue-600 dark:text-blue-400"><i class="fas fa-lightbulb mr-1"></i>这类分析需要深入理解业务，发现业务中的问题和价值洼地</p>
+                        </div>
+                    </div>
+                    
+                    <!-- 业务方提供的数据需求 -->
+                    <div class="content-block bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm">
+                        <h3 class="text-xl font-medium mb-3 text-primary-600 dark:text-primary-400">
+                            <i class="fas fa-tasks mr-2"></i>业务方的数据需求
+                        </h3>
+                        <p class="mb-4">处理来自产品和运营的各种数据提取需求：</p>
+                        <div class="bg-red-50 dark:bg-red-900/20 p-4 rounded border border-red-200 dark:border-red-800 mb-4">
+                            <p class="text-red-700 dark:text-red-300"><i class="fas fa-exclamation-triangle mr-2"></i>分析师每天会收到大量"我想看某某数据"的请求</p>
+                        </div>
+                        <h4 class="font-medium mb-2">应对策略：</h4>
+                        <ul class="list-disc pl-5 space-y-2 text-sm">
+                            <li>收敛需求：询问为什么需要这个数据，能否合并相似需求</li>
+                            <li>建设可视化看板：将常用数据做成自助查询看板</li>
+                            <li>统一收集：让业务方先内部收敛需求，定期统一提出</li>
+                        </ul>
+                        <div class="bg-yellow-50 dark:bg-yellow-900/20 p-3 rounded mt-4">
+                            <p class="text-xs text-yellow-600 dark:text-yellow-400"><i class="fas fa-info-circle mr-1"></i>目标是提高效率，在有限精力内做最有价值的事</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Workflow Section -->
+            <section id="workflow" class="mb-12">
+                <h2 class="text-2xl font-semibold mb-6 text-primary-600 dark:text-primary-400 border-b pb-2 border-gray-200 dark:border-gray-700">数据分析工作流程</h2>
+                
+                <div class="content-block bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm">
+                    <div class="space-y-8">
+                        <!-- Step 1 -->
+                        <div class="workflow-step border-primary-500">
+                            <div class="flex items-center mb-2">
+                                <div class="bg-primary-100 dark:bg-primary-900 text-primary-700 dark:text-primary-300 rounded-full w-6 h-6 flex items-center justify-center flex-shrink-0 mr-3 text-sm font-bold">1</div>
+                                <h3 class="text-lg font-medium">获取数据</h3>
+                            </div>
+                            <div class="pl-9">
+                                <p>从公司数据库提取数据，或通过爬虫等工具收集外部数据</p>
+                                <div class="bg-gray-100 dark:bg-gray-700 p-2 rounded mt-2">
+                                    <p class="text-xs text-gray-600 dark:text-gray-400"><i class="fas fa-info-circle mr-1"></i>大部分情况下直接从公司数据库提取</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Step 2 -->
+                        <div class="workflow-step border-purple-500">
+                            <div class="flex items-center mb-2">
+                                <div class="bg-purple-100 dark:bg-purple-900 text-purple-700 dark:text-purple-300 rounded-full w-6 h-6 flex items-center justify-center flex-shrink-0 mr-3 text-sm font-bold">2</div>
+                                <h3 class="text-lg font-medium">数据清洗</h3>
+                            </div>
+                            <div class="pl-9">
+                                <p>将杂乱无章的原始数据整理为有序、无错误的数据</p>
+                                <div class="bg-yellow-50 dark:bg-yellow-900/20 p-2 rounded mt-2">
+                                    <p class="text-xs text-yellow-600 dark:text-yellow-400"><i class="fas fa-exclamation-circle mr-1"></i>非常繁琐但至关重要，是分析的基石</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Step 3 -->
+                        <div class="workflow-step border-green-500">
+                            <div class="flex items-center mb-2">
+                                <div class="bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300 rounded-full w-6 h-6 flex items-center justify-center flex-shrink-0 mr-3 text-sm font-bold">3</div>
+                                <h3 class="text-lg font-medium">分析与建模</h3>
+                            </div>
+                            <div class="pl-9">
+                                <p>根据分析目标设计指标体系，或使用模型进行预测分析</p>
+                            </div>
+                        </div>
+                        
+                        <!-- Step 4 -->
+                        <div class="workflow-step border-blue-500">
+                            <div class="flex items-center mb-2">
+                                <div class="bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 rounded-full w-6 h-6 flex items-center justify-center flex-shrink-0 mr-3 text-sm font-bold">4</div>
+                                <h3 class="text-lg font-medium">结果呈现</h3>
+                            </div>
+                            <div class="pl-9">
+                                <p>制作数据分析报告，作为企业决策依据</p>
+                                <div class="bg-blue-50 dark:bg-blue-900/20 p-2 rounded mt-2">
+                                    <p class="text-xs text-blue-600 dark:text-blue-400"><i class="fas fa-lightbulb mr-1"></i>好的数据分析报告是分析师职场价值的体现</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Conclusion Section -->
+            <section id="conclusion" class="mb-12">
+                <h2 class="text-2xl font-semibold mb-6 text-primary-600 dark:text-primary-400 border-b pb-2 border-gray-200 dark:border-gray-700">总结</h2>
+                
+                <div class="content-block bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm">
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div>
+                            <h3 class="text-xl font-medium mb-3">数据分析师的核心能力</h3>
+                            <ul class="list-disc pl-5 space-y-2">
+                                <li><strong>技术能力：</strong>数据收集、清洗、分析、可视化</li>
+                                <li><strong>业务理解：</strong>深入理解所支持的行业和业务</li>
+                                <li><strong>沟通协调：</strong>跨部门协作，理解并收敛需求</li>
+                                <li><strong>报告撰写：</strong>清晰呈现分析结果和建议</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-medium mb-3">高效工作建议</h3>
+                            <ul class="list-disc pl-5 space-y-2">
+                                <li>建立标准化数据体系，减少重复工作</li>
+                                <li>建设自助查询看板，减少临时数据需求</li>
+                                <li>定期与业务方沟通，主动发现问题</li>
+                                <li>持续学习新的分析方法和工具</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-primary-50 dark:bg-primary-900/20 border-l-4 border-primary-500 dark:border-primary-600 p-6 rounded-lg shadow-sm mt-6">
+                        <p class="text-primary-700 dark:text-primary-300 font-medium"><i class="fas fa-quote-left mr-2 opacity-70"></i>数据分析师的工作不仅仅是处理数字，更重要的是通过数据理解业务，发现问题，并为决策提供可靠依据。这需要技术能力、业务洞察力和沟通能力的完美结合。</p>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Footer -->
+        <footer class="mt-12 pt-8 border-t border-gray-200 dark:border-gray-700 text-center text-gray-500 dark:text-gray-400 text-sm">
+            <p>© 2025 数据分析实战课程. 保留所有权利.</p>
+            <p class="mt-2">最后更新: 2025年4月15日</p>
+        </footer>
+    </div>
+
+    <script>
+        // Theme toggle
+        const themeToggle = document.getElementById('themeToggle');
+        const html = document.documentElement;
+        
+        // Check for saved theme preference or use system preference
+        const savedTheme = localStorage.getItem('theme') || 
+                          (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+        html.classList.add(savedTheme);
+        
+        themeToggle.addEventListener('click', () => {
+            html.classList.toggle('dark');
+            const theme = html.classList.contains('dark') ? 'dark' : 'light';
+            localStorage.setItem('theme', theme);
+        });
+        
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                const targetId = this.getAttribute('href');
+                const targetElement = document.querySelector(targetId);
+                if (targetElement) {
+                    targetElement.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+        
+        // Add fade-in animation to content blocks when they come into view
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('fade-in');
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, {
+            threshold: 0.1
+        });
+        
+        document.querySelectorAll('.content-block').forEach(block => {
+            observer.observe(block);
+        });
+    </script>
+</body>
+</html>
