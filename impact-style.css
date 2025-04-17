@@ -1,0 +1,164 @@
+/* --- Global Styles & Font Import --- */
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;700&display=swap');
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html {
+    font-size: 16px; /* Base font size */
+}
+
+body {
+    font-family: 'Noto Sans SC', "Microsoft YaHei", sans-serif;
+    line-height: 1.7;
+    /* --- Impactful Background --- */
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+    color: #e0e0e0; /* Light text for dark background */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 30px 15px; /* Padding around the container */
+}
+
+/* --- Main Container --- */
+.container {
+    max-width: 750px;
+    width: 100%;
+    background-color: rgba(22, 33, 62, 0.7); /* Semi-transparent dark blue */
+    backdrop-filter: blur(8px); /* Glassmorphism effect (optional) */
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 15px;
+    padding: 40px 50px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+    text-align: center; /* Center header content */
+}
+
+/* --- Header Styles --- */
+header {
+    margin-bottom: 40px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+    padding-bottom: 30px;
+}
+
+h1 {
+    /* --- Vibrant Title --- */
+    font-size: 2.8rem; /* Larger font size */
+    font-weight: 700;
+    background: linear-gradient(90deg, #fca311, #e94560); /* Orange to Pink gradient */
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent; /* Make text transparent to show gradient */
+    margin-bottom: 10px;
+    text-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+.subtitle {
+    font-size: 1.1rem;
+    color: #a0a0c0; /* Softer color for subtitle */
+    font-weight: 400;
+}
+
+/* --- Navigation / List Styles --- */
+.learning-path ul {
+    list-style: none;
+}
+
+.learning-path li {
+    background-color: rgba(255, 255, 255, 0.08);
+    margin-bottom: 15px;
+    border-radius: 8px;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); /* Smoother transition */
+    border-left: 5px solid transparent; /* Placeholder for hover effect */
+    position: relative; /* For positioning potential pseudo-elements */
+    overflow: hidden; /* Ensure content respects border-radius */
+}
+
+.learning-path li:hover {
+    transform: translateX(10px) scale(1.03); /* Move right and slightly enlarge */
+    background-color: rgba(255, 255, 255, 0.15);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+    border-left-color: #fca311; /* Accent color on hover */
+}
+
+/* --- Link Styles --- */
+.learning-path a {
+    display: flex; /* Use flex for alignment */
+    align-items: center;
+    padding: 18px 25px;
+    color: #e5e5e5;
+    text-decoration: none;
+    font-size: 1.15rem; /* Slightly larger link text */
+    font-weight: 400;
+    transition: color 0.3s ease;
+    text-align: left; /* Align text to the left within the flex container */
+}
+
+.learning-path a:hover {
+    color: #ffffff; /* Brighter text on hover */
+}
+
+/* --- Number/Icon Span --- */
+.learning-path a span {
+    display: inline-block;
+    min-width: 30px; /* Ensure consistent spacing */
+    margin-right: 15px;
+    font-weight: 700;
+    color: #e94560; /* Accent color for numbers/icons */
+    font-size: 1rem;
+    text-align: center;
+}
+
+/* --- Special Item Style --- */
+.learning-path li.special-item {
+    background-color: rgba(252, 163, 17, 0.15); /* Use accent color background */
+    border-left-color: #e94560; /* Different accent border */
+}
+
+.learning-path li.special-item:hover {
+    border-left-color: #ffffff; /* White border on hover for special item */
+    background-color: rgba(252, 163, 17, 0.3);
+}
+
+.learning-path li.special-item a span {
+    color: #fca311; /* Match the orange accent */
+    font-size: 1.2rem; /* Make icon slightly larger */
+}
+
+/* --- Focus Styles for Accessibility --- */
+a:focus-visible { /* Use focus-visible for better UX */
+    outline: 3px solid #fca311;
+    outline-offset: 3px;
+    border-radius: 6px;
+    /* Ensure focus is visible inside the list item */
+    position: relative;
+    z-index: 1;
+}
+
+/* --- Responsive Adjustments (Optional Example) --- */
+@media (max-width: 600px) {
+    body {
+        padding: 15px 10px;
+    }
+    .container {
+        padding: 30px 25px;
+    }
+    h1 {
+        font-size: 2.2rem;
+    }
+    .subtitle {
+        font-size: 1rem;
+    }
+    .learning-path a {
+        padding: 15px 15px;
+        font-size: 1rem;
+    }
+    .learning-path a span {
+        margin-right: 10px;
+    }
+}
