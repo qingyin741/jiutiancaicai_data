@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>数据异常波动处理可视化解析</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            200: '#bae6fd',
+                            300: '#7dd3fc',
+                            400: '#38bdf8',
+                            500: '#0ea5e9',
+                            600: '#0284c7',
+                            700: '#0369a1',
+                            800: '#075985',
+                            900: '#0c4a6e',
+                        },
+                        anomaly: {
+                            up: '#10b981',
+                            down: '#ef4444',
+                            normal: '#64748b'
+                        }
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.5s ease-in-out',
+                        'fade-in-up': 'fadeInUp 0.6s ease-out',
+                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite'
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': { opacity: '0' },
+                            '100%': { opacity: '1' }
+                        },
+                        fadeInUp: {
+                            '0%': { 
+                                opacity: '0',
+                                transform: 'translateY(10px)'
+                            },
+                            '100%': { 
+                                opacity: '1',
+                                transform: 'translateY(0)'
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .timeline-step {
+            position: relative;
+            padding-left: 2.5rem;
+            margin-bottom: 2rem;
+        }
+        .timeline-step:before {
+            content: "";
+            position: absolute;
+            left: 0.75rem;
+            top: 0;
+            height: 100%;
+            width: 2px;
+            background-color: #e2e8f0;
+        }
+        .timeline-step:last-child:before {
+            height: 1.5rem;
+        }
+        .timeline-icon {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 1.5rem;
+            height: 1.5rem;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+        }
+        .anomaly-card {
+            transition: all 0.3s ease;
+        }
+        .anomaly-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+        .dark .anomaly-card:hover {
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 dark:bg-gray-900 dark:text-gray-200 transition-colors duration-300 min-h-screen">
+    <div class="container mx-auto px-4 py-8 max-w-4xl">
+        <!-- 头部区域 -->
+        <header class="mb-12 animate-fade-in">
+            <div class="flex justify-between items-center mb-6">
+                <h1 class="text-3xl md:text-4xl font-bold bg-gradient-to-r from-primary-600 to-primary-400 bg-clip-text text-transparent">
+                    数据异常波动处理
+                </h1>
+                <button id="theme-toggle" class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">
+                    <i class="fas fa-moon dark:hidden"></i>
+                    <i class="fas fa-sun hidden dark:inline"></i>
+                </button>
+            </div>
+            <p class="text-lg text-gray-600 dark:text-gray-400 animate-fade-in-up">
+                精准诊断数据异常，快速定位业务问题根源
+            </p>
+        </header>
+
+        <!-- 主要内容 -->
+        <main class="prose prose-lg dark:prose-invert max-w-none animate-fade-in-up">
+            <!-- 定义部分 -->
+            <section class="mb-12">
+                <h2 class="text-2xl font-semibold mb-6 pb-2 border-b border-gray-200 dark:border-gray-700 flex items-center">
+                    <i class="fas fa-chart-line mr-3 text-primary-500"></i>
+                    什么是数据异常波动？
+                </h2>
+                <div class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow mb-6">
+                    <p class="mb-4">
+                        <strong>数据异常波动</strong>是指业务指标（如销售额、用户量等）与正常水平相比出现显著偏离的现象，通常表现为突然的上涨或下跌。
+                    </p>
+                    <div class="grid md:grid-cols-2 gap-6 mt-6">
+                        <div class="bg-red-50 dark:bg-red-900/20 rounded-lg p-4 border-l-4 border-red-500">
+                            <h3 class="font-medium flex items-center mb-2">
+                                <i class="fas fa-arrow-down mr-2 text-red-600 dark:text-red-400"></i>
+                                异常下跌
+                            </h3>
+                            <ul class="list-disc pl-5 text-sm space-y-1">
+                                <li>可能原因：渠道故障、库存不足、技术问题</li>
+                                <li>分析方法：多维度拆解、漏斗分析</li>
+                                <li>目标：止损并恢复常态</li>
+                            </ul>
+                        </div>
+                        <div class="bg-green-50 dark:bg-green-900/20 rounded-lg p-4 border-l-4 border-green-500">
+                            <h3 class="font-medium flex items-center mb-2">
+                                <i class="fas fa-arrow-up mr-2 text-green-600 dark:text-green-400"></i>
+                                异常上涨
+                            </h3>
+                            <ul class="list-disc pl-5 text-sm space-y-1">
+                                <li>可能原因：营销活动、市场热点、数据错误</li>
+                                <li>分析方法：归因分析、渠道追踪</li>
+                                <li>目标：复制成功因素</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 分析流程 -->
+            <section class="mb-12">
+                <h2 class="text-2xl font-semibold mb-6 pb-2 border-b border-gray-200 dark:border-gray-700 flex items-center">
+                    <i class="fas fa-project-diagram mr-3 text-primary-500"></i>
+                    异常波动分析流程
+                </h2>
+                
+                <div class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm">
+                    <!-- 时间线步骤 -->
+                    <div class="timeline-step">
+                        <div class="timeline-icon bg-primary-100 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400">
+                            <i class="fas fa-search"></i>
+                        </div>
+                        <h3 class="font-medium text-lg mb-2">1. 确认异常真实性</h3>
+                        <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4 mb-3">
+                            <ul class="list-disc pl-5 space-y-1">
+                                <li>对比历史数据（周同比/月同比）</li>
+                                <li>检查数据采集是否准确</li>
+                                <li>排除节假日等特殊因素</li>
+                            </ul>
+                        </div>
+                        <p class="text-sm text-gray-600 dark:text-gray-400">
+                            <strong>案例：</strong>收入下降10%是否显著？与过去3个月相比，正常波动范围是多少？
+                        </p>
+                    </div>
+                    
+                    <div class="timeline-step">
+                        <div class="timeline-icon bg-primary-100 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400">
+                            <i class="fas fa-layer-group"></i>
+                        </div>
+                        <h3 class="font-medium text-lg mb-2">2. 多维度拆解分析</h3>
+                        <div class="grid md:grid-cols-2 gap-4 mb-3">
+                            <div class="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-3">
+                                <h4 class="font-medium text-sm mb-1 flex items-center">
+                                    <i class="fas fa-server mr-1 text-blue-600 dark:text-blue-400"></i>
+                                    技术维度
+                                </h4>
+                                <p class="text-xs">服务器状态、API响应、错误日志</p>
+                            </div>
+                            <div class="bg-purple-50 dark:bg-purple-900/20 rounded-lg p-3">
+                                <h4 class="font-medium text-sm mb-1 flex items-center">
+                                    <i class="fas fa-chart-pie mr-1 text-purple-600 dark:text-purple-400"></i>
+                                    业务维度
+                                </h4>
+                                <p class="text-xs">产品、渠道、地区、用户群</p>
+                            </div>
+                            <div class="bg-amber-50 dark:bg-amber-900/20 rounded-lg p-3">
+                                <h4 class="font-medium text-sm mb-1 flex items-center">
+                                    <i class="fas fa-calendar-alt mr-1 text-amber-600 dark:text-amber-400"></i>
+                                    时间维度
+                                </h4>
+                                <p class="text-xs">按小时/日/周趋势分析</p>
+                            </div>
+                            <div class="bg-green-50 dark:bg-green-900/20 rounded-lg p-3">
+                                <h4 class="font-medium text-sm mb-1 flex items-center">
+                                    <i class="fas fa-users mr-1 text-green-600 dark:text-green-400"></i>
+                                    用户维度
+                                </h4>
+                                <p class="text-xs">新老用户、用户层级</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="timeline-step">
+                        <div class="timeline-icon bg-primary-100 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400">
+                            <i class="fas fa-bullseye"></i>
+                        </div>
+                        <h3 class="font-medium text-lg mb-2">3. 定位问题根源</h3>
+                        <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4 mb-3">
+                            <ul class="list-disc pl-5 space-y-1">
+                                <li>通过排除法缩小问题范围</li>
+                                <li>交叉验证各维度数据</li>
+                                <li>与业务部门确认近期变更</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="timeline-step">
+                        <div class="timeline-icon bg-primary-100 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400">
+                            <i class="fas fa-lightbulb"></i>
+                        </div>
+                        <h3 class="font-medium text-lg mb-2">4. 制定解决方案</h3>
+                        <div class="grid md:grid-cols-2 gap-4">
+                            <div class="bg-red-50 dark:bg-red-900/20 rounded-lg p-4">
+                                <h4 class="font-medium mb-2 flex items-center">
+                                    <i class="fas fa-first-aid mr-2 text-red-600 dark:text-red-400"></i>
+                                    短期措施
+                                </h4>
+                                <p class="text-sm">快速修复问题，减少损失</p>
+                            </div>
+                            <div class="bg-green-50 dark:bg-green-900/20 rounded-lg p-4">
+                                <h4 class="font-medium mb-2 flex items-center">
+                                    <i class="fas fa-shield-alt mr-2 text-green-600 dark:text-green-400"></i>
+                                    长期预防
+                                </h4>
+                                <p class="text-sm">建立监控机制，避免重复发生</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 案例分析 -->
+            <section class="mb-12">
+                <h2 class="text-2xl font-semibold mb-6 pb-2 border-b border-gray-200 dark:border-gray-700 flex items-center">
+                    <i class="fas fa-search-dollar mr-3 text-primary-500"></i>
+                    收入下降10%案例分析
+                </h2>
+                
+                <div class="anomaly-card bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm mb-6">
+                    <h3 class="font-medium text-lg mb-3">问题发现</h3>
+                    <div class="flex flex-col md:flex-row items-center mb-6">
+                        <div class="md:w-1/2 mb-4 md:mb-0">
+                            <p class="mb-2">
+                                某日公司收入<strong class="text-red-600 dark:text-red-400">突然下降10%</strong>，触发监控警报。
+                            </p>
+                            <p>
+                                对比数据：
+                                <span class="inline-block bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded text-sm ml-2">
+                                    <i class="fas fa-arrow-down text-red-500 mr-1"></i>
+                                    周同比：-10% (正常波动±3%)
+                                </span>
+                            </p>
+                        </div>
+                        <div class="md:w-1/2">
+                            <div class="bg-gray-100 dark:bg-gray-700 rounded-lg p-4 h-40 flex items-center justify-center">
+                                <div class="text-center">
+                                    <div class="inline-flex items-baseline font-medium">
+                                        <span class="text-2xl text-red-600 dark:text-red-400">-10%</span>
+                                        <span class="ml-1 text-gray-600 dark:text-gray-400 text-sm">日环比</span>
+                                    </div>
+                                    <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">异常波动时间：28日-29日</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <h3 class="font-medium text-lg mb-3 mt-6">分析过程</h3>
+                    <div class="grid md:grid-cols-3 gap-4 mb-6">
+                        <div class="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4">
+                            <h4 class="font-medium text-sm mb-2 flex items-center">
+                                <i class="fas fa-check-circle mr-2 text-blue-600 dark:text-blue-400"></i>
+                                技术排查
+                            </h4>
+                            <p class="text-xs">
+                                服务器状态正常，API响应无异常，排除技术问题
+                            </p>
+                        </div>
+                        <div class="bg-purple-50 dark:bg-purple-900/20 rounded-lg p-4">
+                            <h4 class="font-medium text-sm mb-2 flex items-center">
+                                <i class="fas fa-filter mr-2 text-purple-600 dark:text-purple-400"></i>
+                                渠道分析
+                            </h4>
+                            <p class="text-xs">
+                                百度渠道销售额<strong class="text-red-600 dark:text-red-400">下降20%</strong>，其他渠道正常
+                            </p>
+                        </div>
+                        <div class="bg-amber-50 dark:bg-amber-900/20 rounded-lg p-4">
+                            <h4 class="font-medium text-sm mb-2 flex items-center">
+                                <i class="fas fa-map-marker-alt mr-2 text-amber-600 dark:text-amber-400"></i>
+                                地区分析
+                            </h4>
+                            <p class="text-xs">
+                                陕西、浙江两省库存耗尽，销量<strong class="text-red-600 dark:text-red-400">大幅下滑</strong>
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <h3 class="font-medium text-lg mb-3">问题根源</h3>
+                    <div class="bg-red-50 dark:bg-red-900/20 rounded-lg p-4 mb-6">
+                        <div class="flex items-start">
+                            <div class="bg-red-100 dark:bg-red-900/30 rounded-lg p-3 mr-3">
+                                <i class="fas fa-exclamation-triangle text-red-600 dark:text-red-400"></i>
+                            </div>
+                            <div>
+                                <p class="font-medium">百度关键词投放计划断层</p>
+                                <p class="text-sm text-gray-600 dark:text-gray-400">
+                                    陕西和浙江地区关键词消耗完毕后，从28号到29号之间没有及时补充投放
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <h3 class="font-medium text-lg mb-3">解决方案</h3>
+                    <div class="grid md:grid-cols-2 gap-4">
+                        <div class="bg-green-50 dark:bg-green-900/20 rounded-lg p-4">
+                            <h4 class="font-medium mb-2 flex items-center">
+                                <i class="fas fa-bolt mr-2 text-green-600 dark:text-green-400"></i>
+                                立即措施
+                            </h4>
+                            <ul class="list-disc pl-5 text-sm space-y-1">
+                                <li>紧急补充关键词投放</li>
+                                <li>调配库存至缺货地区</li>
+                                <li>临时增加其他渠道曝光</li>
+                            </ul>
+                        </div>
+                        <div class="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4">
+                            <h4 class="font-medium mb-2 flex items-center">
+                                <i class="fas fa-shield-alt mr-2 text-blue-600 dark:text-blue-400"></i>
+                                长期优化
+                            </h4>
+                            <ul class="list-disc pl-5 text-sm space-y-1">
+                                <li>建立关键词库存预警机制</li>
+                                <li>设置自动补货阈值</li>
+                                <li>增加渠道投放冗余度</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 分析工具 -->
+            <section class="mb-12">
+                <h2 class="text-2xl font-semibold mb-6 pb-2 border-b border-gray-200 dark:border-gray-700 flex items-center">
+                    <i class="fas fa-tools mr-3 text-primary-500"></i>
+                    异常分析工具箱
+                </h2>
+                
+                <div class="grid md:grid-cols-3 gap-6">
+                    <div class="anomaly-card bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm">
+                        <h3 class="font-medium text-lg mb-3 flex items-center">
+                            <i class="fas fa-cubes mr-2 text-primary-500"></i>
+                            多维度拆解法
+                        </h3>
+                        <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
+                            从技术、业务、时间、用户等多个维度交叉分析，快速定位异常来源
+                        </p>
+                        <span class="inline-block bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400 text-xs px-2 py-1 rounded">
+                            适用场景：复杂异常初步筛查
+                        </span>
+                    </div>
+                    <div class="anomaly-card bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm">
+                        <h3 class="font-medium text-lg mb-3 flex items-center">
+                            <i class="fas fa-funnel-dollar mr-2 text-primary-500"></i>
+                            漏斗分析法
+                        </h3>
+                        <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
+                            分析转化流程各环节的异常波动，识别用户流失的关键节点
+                        </p>
+                        <span class="inline-block bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400 text-xs px-2 py-1 rounded">
+                            适用场景：转化率异常诊断
+                        </span>
+                    </div>
+                    <div class="anomaly-card bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm">
+                        <h3 class="font-medium text-lg mb-3 flex items-center">
+                            <i class="fas fa-project-diagram mr-2 text-primary-500"></i>
+                            公式拆解法
+                        </h3>
+                        <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
+                            将业务指标拆解为数学公式，逐项排查各组成部分的异常情况
+                        </p>
+                        <span class="inline-block bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400 text-xs px-2 py-1 rounded">
+                            适用场景：金额类指标异常
+                        </span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 最佳实践 -->
+            <section class="mb-12">
+                <h2 class="text-2xl font-semibold mb-6 pb-2 border-b border-gray-200 dark:border-gray-700 flex items-center">
+                    <i class="fas fa-medal mr-3 text-primary-500"></i>
+                    异常分析最佳实践
+                </h2>
+                
+                <div class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm">
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div>
+                            <h3 class="font-medium text-lg mb-3 flex items-center">
+                                <i class="fas fa-check-circle mr-2 text-green-600 dark:text-green-400"></i>
+                                该做的
+                            </h3>
+                            <ul class="list-disc pl-5 space-y-3">
+                                <li>
+                                    <strong>建立基线数据</strong>
+                                    <p class="text-sm text-gray-600 dark:text-gray-400">了解业务正常波动范围，设置合理阈值</p>
+                                </li>
+                                <li>
+                                    <strong>多维监控体系</strong>
+                                    <p class="text-sm text-gray-600 dark:text-gray-400">从技术、业务等多角度设置监控指标</p>
+                                </li>
+                                <li>
+                                    <strong>标准化分析流程</strong>
+                                    <p class="text-sm text-gray-600 dark:text-gray-400">形成可复用的异常分析SOP</p>
+                                </li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h3 class="font-medium text-lg mb-3 flex items-center">
+                                <i class="fas fa-times-circle mr-2 text-red-600 dark:text-red-400"></i>
+                                不该做的
+                            </h3>
+                            <ul class="list-disc pl-5 space-y-3">
+                                <li>
+                                    <strong>仅看表面数据</strong>
+                                    <p class="text-sm text-gray-600 dark:text-gray-400">不深入分析就下结论</p>
+                                </li>
+                                <li>
+                                    <strong>忽视业务背景</strong>
+                                    <p class="text-sm text-gray-600 dark:text-gray-400">不了解业务变更就进行分析</p>
+                                </li>
+                                <li>
+                                    <strong>不记录解决方案</strong>
+                                    <p class="text-sm text-gray-600 dark:text-gray-400">同样问题反复出现</p>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- 总结区块 -->
+        <div class="mt-12 bg-primary-50 dark:bg-primary-900/20 rounded-xl p-6 border border-primary-200 dark:border-primary-800 animate-fade-in-up">
+            <h3 class="text-xl font-semibold mb-3 flex items-center">
+                <i class="fas fa-check-circle mr-2 text-primary-600 dark:text-primary-400"></i>
+                异常波动处理关键点
+            </h3>
+            <div class="grid md:grid-cols-2 gap-4">
+                <div class="flex items-start">
+                    <i class="fas fa-check text-primary-500 mt-1 mr-2"></i>
+                    <span>快速响应与深入分析同样重要</span>
+                </div>
+                <div class="flex items-start">
+                    <i class="fas fa-check text-primary-500 mt-1 mr-2"></i>
+                    <span>多维度交叉验证避免误判</span>
+                </div>
+                <div class="flex items-start">
+                    <i class="fas fa-check text-primary-500 mt-1 mr-2"></i>
+                    <span>技术排查与业务分析相结合</span>
+                </div>
+                <div class="flex items-start">
+                    <i class="fas fa-check text-primary-500 mt-1 mr-2"></i>
+                    <span>短期修复与长期预防并重</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 页脚 -->
+        <footer class="mt-12 pt-6 border-t border-gray-200 dark:border-gray-800 text-sm text-gray-500 dark:text-gray-400 text-center">
+            <p>© 2025 数据分析方法系列 | 数据异常波动处理解析</p>
+        </footer>
+    </div>
+
+    <script>
+        // 明暗模式切换
+        const themeToggle = document.getElementById('theme-toggle');
+        const html = document.documentElement;
+
+        if (localStorage.getItem('theme') === 'dark' || 
+            (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            html.classList.add('dark');
+        }
+
+        themeToggle.addEventListener('click', () => {
+            html.classList.toggle('dark');
+            localStorage.setItem('theme', html.classList.contains('dark') ? 'dark' : 'light');
+        });
+
+        // 滚动动画
+        const animateOnScroll = () => {
+            const elements = document.querySelectorAll('.animate-fade-in-up');
+            elements.forEach(el => {
+                const elementTop = el.getBoundingClientRect().top;
+                const windowHeight = window.innerHeight;
+                
+                if (elementTop < windowHeight - 100) {
+                    el.style.opacity = '1';
+                    el.style.transform = 'translateY(0)';
+                }
+            });
+        };
+
+        // 初始加载动画
+        document.addEventListener('DOMContentLoaded', () => {
+            const animatedElements = document.querySelectorAll('.animate-fade-in-up');
+            animatedElements.forEach(el => {
+                el.style.opacity = '0';
+                el.style.transform = 'translateY(20px)';
+                el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+            });
+
+            setTimeout(() => {
+                animateOnScroll();
+            }, 100);
+        });
+
+        window.addEventListener('scroll', animateOnScroll);
+
+        // 异常卡片点击效果
+        const anomalyCards = document.querySelectorAll('.anomaly-card');
+        anomalyCards.forEach(card => {
+            card.addEventListener('click', () => {
+                anomalyCards.forEach(c => c.classList.remove('ring-2', 'ring-primary-500'));
+                card.classList.add('ring-2', 'ring-primary-500');
+            });
+        });
+    </script>
+</body>
+</html>

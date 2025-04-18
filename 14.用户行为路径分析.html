@@ -1,0 +1,728 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>用户行为路径分析可视化解析</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            200: '#bae6fd',
+                            300: '#7dd3fc',
+                            400: '#38bdf8',
+                            500: '#0ea5e9',
+                            600: '#0284c7',
+                            700: '#0369a1',
+                            800: '#075985',
+                            900: '#0c4a6e',
+                        },
+                        path: {
+                            start: '#10b981',
+                            step: '#3b82f6',
+                            end: '#8b5cf6',
+                            drop: '#ef4444'
+                        }
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.5s ease-in-out',
+                        'fade-in-up': 'fadeInUp 0.6s ease-out',
+                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite'
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': { opacity: '0' },
+                            '100%': { opacity: '1' }
+                        },
+                        fadeInUp: {
+                            '0%': { 
+                                opacity: '0',
+                                transform: 'translateY(10px)'
+                            },
+                            '100%': { 
+                                opacity: '1',
+                                transform: 'translateY(0)'
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .path-card {
+            transition: all 0.3s ease;
+        }
+        .path-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+        .dark .path-card:hover {
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+        }
+        .path-line {
+            position: relative;
+            padding-left: 2rem;
+        }
+        .path-line:before {
+            content: "";
+            position: absolute;
+            left: 0.75rem;
+            top: 0;
+            height: 100%;
+            width: 2px;
+            background: linear-gradient(to bottom, #38bdf8, #8b5cf6);
+        }
+        .path-dot {
+            position: absolute;
+            left: 0;
+            width: 1.5rem;
+            height: 1.5rem;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .user-path {
+            display: flex;
+            overflow-x: auto;
+            padding: 1rem 0;
+            scrollbar-width: thin;
+        }
+        .user-path::-webkit-scrollbar {
+            height: 6px;
+        }
+        .user-path::-webkit-scrollbar-thumb {
+            background-color: rgba(156, 163, 175, 0.5);
+            border-radius: 3px;
+        }
+        .path-step {
+            flex: 0 0 auto;
+            width: 120px;
+            margin-right: 0.5rem;
+            position: relative;
+        }
+        .path-step:after {
+            content: "→";
+            position: absolute;
+            right: -0.5rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #94a3b8;
+        }
+        .path-step:last-child:after {
+            display: none;
+        }
+        .sankey-link {
+            opacity: 0.5;
+            transition: opacity 0.3s ease;
+        }
+        .sankey-link:hover {
+            opacity: 0.9;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 dark:bg-gray-900 dark:text-gray-200 transition-colors duration-300 min-h-screen">
+    <div class="container mx-auto px-4 py-8 max-w-4xl">
+        <!-- 头部区域 -->
+        <header class="mb-12 animate-fade-in">
+            <div class="flex justify-between items-center mb-6">
+                <h1 class="text-3xl md:text-4xl font-bold bg-gradient-to-r from-primary-600 to-primary-400 bg-clip-text text-transparent">
+                    用户行为路径分析
+                </h1>
+                <button id="theme-toggle" class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">
+                    <i class="fas fa-moon dark:hidden"></i>
+                    <i class="fas fa-sun hidden dark:inline"></i>
+                </button>
+            </div>
+            <p class="text-lg text-gray-600 dark:text-gray-400 animate-fade-in-up">
+                追踪用户旅程，优化关键路径，提升产品转化
+            </p>
+        </header>
+
+        <!-- 主要内容 -->
+        <main class="prose prose-lg dark:prose-invert max-w-none animate-fade-in-up">
+            <!-- 定义部分 -->
+            <section class="mb-12">
+                <h2 class="text-2xl font-semibold mb-6 pb-2 border-b border-gray-200 dark:border-gray-700 flex items-center">
+                    <i class="fas fa-road mr-3 text-primary-500"></i>
+                    什么是用户行为路径分析？
+                </h2>
+                
+                <div class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm mb-6">
+                    <p class="mb-4">
+                        <strong>用户行为路径分析</strong>追踪用户从起始事件到结束事件所经历的所有可能路径，通过分析步骤间的转换关系，识别高频路径和流失环节。
+                    </p>
+                    
+                    <div class="bg-gray-100 dark:bg-gray-700 rounded-lg p-4 mt-4">
+                        <div class="user-path">
+                            <div class="path-step">
+                                <div class="bg-path-start/20 text-path-start text-center py-2 px-3 rounded-lg text-sm">
+                                    启动APP
+                                </div>
+                            </div>
+                            <div class="path-step">
+                                <div class="bg-path-step/20 text-path-step text-center py-2 px-3 rounded-lg text-sm">
+                                    浏览首页
+                                </div>
+                            </div>
+                            <div class="path-step">
+                                <div class="bg-path-step/20 text-path-step text-center py-2 px-3 rounded-lg text-sm">
+                                    点击Banner
+                                </div>
+                            </div>
+                            <div class="path-step">
+                                <div class="bg-path-step/20 text-path-step text-center py-2 px-3 rounded-lg text-sm">
+                                    查看详情
+                                </div>
+                            </div>
+                            <div class="path-step">
+                                <div class="bg-path-end/20 text-path-end text-center py-2 px-3 rounded-lg text-sm">
+                                    完成购买
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="grid md:grid-cols-2 gap-6 mt-6">
+                        <div>
+                            <h3 class="font-medium mb-3 flex items-center">
+                                <i class="fas fa-bullseye mr-2 text-primary-500"></i>
+                                分析目标
+                            </h3>
+                            <ul class="list-disc pl-5 space-y-2">
+                                <li>还原真实用户行为特征</li>
+                                <li>识别高频路径和流失点</li>
+                                <li>发现预期外的用户行为</li>
+                                <li>比较不同路径转化效率</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h3 class="font-medium mb-3 flex items-center">
+                                <i class="fas fa-chart-line mr-2 text-primary-500"></i>
+                                核心价值
+                            </h3>
+                            <ul class="list-disc pl-5 space-y-2">
+                                <li>优化产品布局和用户体验</li>
+                                <li>提升关键转化率指标</li>
+                                <li>设计精准运营活动</li>
+                                <li>降低用户流失率</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 应用案例1：冥想APP -->
+            <section class="mb-12">
+                <h2 class="text-2xl font-semibold mb-6 pb-2 border-b border-gray-200 dark:border-gray-700 flex items-center">
+                    <i class="fas fa-spa mr-3 text-primary-500"></i>
+                    案例1：冥想APP课程优化
+                </h2>
+                
+                <div class="path-card bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm">
+                    <h3 class="font-medium text-lg mb-3">业务背景</h3>
+                    <div class="flex flex-col md:flex-row mb-6">
+                        <div class="md:w-1/2 mb-4 md:mb-0 md:pr-6">
+                            <p class="mb-4">
+                                冥想APP提供五大类课程：<strong>减压</strong>、<strong>情绪管理</strong>、<strong>个人成长</strong>、<strong>睡眠</strong>和<strong>专注</strong>，通过会员订阅变现。
+                            </p>
+                            <p>
+                                产品团队原以为<strong>减压和情绪管理</strong>课程会是用户最感兴趣的内容。
+                            </p>
+                        </div>
+                        <div class="md:w-1/2">
+                            <div class="bg-gray-100 dark:bg-gray-700 rounded-lg p-4">
+                                <div class="flex justify-between text-sm mb-2">
+                                    <span>课程类型</span>
+                                    <span>访问占比</span>
+                                </div>
+                                <div class="space-y-2">
+                                    <div>
+                                        <div class="flex justify-between mb-1">
+                                            <span>睡眠</span>
+                                            <span class="font-medium text-path-step">42%</span>
+                                        </div>
+                                        <div class="w-full bg-gray-300 dark:bg-gray-600 rounded-full h-2">
+                                            <div class="bg-path-step h-2 rounded-full" style="width: 42%"></div>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <div class="flex justify-between mb-1">
+                                            <span>减压</span>
+                                            <span>23%</span>
+                                        </div>
+                                        <div class="w-full bg-gray-300 dark:bg-gray-600 rounded-full h-2">
+                                            <div class="bg-gray-500 h-2 rounded-full" style="width: 23%"></div>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <div class="flex justify-between mb-1">
+                                            <span>情绪管理</span>
+                                            <span>18%</span>
+                                        </div>
+                                        <div class="w-full bg-gray-300 dark:bg-gray-600 rounded-full h-2">
+                                            <div class="bg-gray-500 h-2 rounded-full" style="width: 18%"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <h3 class="font-medium text-lg mb-3">路径分析发现</h3>
+                    <div class="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4 mb-6">
+                        <p>
+                            通过分析新用户首日行为路径发现，<strong>睡眠类课程</strong>的访问量远超其他课程，且从睡眠课程开始的用户留存率更高。
+                        </p>
+                    </div>
+                    
+                    <h3 class="font-medium text-lg mb-3">优化措施</h3>
+                    <div class="path-line mb-6 pl-8">
+                        <div class="path-dot bg-path-start text-white">
+                            <i class="fas fa-play"></i>
+                        </div>
+                        <div class="mb-6">
+                            <h4 class="font-medium mb-2">提升睡眠课程曝光</h4>
+                            <p class="text-sm text-gray-600 dark:text-gray-400">
+                                将睡眠课程置于首页最显眼位置，减少用户寻找成本
+                            </p>
+                        </div>
+                        
+                        <div class="path-dot bg-path-step text-white">
+                            <i class="fas fa-search"></i>
+                        </div>
+                        <div class="mb-6">
+                            <h4 class="font-medium mb-2">优化课程推荐逻辑</h4>
+                            <p class="text-sm text-gray-600 dark:text-gray-400">
+                                基于首访行为个性化推荐相关内容
+                            </p>
+                        </div>
+                        
+                        <div class="path-dot bg-path-end text-white">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-medium mb-2">业务成果</h4>
+                            <div class="grid grid-cols-3 gap-4 text-sm">
+                                <div class="bg-white dark:bg-gray-700 p-2 rounded text-center">
+                                    <p class="text-gray-500 dark:text-gray-400">次日留存</p>
+                                    <p class="font-bold text-green-600 dark:text-green-400">+15%</p>
+                                </div>
+                                <div class="bg-white dark:bg-gray-700 p-2 rounded text-center">
+                                    <p class="text-gray-500 dark:text-gray-400">日活跃用户</p>
+                                    <p class="font-bold text-green-600 dark:text-green-400">+17%</p>
+                                </div>
+                                <div class="bg-white dark:bg-gray-700 p-2 rounded text-center">
+                                    <p class="text-gray-500 dark:text-gray-400">付费转化</p>
+                                    <p class="font-bold text-green-600 dark:text-green-400">+20%</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-yellow-50 dark:bg-yellow-900/20 rounded-lg p-4">
+                        <h4 class="font-medium mb-2 flex items-center">
+                            <i class="fas fa-lightbulb mr-2 text-yellow-600 dark:text-yellow-400"></i>
+                            关键洞察
+                        </h4>
+                        <p class="text-sm">
+                            通过行为路径分析发现用户真实偏好与产品假设的差异，<strong>小调整带来大回报</strong>。
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 应用案例2：社交APP -->
+            <section class="mb-12">
+                <h2 class="text-2xl font-semibold mb-6 pb-2 border-b border-gray-200 dark:border-gray-700 flex items-center">
+                    <i class="fas fa-users mr-3 text-primary-500"></i>
+                    案例2：社交APP留存提升
+                </h2>
+                
+                <div class="path-card bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm">
+                    <h3 class="font-medium text-lg mb-3">问题发现</h3>
+                    <div class="bg-red-50 dark:bg-red-900/20 rounded-lg p-4 mb-6">
+                        <p>
+                            社交APP近期整体<strong>用户留存率明显下降</strong>，需要分析高价值用户行为特征，设计提升策略。
+                        </p>
+                    </div>
+                    
+                    <h3 class="font-medium text-lg mb-3">高留存用户路径分析</h3>
+                    <div class="bg-gray-100 dark:bg-gray-700 rounded-lg p-4 mb-6">
+                        <div class="user-path">
+                            <div class="path-step">
+                                <div class="bg-path-start/20 text-path-start text-center py-2 px-3 rounded-lg text-sm">
+                                    启动APP
+                                </div>
+                            </div>
+                            <div class="path-step">
+                                <div class="bg-path-step/20 text-path-step text-center py-2 px-3 rounded-lg text-sm">
+                                    浏览内容
+                                </div>
+                            </div>
+                            <div class="path-step">
+                                <div class="bg-path-step/20 text-path-step text-center py-2 px-3 rounded-lg text-sm">
+                                    关注博主
+                                </div>
+                            </div>
+                            <div class="path-step">
+                                <div class="bg-path-step/20 text-path-step text-center py-2 px-3 rounded-lg text-sm">
+                                    互动评论
+                                </div>
+                            </div>
+                            <div class="path-step">
+                                <div class="bg-path-end/20 text-path-end text-center py-2 px-3 rounded-lg text-sm">
+                                    再次访问
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="grid md:grid-cols-2 gap-4 mb-6">
+                        <div>
+                            <h4 class="font-medium mb-2">关键发现</h4>
+                            <ul class="list-disc pl-5 text-sm space-y-2">
+                                <li>70%+活跃用户<strong>每日打开APP≥3次</strong></li>
+                                <li>活跃用户<strong>关注博主比例</strong>显著高于非活跃用户</li>
+                                <li>高留存用户<strong>浏览-关注-互动</strong>路径明确</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h4 class="font-medium mb-2">对比分析</h4>
+                            <div class="bg-gray-100 dark:bg-gray-700 rounded-lg p-3 text-xs">
+                                <div class="flex justify-between mb-1">
+                                    <span>活跃用户关注率</span>
+                                    <span class="font-medium text-green-600 dark:text-green-400">58%</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span>非活跃用户关注率</span>
+                                    <span class="text-red-600 dark:text-red-400">12%</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <h3 class="font-medium text-lg mb-3">优化策略</h3>
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div class="bg-white dark:bg-gray-700 rounded-lg p-4 shadow border border-gray-200 dark:border-gray-600">
+                            <h4 class="font-medium mb-2 flex items-center">
+                                <i class="fas fa-bell mr-2 text-primary-500"></i>
+                                推送机制优化
+                            </h4>
+                            <ul class="list-disc pl-5 text-sm space-y-1">
+                                <li>A/B测试优化推送文案</li>
+                                <li>基于用户行为细分人群</li>
+                                <li>精准触达提升回访率</li>
+                            </ul>
+                        </div>
+                        <div class="bg-white dark:bg-gray-700 rounded-lg p-4 shadow border border-gray-200 dark:border-gray-600">
+                            <h4 class="font-medium mb-2 flex items-center">
+                                <i class="fas fa-user-plus mr-2 text-primary-500"></i>
+                                关注功能强化
+                            </h4>
+                            <ul class="list-disc pl-5 text-sm space-y-1">
+                                <li>浏览内容时智能推荐关注</li>
+                                <li>优化关注按钮显眼度</li>
+                                <li>关注后个性化内容推送</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-6 bg-green-50 dark:bg-green-900/20 rounded-lg p-4">
+                        <h4 class="font-medium mb-2 flex items-center">
+                            <i class="fas fa-chart-line mr-2 text-green-600 dark:text-green-400"></i>
+                            优化成果
+                        </h4>
+                        <p class="text-sm">
+                            实施优化后，30日用户留存率从<strong class="line-through">35%</strong>提升至<strong class="text-green-600 dark:text-green-400">48%</strong>，关注互动率提升2.3倍。
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 分析方法 -->
+            <section class="mb-12">
+                <h2 class="text-2xl font-semibold mb-6 pb-2 border-b border-gray-200 dark:border-gray-700 flex items-center">
+                    <i class="fas fa-flask mr-3 text-primary-500"></i>
+                    五种路径分析方法
+                </h2>
+                
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div class="path-card bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm">
+                        <div class="flex items-start mb-4">
+                            <span class="w-8 h-8 rounded-full bg-primary-500 text-white flex items-center justify-center mr-3 flex-shrink-0">1</span>
+                            <div>
+                                <h3 class="font-medium text-lg mb-1">关键路径优化</h3>
+                                <p class="text-sm text-gray-600 dark:text-gray-400">
+                                    分析从关键起点(如首页)到目标终点(如支付)的所有路径，识别最优转化路径
+                                </p>
+                            </div>
+                        </div>
+                        <div class="bg-gray-100 dark:bg-gray-700 rounded-lg p-3 text-xs">
+                            <div class="flex justify-between mb-1">
+                                <span>首页→活动页→购买</span>
+                                <span class="text-green-600 dark:text-green-400">转化率12%</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span>首页→搜索→购买</span>
+                                <span class="text-amber-600 dark:text-amber-400">转化率8%</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="path-card bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm">
+                        <div class="flex items-start mb-4">
+                            <span class="w-8 h-8 rounded-full bg-primary-500 text-white flex items-center justify-center mr-3 flex-shrink-0">2</span>
+                            <div>
+                                <h3 class="font-medium text-lg mb-1">用户特征路径</h3>
+                                <p class="text-sm text-gray-600 dark:text-gray-400">
+                                    比较不同用户群体(如新老用户、不同渠道)的行为路径差异
+                                </p>
+                            </div>
+                        </div>
+                        <div class="bg-gray-100 dark:bg-gray-700 rounded-lg p-3 text-xs">
+                            <div class="flex justify-between mb-1">
+                                <span>新用户路径</span>
+                                <span>首页→引导页→浏览</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span>老用户路径</span>
+                                <span>推送→详情页→购买</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="path-card bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm">
+                        <div class="flex items-start mb-4">
+                            <span class="w-8 h-8 rounded-full bg-primary-500 text-white flex items-center justify-center mr-3 flex-shrink-0">3</span>
+                            <div>
+                                <h3 class="font-medium text-lg mb-1">转化效率比较</h3>
+                                <p class="text-sm text-gray-600 dark:text-gray-400">
+                                    评估不同引流方式(banner/icon/内容)的付费转化效率
+                                </p>
+                            </div>
+                        </div>
+                        <div class="bg-gray-100 dark:bg-gray-700 rounded-lg p-3 text-xs">
+                            <div class="flex items-center mb-1">
+                                <span class="w-3 h-3 rounded-full bg-path-step mr-2"></span>
+                                <span>内容引流转化率最高</span>
+                            </div>
+                            <div class="flex items-center">
+                                <span class="w-3 h-3 rounded-full bg-amber-500 mr-2"></span>
+                                <span>Banner引流用户量最大</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="path-card bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm">
+                        <div class="flex items-start mb-4">
+                            <span class="w-8 h-8 rounded-full bg-primary-500 text-white flex items-center justify-center mr-3 flex-shrink-0">4</span>
+                            <div>
+                                <h3 class="font-medium text-lg mb-1">开放路径探索</h3>
+                                <p class="text-sm text-gray-600 dark:text-gray-400">
+                                    仅设定起点，观察用户自由流动，发现意外行为模式
+                                </p>
+                            </div>
+                        </div>
+                        <div class="bg-gray-100 dark:bg-gray-700 rounded-lg p-3 text-xs">
+                            <p class="italic">
+                                发现用户从商品页→比价工具→竞品的异常路径
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <div class="path-card bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm md:col-span-2">
+                        <div class="flex items-start mb-4">
+                            <span class="w-8 h-8 rounded-full bg-primary-500 text-white flex items-center justify-center mr-3 flex-shrink-0">5</span>
+                            <div>
+                                <h3 class="font-medium text-lg mb-1">流失原因诊断</h3>
+                                <p class="text-sm text-gray-600 dark:text-gray-400">
+                                    分析流失用户的异常路径，结合多维交叉分析定位问题
+                                </p>
+                            </div>
+                        </div>
+                        <div class="bg-gray-100 dark:bg-gray-700 rounded-lg p-3 text-xs">
+                            <div class="user-path">
+                                <div class="path-step">
+                                    <div class="bg-path-start/20 text-path-start text-center py-2 px-3 rounded-lg text-sm">
+                                        注册
+                                    </div>
+                                </div>
+                                <div class="path-step">
+                                    <div class="bg-path-step/20 text-path-step text-center py-2 px-3 rounded-lg text-sm">
+                                        浏览
+                                    </div>
+                                </div>
+                                <div class="path-step">
+                                    <div class="bg-path-drop/20 text-path-drop text-center py-2 px-3 rounded-lg text-sm">
+                                        权限申请
+                                    </div>
+                                </div>
+                                <div class="path-step">
+                                    <div class="bg-path-end/20 text-path-end text-center py-2 px-3 rounded-lg text-sm">
+                                        流失
+                                    </div>
+                                </div>
+                            </div>
+                            <p class="mt-2">
+                                发现<strong>权限申请环节</strong>是iOS用户流失主因，优化后留存提升22%
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 最佳实践 -->
+            <section class="mb-12">
+                <h2 class="text-2xl font-semibold mb-6 pb-2 border-b border-gray-200 dark:border-gray-700 flex items-center">
+                    <i class="fas fa-medal mr-3 text-primary-500"></i>
+                    路径分析最佳实践
+                </h2>
+                
+                <div class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm">
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div>
+                            <h3 class="font-medium text-lg mb-3 flex items-center">
+                                <i class="fas fa-check-circle mr-2 text-green-600 dark:text-green-400"></i>
+                                该做的
+                            </h3>
+                            <ul class="list-disc pl-5 space-y-3">
+                                <li>
+                                    <strong>结合业务目标定义关键路径</strong>
+                                    <p class="text-sm text-gray-600 dark:text-gray-400">明确分析起点和终点，聚焦核心业务场景</p>
+                                </li>
+                                <li>
+                                    <strong>关注路径间的转化率差异</strong>
+                                    <p class="text-sm text-gray-600 dark:text-gray-400">识别高效路径并分析可复制因素</p>
+                                </li>
+                                <li>
+                                    <strong>定期进行开放路径探索</strong>
+                                    <p class="text-sm text-gray-600 dark:text-gray-400">发现用户自发形成的新行为模式</p>
+                                </li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h3 class="font-medium text-lg mb-3 flex items-center">
+                                <i class="fas fa-times-circle mr-2 text-red-600 dark:text-red-400"></i>
+                                不该做的
+                            </h3>
+                            <ul class="list-disc pl-5 space-y-3">
+                                <li>
+                                    <strong>过度关注少数异常路径</strong>
+                                    <p class="text-sm text-gray-600 dark:text-gray-400">除非有明确业务价值，否则优先优化主流路径</p>
+                                </li>
+                                <li>
+                                    <strong>忽视用户群体差异</strong>
+                                    <p class="text-sm text-gray-600 dark:text-gray-400">不同用户群体可能具有完全不同的行为模式</p>
+                                </li>
+                                <li>
+                                    <strong>仅分析不行动</strong>
+                                    <p class="text-sm text-gray-600 dark:text-gray-400">分析结果必须转化为具体的优化措施</p>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- 总结区块 -->
+        <div class="mt-12 bg-primary-50 dark:bg-primary-900/20 rounded-xl p-6 border border-primary-200 dark:border-primary-800 animate-fade-in-up">
+            <h3 class="text-xl font-semibold mb-3 flex items-center">
+                <i class="fas fa-check-circle mr-2 text-primary-600 dark:text-primary-400"></i>
+                用户行为路径分析核心价值
+            </h3>
+            <div class="grid md:grid-cols-2 gap-4">
+                <div class="flex items-start">
+                    <i class="fas fa-check text-primary-500 mt-1 mr-2"></i>
+                    <span>揭示用户真实行为模式而非产品假设</span>
+                </div>
+                <div class="flex items-start">
+                    <i class="fas fa-check text-primary-500 mt-1 mr-2"></i>
+                    <span>识别高转化路径并规模化应用</span>
+                </div>
+                <div class="flex items-start">
+                    <i class="fas fa-check text-primary-500 mt-1 mr-2"></i>
+                    <span>精准定位流失环节并针对性优化</span>
+                </div>
+                <div class="flex items-start">
+                    <i class="fas fa-check text-primary-500 mt-1 mr-2"></i>
+                    <span>为产品迭代提供数据驱动的决策依据</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 页脚 -->
+        <footer class="mt-12 pt-6 border-t border-gray-200 dark:border-gray-800 text-sm text-gray-500 dark:text-gray-400 text-center">
+            <p>© 2023 用户行为分析系列 | 路径分析助力增长优化</p>
+        </footer>
+    </div>
+
+    <script>
+        // 明暗模式切换
+        const themeToggle = document.getElementById('theme-toggle');
+        const html = document.documentElement;
+
+        if (localStorage.getItem('theme') === 'dark' || 
+            (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            html.classList.add('dark');
+        }
+
+        themeToggle.addEventListener('click', () => {
+            html.classList.toggle('dark');
+            localStorage.setItem('theme', html.classList.contains('dark') ? 'dark' : 'light');
+        });
+
+        // 滚动动画
+        const animateOnScroll = () => {
+            const elements = document.querySelectorAll('.animate-fade-in-up');
+            elements.forEach(el => {
+                const elementTop = el.getBoundingClientRect().top;
+                const windowHeight = window.innerHeight;
+                
+                if (elementTop < windowHeight - 100) {
+                    el.style.opacity = '1';
+                    el.style.transform = 'translateY(0)';
+                }
+            });
+        };
+
+        // 初始加载动画
+        document.addEventListener('DOMContentLoaded', () => {
+            const animatedElements = document.querySelectorAll('.animate-fade-in-up');
+            animatedElements.forEach(el => {
+                el.style.opacity = '0';
+                el.style.transform = 'translateY(20px)';
+                el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+            });
+
+            setTimeout(() => {
+                animateOnScroll();
+            }, 100);
+        });
+
+        window.addEventListener('scroll', animateOnScroll);
+
+        // 用户路径动画
+        const pathSteps = document.querySelectorAll('.path-step');
+        pathSteps.forEach((step, index) => {
+            step.style.opacity = '0';
+            step.style.transform = 'translateY(10px)';
+            step.style.transition = `opacity 0.3s ease ${index * 0.1}s, transform 0.3s ease ${index * 0.1}s`;
+            
+            setTimeout(() => {
+                step.style.opacity = '1';
+                step.style.transform = 'translateY(0)';
+            }, 500 + index * 100);
+        });
+    </script>
+</body>
+</html>

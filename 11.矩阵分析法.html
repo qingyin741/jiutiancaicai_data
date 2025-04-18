@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>矩阵分析法可视化解析</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            200: '#bae6fd',
+                            300: '#7dd3fc',
+                            400: '#38bdf8',
+                            500: '#0ea5e9',
+                            600: '#0284c7',
+                            700: '#0369a1',
+                            800: '#075985',
+                            900: '#0c4a6e',
+                        },
+                        matrix: {
+                            star: '#f59e0b',
+                            cash: '#10b981',
+                            question: '#3b82f6',
+                            dog: '#ef4444'
+                        }
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.5s ease-in-out',
+                        'fade-in-up': 'fadeInUp 0.6s ease-out',
+                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite'
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': { opacity: '0' },
+                            '100%': { opacity: '1' }
+                        },
+                        fadeInUp: {
+                            '0%': { 
+                                opacity: '0',
+                                transform: 'translateY(10px)'
+                            },
+                            '100%': { 
+                                opacity: '1',
+                                transform: 'translateY(0)'
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .matrix-cell {
+            transition: all 0.3s ease;
+        }
+        .matrix-cell:hover {
+            transform: scale(1.03);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+        .dark .matrix-cell:hover {
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+        }
+        .matrix-axis {
+            position: relative;
+        }
+        .matrix-axis:after {
+            content: "";
+            position: absolute;
+            width: 0;
+            height: 0;
+            border-style: solid;
+        }
+        .x-axis:after {
+            right: -12px;
+            top: 50%;
+            transform: translateY(-50%);
+            border-width: 6px 0 6px 8px;
+            border-color: transparent transparent transparent currentColor;
+        }
+        .y-axis:after {
+            bottom: -12px;
+            left: 50%;
+            transform: translateX(-50%);
+            border-width: 8px 6px 0 6px;
+            border-color: currentColor transparent transparent transparent;
+        }
+        .quadrant-label {
+            position: absolute;
+            font-weight: bold;
+            opacity: 0.1;
+            z-index: 0;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 dark:bg-gray-900 dark:text-gray-200 transition-colors duration-300 min-h-screen">
+    <div class="container mx-auto px-4 py-8 max-w-4xl">
+        <!-- 头部区域 -->
+        <header class="mb-12 animate-fade-in">
+            <div class="flex justify-between items-center mb-6">
+                <h1 class="text-3xl md:text-4xl font-bold bg-gradient-to-r from-primary-600 to-primary-400 bg-clip-text text-transparent">
+                    矩阵分析法解析
+                </h1>
+                <button id="theme-toggle" class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">
+                    <i class="fas fa-moon dark:hidden"></i>
+                    <i class="fas fa-sun hidden dark:inline"></i>
+                </button>
+            </div>
+            <p class="text-lg text-gray-600 dark:text-gray-400 animate-fade-in-up">
+                通过二维矩阵交叉分析，实现业务问题的直观诊断
+            </p>
+        </header>
+
+        <!-- 主要内容 -->
+        <main class="prose prose-lg dark:prose-invert max-w-none animate-fade-in-up">
+            <!-- 定义部分 -->
+            <section class="mb-12">
+                <h2 class="text-2xl font-semibold mb-6 pb-2 border-b border-gray-200 dark:border-gray-700 flex items-center">
+                    <i class="fas fa-border-all mr-3 text-primary-500"></i>
+                    什么是矩阵分析法？
+                </h2>
+                <div class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow mb-6">
+                    <p class="mb-4">
+                        <strong>矩阵分析法</strong>通过两个指标的交叉组合形成四个象限的分析矩阵，将复杂业务问题简化为直观的二维可视化分析。
+                    </p>
+                    <div class="grid md:grid-cols-2 gap-6 mt-6">
+                        <div>
+                            <h3 class="font-medium mb-3 flex items-center">
+                                <i class="fas fa-check-circle mr-2 text-primary-500"></i>
+                                核心特点
+                            </h3>
+                            <ul class="list-disc pl-5 space-y-2">
+                                <li>二维交叉分析（X轴和Y轴）</li>
+                                <li>形成四个决策象限</li>
+                                <li>指标间需有业务相关性</li>
+                                <li>直观展示业务状态</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h3 class="font-medium mb-3 flex items-center">
+                                <i class="fas fa-lightbulb mr-2 text-primary-500"></i>
+                                适用场景
+                            </h3>
+                            <ul class="list-disc pl-5 space-y-2">
+                                <li>产品组合分析</li>
+                                <li>资源优先级分配</li>
+                                <li>绩效评估</li>
+                                <li>战略决策支持</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 波士顿矩阵 -->
+            <section class="mb-12">
+                <h2 class="text-2xl font-semibold mb-6 pb-2 border-b border-gray-200 dark:border-gray-700 flex items-center">
+                    <i class="fas fa-chart-pie mr-3 text-primary-500"></i>
+                    波士顿矩阵案例
+                </h2>
+                
+                <div class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm mb-6">
+                    <div class="flex flex-col md:flex-row">
+                        <div class="md:w-1/2 mb-6 md:mb-0 md:pr-6">
+                            <h3 class="font-medium text-lg mb-3">分析维度</h3>
+                            <div class="space-y-4">
+                                <div class="flex items-start">
+                                    <div class="bg-primary-100 dark:bg-primary-900/30 rounded-lg p-3 mr-3">
+                                        <i class="fas fa-arrow-up text-primary-600 dark:text-primary-400"></i>
+                                    </div>
+                                    <div>
+                                        <p class="font-medium">Y轴：市场增长率</p>
+                                        <p class="text-sm text-gray-600 dark:text-gray-400">反映市场发展潜力</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-start">
+                                    <div class="bg-primary-100 dark:bg-primary-900/30 rounded-lg p-3 mr-3">
+                                        <i class="fas fa-chart-bar text-primary-600 dark:text-primary-400"></i>
+                                    </div>
+                                    <div>
+                                        <p class="font-medium">X轴：市场占有率</p>
+                                        <p class="text-sm text-gray-600 dark:text-gray-400">反映市场主导地位</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="md:w-1/2">
+                            <h3 class="font-medium text-lg mb-3">矩阵图示</h3>
+                            <div class="relative h-64 bg-gray-100 dark:bg-gray-700 rounded-lg overflow-hidden">
+                                <!-- 象限标签 -->
+                                <span class="quadrant-label text-matrix-star text-4xl top-1 right-1">明星</span>
+                                <span class="quadrant-label text-matrix-cash text-4xl top-1 left-1">现金牛</span>
+                                <span class="quadrant-label text-matrix-question text-4xl bottom-1 right-1">问题</span>
+                                <span class="quadrant-label text-matrix-dog text-4xl bottom-1 left-1">瘦狗</span>
+                                
+                                <!-- 坐标轴 -->
+                                <div class="absolute left-1/2 top-0 bottom-0 w-px bg-gray-400"></div>
+                                <div class="absolute top-1/2 left-0 right-0 h-px bg-gray-400"></div>
+                                
+                                <!-- 轴标签 -->
+                                <div class="absolute left-1/2 bottom-2 transform -translate-x-1/2 matrix-axis x-axis">
+                                    市场占有率
+                                </div>
+                                <div class="absolute top-1/2 left-2 transform -translate-y-1/2 rotate-90 matrix-axis y-axis">
+                                    市场增长率
+                                </div>
+                                
+                                <!-- 示例点 -->
+                                <div class="absolute w-16 h-16 rounded-full bg-matrix-star/20 border-2 border-matrix-star flex items-center justify-center" 
+                                     style="right: 20%; top: 20%">
+                                    <div class="w-3 h-3 rounded-full bg-matrix-star"></div>
+                                </div>
+                                <div class="absolute w-16 h-16 rounded-full bg-matrix-cash/20 border-2 border-matrix-cash flex items-center justify-center" 
+                                     style="left: 20%; top: 20%">
+                                    <div class="w-3 h-3 rounded-full bg-matrix-cash"></div>
+                                </div>
+                                <div class="absolute w-16 h-16 rounded-full bg-matrix-question/20 border-2 border-matrix-question flex items-center justify-center" 
+                                     style="right: 20%; bottom: 20%">
+                                    <div class="w-3 h-3 rounded-full bg-matrix-question"></div>
+                                </div>
+                                <div class="absolute w-16 h-16 rounded-full bg-matrix-dog/20 border-2 border-matrix-dog flex items-center justify-center" 
+                                     style="left: 20%; bottom: 20%">
+                                    <div class="w-3 h-3 rounded-full bg-matrix-dog"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 四象限解释 -->
+                <div class="grid md:grid-cols-2 gap-6">
+                    <!-- 明星产品 -->
+                    <div class="matrix-cell bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border-t-4 border-matrix-star">
+                        <h3 class="font-medium text-lg mb-2 flex items-center">
+                            <span class="w-6 h-6 rounded-full bg-matrix-star text-white flex items-center justify-center mr-2">★</span>
+                            明星产品
+                        </h3>
+                        <p class="text-sm text-gray-600 dark:text-gray-400 mb-3">
+                            高市场占有率 + 高市场增长率
+                        </p>
+                        <ul class="list-disc pl-5 text-sm space-y-1">
+                            <li>市场份额高且增长迅速</li>
+                            <li>需要持续投资维持优势</li>
+                            <li>未来利润的主要来源</li>
+                            <li>示例：新兴市场领导品牌</li>
+                        </ul>
+                    </div>
+                    
+                    <!-- 现金牛产品 -->
+                    <div class="matrix-cell bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border-t-4 border-matrix-cash">
+                        <h3 class="font-medium text-lg mb-2 flex items-center">
+                            <i class="fas fa-coins mr-2 text-matrix-cash"></i>
+                            现金牛产品
+                        </h3>
+                        <p class="text-sm text-gray-600 dark:text-gray-400 mb-3">
+                            高市场占有率 + 低市场增长率
+                        </p>
+                        <ul class="list-disc pl-5 text-sm space-y-1">
+                            <li>市场成熟稳定</li>
+                            <li>产生大量现金流</li>
+                            <li>需要较少投资</li>
+                            <li>示例：成熟市场主导产品</li>
+                        </ul>
+                    </div>
+                    
+                    <!-- 问题产品 -->
+                    <div class="matrix-cell bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border-t-4 border-matrix-question">
+                        <h3 class="font-medium text-lg mb-2 flex items-center">
+                            <i class="fas fa-question-circle mr-2 text-matrix-question"></i>
+                            问题产品
+                        </h3>
+                        <p class="text-sm text-gray-600 dark:text-gray-400 mb-3">
+                            低市场占有率 + 高市场增长率
+                        </p>
+                        <ul class="list-disc pl-5 text-sm space-y-1">
+                            <li>高风险高回报</li>
+                            <li>需要战略决策</li>
+                            <li>可能转为明星或瘦狗</li>
+                            <li>示例：创新但未验证的产品</li>
+                        </ul>
+                    </div>
+                    
+                    <!-- 瘦狗产品 -->
+                    <div class="matrix-cell bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border-t-4 border-matrix-dog">
+                        <h3 class="font-medium text-lg mb-2 flex items-center">
+                            <i class="fas fa-dog mr-2 text-matrix-dog"></i>
+                            瘦狗产品
+                        </h3>
+                        <p class="text-sm text-gray-600 dark:text-gray-400 mb-3">
+                            低市场占有率 + 低市场增长率
+                        </p>
+                        <ul class="list-disc pl-5 text-sm space-y-1">
+                            <li>市场潜力有限</li>
+                            <li>消耗企业资源</li>
+                            <li>建议放弃或重组</li>
+                            <li>示例：衰退市场边缘产品</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 时间管理矩阵 -->
+            <section class="mb-12">
+                <h2 class="text-2xl font-semibold mb-6 pb-2 border-b border-gray-200 dark:border-gray-700 flex items-center">
+                    <i class="fas fa-clock mr-3 text-primary-500"></i>
+                    时间管理矩阵
+                </h2>
+                
+                <div class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm">
+                    <div class="flex flex-col md:flex-row">
+                        <div class="md:w-1/3 mb-6 md:mb-0 md:pr-6">
+                            <h3 class="font-medium text-lg mb-3">分析维度</h3>
+                            <div class="space-y-4">
+                                <div class="flex items-start">
+                                    <div class="bg-primary-100 dark:bg-primary-900/30 rounded-lg p-3 mr-3">
+                                        <i class="fas fa-bullseye text-primary-600 dark:text-primary-400"></i>
+                                    </div>
+                                    <div>
+                                        <p class="font-medium">Y轴：重要性</p>
+                                        <p class="text-sm text-gray-600 dark:text-gray-400">对长期目标的影响</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-start">
+                                    <div class="bg-primary-100 dark:bg-primary-900/30 rounded-lg p-3 mr-3">
+                                        <i class="fas fa-running text-primary-600 dark:text-primary-400"></i>
+                                    </div>
+                                    <div>
+                                        <p class="font-medium">X轴：紧急性</p>
+                                        <p class="text-sm text-gray-600 dark:text-gray-400">时间压力的程度</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="md:w-2/3">
+                            <div class="grid grid-cols-2 gap-4">
+                                <!-- 第一象限 -->
+                                <div class="matrix-cell bg-red-50 dark:bg-red-900/20 rounded-lg p-4 border-l-4 border-red-500">
+                                    <h4 class="font-medium mb-2">重要且紧急</h4>
+                                    <p class="text-sm mb-2">危机、截止期限迫近的任务</p>
+                                    <p class="text-xs font-medium text-red-600 dark:text-red-400">立即处理</p>
+                                </div>
+                                
+                                <!-- 第二象限 -->
+                                <div class="matrix-cell bg-green-50 dark:bg-green-900/20 rounded-lg p-4 border-l-4 border-green-500">
+                                    <h4 class="font-medium mb-2">重要不紧急</h4>
+                                    <p class="text-sm mb-2">规划、关系建立、预防工作</p>
+                                    <p class="text-xs font-medium text-green-600 dark:text-green-400">计划执行</p>
+                                </div>
+                                
+                                <!-- 第三象限 -->
+                                <div class="matrix-cell bg-yellow-50 dark:bg-yellow-900/20 rounded-lg p-4 border-l-4 border-yellow-500">
+                                    <h4 class="font-medium mb-2">紧急不重要</h4>
+                                    <p class="text-sm mb-2">干扰、某些会议、邮件</p>
+                                    <p class="text-xs font-medium text-yellow-600 dark:text-yellow-400">委派处理</p>
+                                </div>
+                                
+                                <!-- 第四象限 -->
+                                <div class="matrix-cell bg-gray-100 dark:bg-gray-700 rounded-lg p-4 border-l-4 border-gray-500">
+                                    <h4 class="font-medium mb-2">不紧急不重要</h4>
+                                    <p class="text-sm mb-2">琐事、消遣活动</p>
+                                    <p class="text-xs font-medium text-gray-600 dark:text-gray-400">尽量避免</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 销售能力矩阵 -->
+            <section class="mb-12">
+                <h2 class="text-2xl font-semibold mb-6 pb-2 border-b border-gray-200 dark:border-gray-700 flex items-center">
+                    <i class="fas fa-user-tie mr-3 text-primary-500"></i>
+                    销售能力矩阵
+                </h2>
+                
+                <div class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm">
+                    <div class="flex flex-col md:flex-row mb-6">
+                        <div class="md:w-1/3 mb-6 md:mb-0 md:pr-6">
+                            <h3 class="font-medium text-lg mb-3">分析维度</h3>
+                            <div class="space-y-4">
+                                <div class="flex items-start">
+                                    <div class="bg-primary-100 dark:bg-primary-900/30 rounded-lg p-3 mr-3">
+                                        <i class="fas fa-dollar-sign text-primary-600 dark:text-primary-400"></i>
+                                    </div>
+                                    <div>
+                                        <p class="font-medium">Y轴：销售业绩</p>
+                                        <p class="text-sm text-gray-600 dark:text-gray-400">销售额/利润贡献</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-start">
+                                    <div class="bg-primary-100 dark:bg-primary-900/30 rounded-lg p-3 mr-3">
+                                        <i class="fas fa-users text-primary-600 dark:text-primary-400"></i>
+                                    </div>
+                                    <div>
+                                        <p class="font-medium">X轴：客户数量</p>
+                                        <p class="text-sm text-gray-600 dark:text-gray-400">维护的客户总数</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="md:w-2/3">
+                            <div class="relative h-64 bg-gray-100 dark:bg-gray-700 rounded-lg overflow-hidden">
+                                <!-- 象限标签 -->
+                                <span class="quadrant-label text-green-600 text-3xl top-1 right-1">均衡型</span>
+                                <span class="quadrant-label text-blue-600 text-3xl top-1 left-1">大客户型</span>
+                                <span class="quadrant-label text-amber-600 text-3xl bottom-1 right-1">小摊型</span>
+                                <span class="quadrant-label text-red-600 text-3xl bottom-1 left-1">待改进</span>
+                                
+                                <!-- 坐标轴 -->
+                                <div class="absolute left-1/2 top-0 bottom-0 w-px bg-gray-400"></div>
+                                <div class="absolute top-1/2 left-0 right-0 h-px bg-gray-400"></div>
+                                
+                                <!-- 轴标签 -->
+                                <div class="absolute left-1/2 bottom-2 transform -translate-x-1/2 matrix-axis x-axis">
+                                    客户数量
+                                </div>
+                                <div class="absolute top-1/2 left-2 transform -translate-y-1/2 rotate-90 matrix-axis y-axis">
+                                    销售业绩
+                                </div>
+                                
+                                <!-- 示例点 -->
+                                <div class="absolute w-16 h-16 rounded-full bg-green-100/50 border-2 border-green-500 flex items-center justify-center" 
+                                     style="right: 20%; top: 20%">
+                                    <div class="text-xs font-bold text-green-600 text-center">均衡型<br>维持</div>
+                                </div>
+                                <div class="absolute w-16 h-16 rounded-full bg-blue-100/50 border-2 border-blue-500 flex items-center justify-center" 
+                                     style="left: 20%; top: 20%">
+                                    <div class="text-xs font-bold text-blue-600 text-center">大客户型<br>深耕</div>
+                                </div>
+                                <div class="absolute w-16 h-16 rounded-full bg-amber-100/50 border-2 border-amber-500 flex items-center justify-center" 
+                                     style="right: 20%; bottom: 20%">
+                                    <div class="text-xs font-bold text-amber-600 text-center">小摊型<br>提升</div>
+                                </div>
+                                <div class="absolute w-16 h-16 rounded-full bg-red-100/50 border-2 border-red-500 flex items-center justify-center" 
+                                     style="left: 20%; bottom: 20%">
+                                    <div class="text-xs font-bold text-red-600 text-center">待改进<br>调整</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div>
+                            <h3 class="font-medium mb-3">销售策略建议</h3>
+                            <ul class="list-disc pl-5 space-y-2">
+                                <li><strong>均衡型</strong>：保持现有策略，优化效率</li>
+                                <li><strong>大客户型</strong>：加强客户关系管理，防止流失</li>
+                                <li><strong>小摊型</strong>：提升单客户价值，交叉销售</li>
+                                <li><strong>待改进型</strong>：重新评估销售方法或客户定位</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h3 class="font-medium mb-3">关键洞察</h3>
+                            <ul class="list-disc pl-5 space-y-2">
+                                <li>对角线分析揭示改进路径</li>
+                                <li>客户数量≠销售业绩</li>
+                                <li>需平衡客户广度与深度</li>
+                                <li>销售策略应因人而异</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 方法论总结 -->
+            <section class="mb-12">
+                <h2 class="text-2xl font-semibold mb-6 pb-2 border-b border-gray-200 dark:border-gray-700 flex items-center">
+                    <i class="fas fa-clipboard-list mr-3 text-primary-500"></i>
+                    矩阵分析法实施步骤
+                </h2>
+                
+                <div class="grid md:grid-cols-4 gap-6">
+                    <div class="matrix-cell bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border-t-4 border-primary-500">
+                        <div class="w-12 h-12 rounded-full bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center text-primary-600 dark:text-primary-400 mb-4">
+                            <span class="text-xl font-bold">1</span>
+                        </div>
+                        <h3 class="font-medium text-lg mb-2">选择指标</h3>
+                        <p class="text-sm text-gray-600 dark:text-gray-400">
+                            确定两个有业务相关性的关键指标
+                        </p>
+                    </div>
+                    <div class="matrix-cell bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border-t-4 border-primary-500">
+                        <div class="w-12 h-12 rounded-full bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center text-primary-600 dark:text-primary-400 mb-4">
+                            <span class="text-xl font-bold">2</span>
+                        </div>
+                        <h3 class="font-medium text-lg mb-2">划分象限</h3>
+                        <p class="text-sm text-gray-600 dark:text-gray-400">
+                            设定高低阈值，形成四个分析象限
+                        </p>
+                    </div>
+                    <div class="matrix-cell bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border-t-4 border-primary-500">
+                        <div class="w-12 h-12 rounded-full bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center text-primary-600 dark:text-primary-400 mb-4">
+                            <span class="text-xl font-bold">3</span>
+                        </div>
+                        <h3 class="font-medium text-lg mb-2">数据映射</h3>
+                        <p class="text-sm text-gray-600 dark:text-gray-400">
+                            将业务元素定位到相应象限
+                        </p>
+                    </div>
+                    <div class="matrix-cell bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border-t-4 border-primary-500">
+                        <div class="w-12 h-12 rounded-full bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center text-primary-600 dark:text-primary-400 mb-4">
+                            <span class="text-xl font-bold">4</span>
+                        </div>
+                        <h3 class="font-medium text-lg mb-2">制定策略</h3>
+                        <p class="text-sm text-gray-600 dark:text-gray-400">
+                            针对不同象限制定差异化策略
+                        </p>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- 总结区块 -->
+        <div class="mt-12 bg-primary-50 dark:bg-primary-900/20 rounded-xl p-6 border border-primary-200 dark:border-primary-800 animate-fade-in-up">
+            <h3 class="text-xl font-semibold mb-3 flex items-center">
+                <i class="fas fa-check-circle mr-2 text-primary-600 dark:text-primary-400"></i>
+                矩阵分析法核心价值
+            </h3>
+            <div class="grid md:grid-cols-2 gap-4">
+                <div class="flex items-start">
+                    <i class="fas fa-check text-primary-500 mt-1 mr-2"></i>
+                    <span>将复杂业务问题简化为二维可视化分析</span>
+                </div>
+                <div class="flex items-start">
+                    <i class="fas fa-check text-primary-500 mt-1 mr-2"></i>
+                    <span>直观展示业务元素的状态和优先级</span>
+                </div>
+                <div class="flex items-start">
+                    <i class="fas fa-check text-primary-500 mt-1 mr-2"></i>
+                    <span>揭示指标间的关联性和平衡关系</span>
+                </div>
+                <div class="flex items-start">
+                    <i class="fas fa-check text-primary-500 mt-1 mr-2"></i>
+                    <span>为资源分配提供清晰决策依据</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 页脚 -->
+        <footer class="mt-12 pt-6 border-t border-gray-200 dark:border-gray-800 text-sm text-gray-500 dark:text-gray-400 text-center">
+            <p>© 2023 数据分析方法系列 | 矩阵分析法可视化解析</p>
+        </footer>
+    </div>
+
+    <script>
+        // 明暗模式切换
+        const themeToggle = document.getElementById('theme-toggle');
+        const html = document.documentElement;
+
+        if (localStorage.getItem('theme') === 'dark' || 
+            (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            html.classList.add('dark');
+        }
+
+        themeToggle.addEventListener('click', () => {
+            html.classList.toggle('dark');
+            localStorage.setItem('theme', html.classList.contains('dark') ? 'dark' : 'light');
+        });
+
+        // 滚动动画
+        const animateOnScroll = () => {
+            const elements = document.querySelectorAll('.animate-fade-in-up');
+            elements.forEach(el => {
+                const elementTop = el.getBoundingClientRect().top;
+                const windowHeight = window.innerHeight;
+                
+                if (elementTop < windowHeight - 100) {
+                    el.style.opacity = '1';
+                    el.style.transform = 'translateY(0)';
+                }
+            });
+        };
+
+        // 初始加载动画
+        document.addEventListener('DOMContentLoaded', () => {
+            const animatedElements = document.querySelectorAll('.animate-fade-in-up');
+            animatedElements.forEach(el => {
+                el.style.opacity = '0';
+                el.style.transform = 'translateY(20px)';
+                el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+            });
+
+            setTimeout(() => {
+                animateOnScroll();
+            }, 100);
+        });
+
+        window.addEventListener('scroll', animateOnScroll);
+
+        // 矩阵单元格点击效果
+        const matrixCells = document.querySelectorAll('.matrix-cell');
+        matrixCells.forEach(cell => {
+            cell.addEventListener('click', () => {
+                matrixCells.forEach(c => c.classList.remove('ring-2', 'ring-primary-500'));
+                cell.classList.add('ring-2', 'ring-primary-500');
+            });
+        });
+    </script>
+</body>
+</html>

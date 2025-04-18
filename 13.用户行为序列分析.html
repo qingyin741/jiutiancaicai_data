@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>用户行为分析课程</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                fontFamily: {
+                    sans: ['Noto Sans SC', 'sans-serif'],
+                },
+                extend: {
+                    colors: {
+                        primary: {
+                            light: '#3B82F6',
+                            dark: '#60A5FA',
+                        },
+                        secondary: {
+                            light: '#10B981',
+                            dark: '#34D399',
+                        },
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .content-block {
+            transition: all 0.2s ease;
+        }
+        .content-block:hover {
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        .dark .content-block:hover {
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
+        }
+        .toggle-checkbox:checked {
+            right: 0;
+            border-color: #68D391;
+        }
+        .toggle-checkbox:checked + .toggle-label {
+            background-color: #68D391;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 dark:bg-gray-900 dark:text-gray-200 font-sans transition-colors duration-200">
+    <div class="min-h-screen pb-16">
+        <!-- 导航栏 -->
+        <nav class="bg-white dark:bg-gray-800 shadow-sm sticky top-0 z-10">
+            <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex justify-between h-16">
+                    <div class="flex items-center">
+                        <i class="fas fa-chart-line text-primary-light dark:text-primary-dark mr-2"></i>
+                        <span class="text-xl font-semibold">用户行为分析</span>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        <button id="theme-toggle" type="button" class="text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg p-2">
+                            <i class="fas fa-moon dark:hidden"></i>
+                            <i class="fas fa-sun hidden dark:block"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <!-- 主要内容 -->
+        <main class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <!-- 课程标题 -->
+            <div class="text-center mb-12 fade-in">
+                <h1 class="text-3xl md:text-4xl font-bold mb-4">用户行为分析课程</h1>
+                <p class="text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">深入理解互联网时代的用户行为分析方法与应用场景</p>
+            </div>
+
+            <!-- 目录导航 -->
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 mb-8 content-block fade-in">
+                <h2 class="text-xl font-semibold mb-4 flex items-center">
+                    <i class="fas fa-list-ul text-primary-light dark:text-primary-dark mr-2"></i>
+                    课程目录
+                </h2>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    <a href="#section-intro" class="flex items-center text-gray-700 dark:text-gray-300 hover:text-primary-light dark:hover:text-primary-dark transition-colors">
+                        <i class="fas fa-play-circle mr-2"></i>
+                        <span>课程介绍</span>
+                    </a>
+                    <a href="#section-event-model" class="flex items-center text-gray-700 dark:text-gray-300 hover:text-primary-light dark:hover:text-primary-dark transition-colors">
+                        <i class="fas fa-cube mr-2"></i>
+                        <span>事件模型</span>
+                    </a>
+                    <a href="#section-sequence-analysis" class="flex items-center text-gray-700 dark:text-gray-300 hover:text-primary-light dark:hover:text-primary-dark transition-colors">
+                        <i class="fas fa-project-diagram mr-2"></i>
+                        <span>行为序列分析</span>
+                    </a>
+                    <a href="#section-case-study" class="flex items-center text-gray-700 dark:text-gray-300 hover:text-primary-light dark:hover:text-primary-dark transition-colors">
+                        <i class="fas fa-briefcase mr-2"></i>
+                        <span>案例分析</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- 课程介绍 -->
+            <section id="section-intro" class="mb-12 fade-in">
+                <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 content-block">
+                    <h2 class="text-2xl font-semibold mb-4 flex items-center">
+                        <i class="fas fa-play-circle text-primary-light dark:text-primary-dark mr-2"></i>
+                        课程介绍
+                    </h2>
+                    <div class="space-y-4">
+                        <p>在互联网时代，"<strong>流量为王</strong>"是一个普遍观念。为什么说流量为王呢？因为流量实质上等同于金钱。无论是企业还是个人想要盈利，都必须获取充足的流量。</p>
+                        
+                        <blockquote class="border-l-4 border-primary-light dark:border-primary-dark pl-4 py-1 my-2 bg-gray-50 dark:bg-gray-700 italic">
+                            "流量的背后实质是用户，因此用户构成了我们当前互联网商业模式的基础。"
+                        </blockquote>
+                        
+                        <p>在互联网时代，构建一个有效的商业模式至关重要。所谓有效的商业模式，指的是能够实现盈利的模式。而海量的用户基础是实现盈利的根本。</p>
+                        
+                        <div class="bg-blue-50 dark:bg-blue-900/30 p-4 rounded-lg">
+                            <h3 class="font-medium mb-2 flex items-center">
+                                <i class="fas fa-lightbulb text-blue-500 mr-2"></i>
+                                关键思考
+                            </h3>
+                            <p>如何吸引大量用户呢？前提条件是必须为用户提供有价值的产品或服务。因此，企业需要思考能为用户提供何种产品、服务或价值，以获取有效的商业收益。</p>
+                        </div>
+                        
+                        <p>在互联网时代，企业的生存法则一切以用户为中心，所有活动都围绕用户展开。在此基础上，衍生出了众多用户行为分析方法，包括：</p>
+                        
+                        <ul class="list-disc pl-5 space-y-1">
+                            <li>用户行为分析</li>
+                            <li>用户流程分析</li>
+                            <li>同期群分析</li>
+                            <li>用户画像</li>
+                        </ul>
+                        
+                        <p>这些方法均以用户为中心进行分析。</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 事件模型 -->
+            <section id="section-event-model" class="mb-12 fade-in">
+                <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 content-block">
+                    <h2 class="text-2xl font-semibold mb-4 flex items-center">
+                        <i class="fas fa-cube text-primary-light dark:text-primary-dark mr-2"></i>
+                        事件模型
+                    </h2>
+                    <div class="space-y-6">
+                        <p>首先，我们将学习第一个分析方法——<strong>用户行为分析</strong>。让我们先理解何为用户行为。在互联网行业中，通常使用"<strong>事件模型</strong>"这一术语来描述用户的行为。</p>
+                        
+                        <div class="bg-yellow-50 dark:bg-yellow-900/20 p-4 rounded-lg">
+                            <h3 class="font-medium mb-2 flex items-center">
+                                <i class="fas fa-question-circle text-yellow-500 mr-2"></i>
+                                思考问题
+                            </h3>
+                            <p>这个模型包含哪两个核心要素呢？</p>
+                        </div>
+                        
+                        <div>
+                            <h3 class="text-xl font-medium mb-2">事件要素的五个关键因素：</h3>
+                            <ol class="list-decimal pl-5 space-y-2">
+                                <li>
+                                    <strong>Who</strong> - 参与事件的用户身份
+                                </li>
+                                <li>
+                                    <strong>When</strong> - 事件的发生时间
+                                </li>
+                                <li>
+                                    <strong>Where</strong> - 事件发生的地点，比如是在产品的首页还是购买页等
+                                </li>
+                                <li>
+                                    <strong>How</strong> - 描述了事件的发生过程，也就是用户如何参与该事件
+                                </li>
+                                <li>
+                                    <strong>What</strong> - 用户在事件中具体做了什么，我们会以字段的形式记录这些事件
+                                </li>
+                            </ol>
+                        </div>
+                        
+                        <div class="bg-purple-50 dark:bg-purple-900/20 p-4 rounded-lg">
+                            <h3 class="font-medium mb-2">关于"How"的深入分析：</h3>
+                            <p>在分析用户行为的"how"时，我们需考虑众多因素，包括：</p>
+                            <ul class="list-disc pl-5 mt-2 space-y-1">
+                                <li>用户使用的设备类型</li>
+                                <li>浏览器版本</li>
+                                <li>手机操作系统</li>
+                                <li>APP版本</li>
+                                <li>用户是如何到达和浏览页面的</li>
+                                <li>通过哪个渠道或哪个页面链接</li>
+                            </ul>
+                            <p class="mt-2">这些与"how"密切相关的因素都应纳入我们的考量之中。</p>
+                        </div>
+                        
+                        <p>在事件模型中，除了事件本身，还需要考虑用户行为分析，因此用户是不可或缺的。这里的用户代表的是真实的互联网用户。</p>
+                        
+                        <div class="grid md:grid-cols-2 gap-4">
+                            <div class="bg-green-50 dark:bg-green-900/20 p-4 rounded-lg">
+                                <h3 class="font-medium mb-2">用户基本属性：</h3>
+                                <ul class="list-disc pl-5 space-y-1">
+                                    <li>年龄</li>
+                                    <li>性别</li>
+                                </ul>
+                            </div>
+                            <div class="bg-green-50 dark:bg-green-900/20 p-4 rounded-lg">
+                                <h3 class="font-medium mb-2">业务相关属性：</h3>
+                                <ul class="list-disc pl-5 space-y-1">
+                                    <li>用户在网站上的等级</li>
+                                    <li>积分数量</li>
+                                    <li>好友关系</li>
+                                    <li>参与的圈子或群聊</li>
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <p>这些属性有助于我们深入理解用户行为，因此也应当被记录下来。这就是事件模型，涵盖了用户的行为以及用户的属性信息。</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 行为序列分析 -->
+            <section id="section-sequence-analysis" class="mb-12 fade-in">
+                <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 content-block">
+                    <h2 class="text-2xl font-semibold mb-4 flex items-center">
+                        <i class="fas fa-project-diagram text-primary-light dark:text-primary-dark mr-2"></i>
+                        用户行为序列分析
+                    </h2>
+                    <div class="space-y-6">
+                        <p>在了解用户行为之后，我们将探讨一系列与用户行为相关的分析方法。主要有两种：</p>
+                        
+                        <div class="grid md:grid-cols-2 gap-4">
+                            <div class="bg-blue-50 dark:bg-blue-900/30 p-4 rounded-lg">
+                                <h3 class="font-medium mb-2">用户行为序列分析</h3>
+                                <p>将单个用户的所有行为按照时间线进行排列</p>
+                            </div>
+                            <div class="bg-blue-50 dark:bg-blue-900/30 p-4 rounded-lg">
+                                <h3 class="font-medium mb-2">用户行为路径分析</h3>
+                                <p>分析用户在应用中的导航路径</p>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-orange-50 dark:bg-orange-900/20 p-4 rounded-lg">
+                            <h3 class="font-medium mb-2">什么是用户行为序列？</h3>
+                            <p>用户行为序列是指将单个用户的所有行为按照时间线进行排列。<strong>时间线</strong>和<strong>单一用户的所有行为</strong>是两个关键要素。</p>
+                        </div>
+                        
+                        <div>
+                            <h3 class="text-xl font-medium mb-2">用户行为序列模型：</h3>
+                            <p>该模型通过查看固定时间段内单个用户按时间顺序进行的事件部分或全部情况，找出异常或特殊点，从而归纳出群体用户的行为特征，这就是序列分析模型。</p>
+                        </div>
+                        
+                        <div class="bg-gray-100 dark:bg-gray-700 p-4 rounded-lg">
+                            <div class="flex items-center mb-2">
+                                <i class="fas fa-desktop text-gray-500 mr-2"></i>
+                                <span class="font-medium">示例图表</span>
+                            </div>
+                            <div class="text-center py-8 text-gray-500">
+                                [此处为行为序列图表占位]
+                                <p class="text-sm mt-2">用户从12点24分到35分的行为轨迹</p>
+                            </div>
+                        </div>
+                        
+                        <p>例如，图表描绘了某一用户从12点24分到35分的行为轨迹。用户在凌晨12点24分对网站进行了点击，点击了某个元素。用户还停留在该页面上浏览了一段时间，之后点击了活动按钮或banner页等。这些都是用户的行为，会被记录下来。</p>
+                        
+                        <blockquote class="border-l-4 border-primary-light dark:border-primary-dark pl-4 py-1 my-2 bg-gray-50 dark:bg-gray-700 italic">
+                            "你平时玩手机玩电脑，你在手机APP里面进行的一系列操作，后台都记录了你的数据。这些数据按时间顺序排列，就是用户的行为序列。"
+                        </blockquote>
+                        
+                        <div class="bg-green-50 dark:bg-green-900/20 p-4 rounded-lg">
+                            <h3 class="font-medium mb-2">应用场景：</h3>
+                            <ul class="list-disc pl-5 space-y-1">
+                                <li>探究转化效率低下的原因</li>
+                                <li>识别流失用户行为模式</li>
+                                <li>发现新的渠道价值</li>
+                                <li>优化用户体验流程</li>
+                            </ul>
+                        </div>
+                        
+                        <div>
+                            <h3 class="text-xl font-medium mb-2">分析方法：</h3>
+                            <ol class="list-decimal pl-5 space-y-2">
+                                <li>通过漏斗分析识别关键流失环节</li>
+                                <li>分析流失用户的行为序列</li>
+                                <li>识别异常用户群体</li>
+                                <li>探究行为异常原因</li>
+                                <li>发现新的业务价值</li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 案例分析 -->
+            <section id="section-case-study" class="mb-12 fade-in">
+                <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 content-block">
+                    <h2 class="text-2xl font-semibold mb-4 flex items-center">
+                        <i class="fas fa-briefcase text-primary-light dark:text-primary-dark mr-2"></i>
+                        电商小程序案例分析
+                    </h2>
+                    <div class="space-y-6">
+                        <div class="bg-red-50 dark:bg-red-900/20 p-4 rounded-lg">
+                            <h3 class="font-medium mb-2">案例背景：</h3>
+                            <p>一个电商平台的小程序仅作为直营渠道，提供商品购买功能。用户可以通过该小程序购买商品，并且能够绑定设备来领取优惠券和获取最新的产品信息。</p>
+                        </div>
+                        
+                        <div>
+                            <h3 class="text-xl font-medium mb-2">发现问题：</h3>
+                            <p>运营人员在分析用户行为时，发现了一个有趣的现象：</p>
+                            <ul class="list-disc pl-5 mt-2 space-y-1">
+                                <li>三月份，有一批用户在小程序上集中活跃，进行了大量操作并产生了大量事件</li>
+                                <li>这批用户随后便没有了任何动作，没有再进行任何活跃行为</li>
+                                <li>到了五月份，这批用户又重新出现，并完成了注册</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="bg-blue-50 dark:bg-blue-900/30 p-4 rounded-lg">
+                            <h3 class="font-medium mb-2">分析过程：</h3>
+                            <ol class="list-decimal pl-5 space-y-2">
+                                <li>分析用户的操作序列</li>
+                                <li>发现用户在三月份就已经通过该小程序了解了相关产品</li>
+                                <li>由于价格原因未能在小程序下单购买</li>
+                                <li>后来再次访问小程序是为了绑定产品以获得更多的优惠福利</li>
+                            </ol>
+                        </div>
+                        
+                        <div class="grid md:grid-cols-2 gap-4">
+                            <div class="bg-purple-50 dark:bg-purple-900/20 p-4 rounded-lg">
+                                <h3 class="font-medium mb-2">用户行为序列：</h3>
+                                <ol class="list-decimal pl-5 space-y-1">
+                                    <li>三月：访问小程序了解产品</li>
+                                    <li>三月：因价格高未购买</li>
+                                    <li>三月-五月：在其他渠道购买</li>
+                                    <li>五月：返回小程序绑定产品</li>
+                                </ol>
+                            </div>
+                            <div class="bg-green-50 dark:bg-green-900/20 p-4 rounded-lg">
+                                <h3 class="font-medium mb-2">业务洞察：</h3>
+                                <ul class="list-disc pl-5 space-y-1">
+                                    <li>小程序不仅是销售平台</li>
+                                    <li>能够影响用户心理、推动用户种草</li>
+                                    <li>具有售前渠道价值</li>
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <h3 class="text-xl font-medium mb-2">业务启示：</h3>
+                            <ul class="list-disc pl-5 space-y-2">
+                                <li><strong>美化商品展示</strong>：增强种草的意图，吸引更多用户了解产品</li>
+                                <li><strong>优化价格策略</strong>：提供更具吸引力的价格，促使用户在小程序内完成购买</li>
+                                <li><strong>双重价值开发</strong>：不仅作为销售平台，也作为用户心智培养渠道</li>
+                            </ul>
+                        </div>
+                        
+                        <blockquote class="border-l-4 border-primary-light dark:border-primary-dark pl-4 py-1 my-2 bg-gray-50 dark:bg-gray-700 italic">
+                            "用户行为序列分析能帮助我们发现平时未注意到的渠道价值。"
+                        </blockquote>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 总结 -->
+            <section class="mb-12 fade-in">
+                <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 content-block">
+                    <h2 class="text-2xl font-semibold mb-4 flex items-center">
+                        <i class="fas fa-check-circle text-primary-light dark:text-primary-dark mr-2"></i>
+                        课程总结
+                    </h2>
+                    <div class="space-y-4">
+                        <div class="grid md:grid-cols-3 gap-4">
+                            <div class="bg-indigo-50 dark:bg-indigo-900/20 p-4 rounded-lg">
+                                <h3 class="font-medium mb-2">核心概念</h3>
+                                <ul class="list-disc pl-5 space-y-1">
+                                    <li>流量即用户</li>
+                                    <li>用户为中心</li>
+                                    <li>事件模型</li>
+                                </ul>
+                            </div>
+                            <div class="bg-indigo-50 dark:bg-indigo-900/20 p-4 rounded-lg">
+                                <h3 class="font-medium mb-2">分析方法</h3>
+                                <ul class="list-disc pl-5 space-y-1">
+                                    <li>行为序列分析</li>
+                                    <li>路径分析</li>
+                                    <li>漏斗分析</li>
+                                </ul>
+                            </div>
+                            <div class="bg-indigo-50 dark:bg-indigo-900/20 p-4 rounded-lg">
+                                <h3 class="font-medium mb-2">业务价值</h3>
+                                <ul class="list-disc pl-5 space-y-1">
+                                    <li>发现隐藏价值</li>
+                                    <li>优化转化路径</li>
+                                    <li>提升用户体验</li>
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-yellow-50 dark:bg-yellow-900/20 p-4 rounded-lg">
+                            <h3 class="font-medium mb-2">关键收获：</h3>
+                            <p>通过用户行为序列分析，我们能够深入理解用户真实行为模式，发现业务中的隐藏价值点，并据此优化产品设计和运营策略，最终提升商业效益。</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- 页脚 -->
+    <footer class="bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 py-6">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-gray-500 dark:text-gray-400">
+            <p>© 2025 用户行为分析课程</p>
+        </div>
+    </footer>
+
+    <script>
+        // 暗黑模式切换
+        const themeToggle = document.getElementById('theme-toggle');
+        const html = document.documentElement;
+        
+        // 检查本地存储或系统偏好
+        if (localStorage.getItem('theme') === 'dark' || 
+            (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            html.classList.add('dark');
+        }
+        
+        themeToggle.addEventListener('click', () => {
+            html.classList.toggle('dark');
+            localStorage.setItem('theme', html.classList.contains('dark') ? 'dark' : 'light');
+        });
+        
+        // 平滑滚动
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+        
+        // 滚动动画
+        const fadeElements = document.querySelectorAll('.fade-in');
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = 1;
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, { threshold: 0.1 });
+        
+        fadeElements.forEach(el => {
+            el.style.opacity = 0;
+            el.style.transform = 'translateY(20px)';
+            el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+            observer.observe(el);
+        });
+    </script>
+</body>
+</html>
