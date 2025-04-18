@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>公式拆解法可视化解析</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            200: '#bae6fd',
+                            300: '#7dd3fc',
+                            400: '#38bdf8',
+                            500: '#0ea5e9',
+                            600: '#0284c7',
+                            700: '#0369a1',
+                            800: '#075985',
+                            900: '#0c4a6e',
+                        },
+                        secondary: {
+                            500: '#8b5cf6'
+                        }
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.5s ease-in-out',
+                        'fade-in-up': 'fadeInUp 0.6s ease-out',
+                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite'
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': { opacity: '0' },
+                            '100%': { opacity: '1' }
+                        },
+                        fadeInUp: {
+                            '0%': { 
+                                opacity: '0',
+                                transform: 'translateY(10px)'
+                            },
+                            '100%': { 
+                                opacity: '1',
+                                transform: 'translateY(0)'
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .formula-step {
+            transition: all 0.3s ease;
+        }
+        .formula-step:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+        .dark .formula-step:hover {
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+        }
+        .arrow-connector {
+            position: relative;
+        }
+        .arrow-connector:after {
+            content: "";
+            position: absolute;
+            left: 50%;
+            bottom: -20px;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 10px solid transparent;
+            border-right: 10px solid transparent;
+            border-top: 10px solid rgb(14 165 233);
+        }
+        .dark .arrow-connector:after {
+            border-top-color: rgb(2 132 199);
+        }
+        .formula-highlight {
+            background: linear-gradient(120deg, #38bdf8 0%, #38bdf8 100%);
+            background-repeat: no-repeat;
+            background-size: 100% 40%;
+            background-position: 0 88%;
+            transition: all 0.3s ease;
+        }
+        .formula-highlight:hover {
+            background-size: 100% 100%;
+            color: white;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 dark:bg-gray-900 dark:text-gray-200 transition-colors duration-300 min-h-screen">
+    <div class="container mx-auto px-4 py-8 max-w-4xl">
+        <!-- 头部区域 -->
+        <header class="mb-12 animate-fade-in">
+            <div class="flex justify-between items-center mb-6">
+                <h1 class="text-3xl md:text-4xl font-bold bg-gradient-to-r from-primary-600 to-primary-400 bg-clip-text text-transparent">
+                    公式拆解法解析
+                </h1>
+                <button id="theme-toggle" class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">
+                    <i class="fas fa-moon dark:hidden"></i>
+                    <i class="fas fa-sun hidden dark:inline"></i>
+                </button>
+            </div>
+            <p class="text-lg text-gray-600 dark:text-gray-400 animate-fade-in-up">
+                通过数学公式层层拆解业务指标，精准定位问题根源
+            </p>
+        </header>
+
+        <!-- 主要内容 -->
+        <main class="prose prose-lg dark:prose-invert max-w-none animate-fade-in-up">
+            <!-- 定义部分 -->
+            <section class="mb-12">
+                <h2 class="text-2xl font-semibold mb-6 pb-2 border-b border-gray-200 dark:border-gray-700 flex items-center">
+                    <i class="fas fa-calculator mr-3 text-primary-500"></i>
+                    什么是公式拆解法？
+                </h2>
+                <div class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow mb-6">
+                    <p class="mb-4">
+                        <strong>公式拆解法</strong>是通过一个数学公式来展示业务指标（如销售额），然后对该公式进行逐层分解，从而分析指标变化原因的方法。
+                    </p>
+                    <div class="bg-primary-50 dark:bg-primary-900/20 p-4 rounded-lg mt-4">
+                        <p class="font-medium text-center text-lg">
+                            销售额 = A产品销售额 + B产品销售额 + C产品销售额
+                        </p>
+                    </div>
+                    <p class="mt-4">
+                        每个产品销售额又可以拆解为 <span class="font-medium">销售数量 × 客单价</span>，而销售数量又可进一步拆解为新客户购买量、老客户购买量等，通过这种层层分解可以定位问题根源。
+                    </p>
+                </div>
+            </section>
+
+            <!-- 核心公式可视化 -->
+            <section class="mb-12">
+                <h2 class="text-2xl font-semibold mb-6 pb-2 border-b border-gray-200 dark:border-gray-700 flex items-center">
+                    <i class="fas fa-project-diagram mr-3 text-primary-500"></i>
+                    五层拆解可视化
+                </h2>
+                
+                <div class="space-y-8">
+                    <!-- 第一层 -->
+                    <div class="formula-step bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm arrow-connector">
+                        <h3 class="font-medium text-lg mb-3 text-primary-600 dark:text-primary-400">
+                            第一层：日销售额
+                        </h3>
+                        <div class="text-center text-xl font-mono bg-gray-100 dark:bg-gray-700 py-3 rounded">
+                            日销售额 = ∑(产品销售额)
+                        </div>
+                        <p class="mt-3 text-sm text-gray-600 dark:text-gray-400">
+                            所有产品销售额的总和
+                        </p>
+                    </div>
+                    
+                    <!-- 第二层 -->
+                    <div class="formula-step bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm arrow-connector">
+                        <h3 class="font-medium text-lg mb-3 text-primary-600 dark:text-primary-400">
+                            第二层：单产品销售额
+                        </h3>
+                        <div class="text-center text-xl font-mono bg-gray-100 dark:bg-gray-700 py-3 rounded">
+                            产品销售额 = 销售数量 × 客单价
+                        </div>
+                        <p class="mt-3 text-sm text-gray-600 dark:text-gray-400">
+                            每个产品的销售额由数量和单价决定
+                        </p>
+                    </div>
+                    
+                    <!-- 第三层 -->
+                    <div class="formula-step bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm arrow-connector">
+                        <h3 class="font-medium text-lg mb-3 text-primary-600 dark:text-primary-400">
+                            第三层：销售数量构成
+                        </h3>
+                        <div class="text-center text-xl font-mono bg-gray-100 dark:bg-gray-700 py-3 rounded">
+                            销售数量 = 新客购买量 + 老客复购量 + 老客交叉购买量
+                        </div>
+                        <p class="mt-3 text-sm text-gray-600 dark:text-gray-400">
+                            用户结构对销售数量的影响
+                        </p>
+                    </div>
+                    
+                    <!-- 第四层 -->
+                    <div class="formula-step bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm arrow-connector">
+                        <h3 class="font-medium text-lg mb-3 text-primary-600 dark:text-primary-400">
+                            第四层：新客来源
+                        </h3>
+                        <div class="text-center text-xl font-mono bg-gray-100 dark:bg-gray-700 py-3 rounded">
+                            新客购买量 = ∑(各渠道新客购买量)
+                        </div>
+                        <p class="mt-3 text-sm text-gray-600 dark:text-gray-400">
+                            渠道A、渠道B等带来的新客贡献
+                        </p>
+                    </div>
+                    
+                    <!-- 第五层 -->
+                    <div class="formula-step bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm">
+                        <h3 class="font-medium text-lg mb-3 text-primary-600 dark:text-primary-400">
+                            第五层：渠道ROI分析
+                        </h3>
+                        <div class="text-center text-xl font-mono bg-gray-100 dark:bg-gray-700 py-3 rounded">
+                            渠道收益 = 新客销售额 - 渠道推广成本
+                        </div>
+                        <p class="mt-3 text-sm text-gray-600 dark:text-gray-400">
+                            评估各渠道的实际推广效果
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 客单价案例 -->
+            <section class="mb-12">
+                <h2 class="text-2xl font-semibold mb-6 pb-2 border-b border-gray-200 dark:border-gray-700 flex items-center">
+                    <i class="fas fa-shopping-bag mr-3 text-primary-500"></i>
+                    电商客单价分析案例
+                </h2>
+                
+                <div class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm mb-6">
+                    <h3 class="font-medium text-lg mb-3">问题描述</h3>
+                    <p class="mb-4">
+                        电商平台近几个月客单价呈现缓慢下降趋势，需要分析原因。
+                    </p>
+                    
+                    <h3 class="font-medium text-lg mb-3 mt-6">第一步：确定计算公式</h3>
+                    <div class="bg-primary-50 dark:bg-primary-900/20 p-4 rounded-lg">
+                        <p class="font-medium text-center">
+                            客单价 = 总交易额 ÷ 下单人数
+                        </p>
+                    </div>
+                    
+                    <h3 class="font-medium text-lg mb-3 mt-6">第二步：用户结构拆解</h3>
+                    <div class="bg-gray-50 dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
+                        <p class="font-mono text-center mb-2">
+                            客单价 = (新客占比 × 新客客单价) + (老客占比 × 老客客单价)
+                        </p>
+                        <div class="flex justify-center mt-3">
+                            <div class="px-4 py-2 bg-amber-100 dark:bg-amber-900/30 rounded-lg mr-3">
+                                <p class="text-sm">新客客单价</p>
+                                <p class="font-bold text-amber-600 dark:text-amber-400">通常较低</p>
+                            </div>
+                            <div class="px-4 py-2 bg-green-100 dark:bg-green-900/30 rounded-lg">
+                                <p class="text-sm">老客客单价</p>
+                                <p class="font-bold text-green-600 dark:text-green-400">通常较高</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <h3 class="font-medium text-lg mb-3 mt-6">第三步：可能原因分析</h3>
+                    <div class="grid md:grid-cols-2 gap-4">
+                        <div class="bg-rose-50 dark:bg-rose-900/20 p-4 rounded-lg">
+                            <h4 class="font-medium flex items-center mb-2">
+                                <i class="fas fa-user-plus mr-2 text-rose-600 dark:text-rose-400"></i>
+                                用户结构变化
+                            </h4>
+                            <ul class="list-disc pl-5 text-sm space-y-1">
+                                <li>新客占比增加，老客占比减少</li>
+                                <li>高客单价老客流失严重</li>
+                                <li>新客质量下降（只买低价商品）</li>
+                            </ul>
+                        </div>
+                        <div class="bg-purple-50 dark:bg-purple-900/20 p-4 rounded-lg">
+                            <h4 class="font-medium flex items-center mb-2">
+                                <i class="fas fa-tag mr-2 text-purple-600 dark:text-purple-400"></i>
+                                商品与价格因素
+                            </h4>
+                            <ul class="list-disc pl-5 text-sm space-y-1">
+                                <li>用户购买低价SKU比例增加</li>
+                                <li>优惠力度过大导致实际支付价下降</li>
+                                <li>高价商品吸引力不足</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- SKU解释 -->
+                <div class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm">
+                    <h3 class="font-medium text-lg mb-3 flex items-center">
+                        <i class="fas fa-boxes mr-2 text-secondary-500"></i>
+                        SKU概念解释
+                    </h3>
+                    <div class="flex flex-col md:flex-row items-center">
+                        <div class="md:w-2/3">
+                            <p>
+                                <strong>SKU（Stock Keeping Unit）</strong>是最小库存单位，指不可再分的最小存货单元。例如：
+                            </p>
+                            <ul class="list-disc pl-5 mt-2">
+                                <li>同款商品的不同颜色（粉色笔 vs 红色笔）</li>
+                                <li>同款商品的不同尺寸（S码 vs M码）</li>
+                            </ul>
+                            <p class="mt-3 text-sm text-gray-600 dark:text-gray-400">
+                                客单价 = ∑(SKU数量 × 实际支付价格) ÷ 订单数
+                            </p>
+                        </div>
+                        <div class="md:w-1/3 mt-4 md:mt-0 flex justify-center">
+                            <div class="bg-gradient-to-br from-purple-100 to-blue-100 dark:from-purple-900/30 dark:to-blue-900/30 p-4 rounded-lg w-48 text-center">
+                                <i class="fas fa-barcode text-4xl text-purple-600 dark:text-purple-400 mb-2"></i>
+                                <p class="font-medium">SKU示例</p>
+                                <p class="text-sm mt-1">商品ID: #20394</p>
+                                <p class="text-sm">颜色: 粉色</p>
+                                <p class="text-sm">尺寸: S</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 方法论总结 -->
+            <section class="mb-12">
+                <h2 class="text-2xl font-semibold mb-6 pb-2 border-b border-gray-200 dark:border-gray-700 flex items-center">
+                    <i class="fas fa-lightbulb mr-3 text-primary-500"></i>
+                    方法论总结
+                </h2>
+                
+                <div class="grid md:grid-cols-3 gap-6">
+                    <div class="formula-step bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm">
+                        <h3 class="font-medium text-lg mb-3 flex items-center">
+                            <span class="w-8 h-8 rounded-full bg-primary-500 text-white flex items-center justify-center mr-3">1</span>
+                            选择核心指标
+                        </h3>
+                        <p class="text-sm text-gray-600 dark:text-gray-400">
+                            确定需要分析的业务指标（如销售额、客单价等）
+                        </p>
+                    </div>
+                    <div class="formula-step bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm">
+                        <h3 class="font-medium text-lg mb-3 flex items-center">
+                            <span class="w-8 h-8 rounded-full bg-primary-500 text-white flex items-center justify-center mr-3">2</span>
+                            建立数学公式
+                        </h3>
+                        <p class="text-sm text-gray-600 dark:text-gray-400">
+                            用加法、乘法等方式表达指标构成
+                        </p>
+                    </div>
+                    <div class="formula-step bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm">
+                        <h3 class="font-medium text-lg mb-3 flex items-center">
+                            <span class="w-8 h-8 rounded-full bg-primary-500 text-white flex items-center justify-center mr-3">3</span>
+                            逐层拆解
+                        </h3>
+                        <p class="text-sm text-gray-600 dark:text-gray-400">
+                            对公式中的每个变量继续分解，通常3-5层
+                        </p>
+                    </div>
+                    <div class="formula-step bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm">
+                        <h3 class="font-medium text-lg mb-3 flex items-center">
+                            <span class="w-8 h-8 rounded-full bg-primary-500 text-white flex items-center justify-center mr-3">4</span>
+                            数据验证
+                        </h3>
+                        <p class="text-sm text-gray-600 dark:text-gray-400">
+                            确保每个层级都有数据支撑
+                        </p>
+                    </div>
+                    <div class="formula-step bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm">
+                        <h3 class="font-medium text-lg mb-3 flex items-center">
+                            <span class="w-8 h-8 rounded-full bg-primary-500 text-white flex items-center justify-center mr-3">5</span>
+                            定位问题
+                        </h3>
+                        <p class="text-sm text-gray-600 dark:text-gray-400">
+                            分析哪一层级的哪个变量导致了指标变化
+                        </p>
+                    </div>
+                    <div class="formula-step bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm">
+                        <h3 class="font-medium text-lg mb-3 flex items-center">
+                            <span class="w-8 h-8 rounded-full bg-primary-500 text-white flex items-center justify-center mr-3">6</span>
+                            综合解决
+                        </h3>
+                        <p class="text-sm text-gray-600 dark:text-gray-400">
+                            结合其他分析方法制定解决方案
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 拆解方法对比 -->
+            <section class="mb-12">
+                <h2 class="text-2xl font-semibold mb-6 pb-2 border-b border-gray-200 dark:border-gray-700 flex items-center">
+                    <i class="fas fa-balance-scale mr-3 text-primary-500"></i>
+                    三大拆解方法对比
+                </h2>
+                
+                <div class="bg-white dark:bg-gray-800 rounded-xl overflow-hidden shadow-sm">
+                    <table class="w-full">
+                        <thead class="bg-gray-100 dark:bg-gray-700">
+                            <tr>
+                                <th class="py-3 px-4 text-left">方法</th>
+                                <th class="py-3 px-4 text-left">拆解对象</th>
+                                <th class="py-3 px-4 text-left">适用场景</th>
+                                <th class="py-3 px-4 text-left">核心特点</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
+                            <tr>
+                                <td class="py-3 px-4 font-medium">多维度拆解法</td>
+                                <td class="py-3 px-4">问题角度</td>
+                                <td class="py-3 px-4">全面分析复杂问题</td>
+                                <td class="py-3 px-4">从不同视角切入</td>
+                            </tr>
+                            <tr class="bg-primary-50/30 dark:bg-primary-900/20">
+                                <td class="py-3 px-4 font-medium">公式拆解法</td>
+                                <td class="py-3 px-4">业务指标</td>
+                                <td class="py-3 px-4">金额类指标分析</td>
+                                <td class="py-3 px-4">数学公式层层分解</td>
+                            </tr>
+                            <tr>
+                                <td class="py-3 px-4 font-medium">漏斗分析法</td>
+                                <td class="py-3 px-4">业务流程</td>
+                                <td class="py-3 px-4">转化流程分析</td>
+                                <td class="py-3 px-4">追踪用户流失点</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <p class="mt-4 text-sm text-gray-600 dark:text-gray-400">
+                    注：这三种方法都属于拆解类分析方法，核心都是对原始问题或流程进行细致分解。
+                </p>
+            </section>
+        </main>
+
+        <!-- 总结区块 -->
+        <div class="mt-12 bg-primary-50 dark:bg-primary-900/20 rounded-xl p-6 border border-primary-200 dark:border-primary-800 animate-fade-in-up">
+            <h3 class="text-xl font-semibold mb-3 flex items-center">
+                <i class="fas fa-check-circle mr-2 text-primary-600 dark:text-primary-400"></i>
+                公式拆解法关键价值
+            </h3>
+            <div class="grid md:grid-cols-2 gap-4">
+                <div class="flex items-start">
+                    <i class="fas fa-check text-primary-500 mt-1 mr-2"></i>
+                    <span>将复杂业务问题转化为可量化的数学关系</span>
+                </div>
+                <div class="flex items-start">
+                    <i class="fas fa-check text-primary-500 mt-1 mr-2"></i>
+                    <span>精准定位指标变动的具体原因层级</span>
+                </div>
+                <div class="flex items-start">
+                    <i class="fas fa-check text-primary-500 mt-1 mr-2"></i>
+                    <span>特别适合分析销售额、客单价等金额类指标</span>
+                </div>
+                <div class="flex items-start">
+                    <i class="fas fa-check text-primary-500 mt-1 mr-2"></i>
+                    <span>需要与业务知识结合，确保拆解逻辑合理</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 页脚 -->
+        <footer class="mt-12 pt-6 border-t border-gray-200 dark:border-gray-800 text-sm text-gray-500 dark:text-gray-400 text-center">
+            <p>© 2023 数据分析方法系列 | 公式拆解法可视化解析</p>
+        </footer>
+    </div>
+
+    <script>
+        // 明暗模式切换
+        const themeToggle = document.getElementById('theme-toggle');
+        const html = document.documentElement;
+
+        if (localStorage.getItem('theme') === 'dark' || 
+            (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            html.classList.add('dark');
+        }
+
+        themeToggle.addEventListener('click', () => {
+            html.classList.toggle('dark');
+            localStorage.setItem('theme', html.classList.contains('dark') ? 'dark' : 'light');
+        });
+
+        // 滚动动画
+        const animateOnScroll = () => {
+            const elements = document.querySelectorAll('.animate-fade-in-up');
+            elements.forEach(el => {
+                const elementTop = el.getBoundingClientRect().top;
+                const windowHeight = window.innerHeight;
+                
+                if (elementTop < windowHeight - 100) {
+                    el.style.opacity = '1';
+                    el.style.transform = 'translateY(0)';
+                }
+            });
+        };
+
+        // 初始加载动画
+        document.addEventListener('DOMContentLoaded', () => {
+            const animatedElements = document.querySelectorAll('.animate-fade-in-up');
+            animatedElements.forEach(el => {
+                el.style.opacity = '0';
+                el.style.transform = 'translateY(20px)';
+                el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+            });
+
+            setTimeout(() => {
+                animateOnScroll();
+            }, 100);
+        });
+
+        window.addEventListener('scroll', animateOnScroll);
+
+        // 公式高亮交互
+        const formulaHighlights = document.querySelectorAll('.formula-highlight');
+        formulaHighlights.forEach(item => {
+            item.addEventListener('mouseenter', () => {
+                item.classList.add('text-white');
+            });
+            item.addEventListener('mouseleave', () => {
+                item.classList.remove('text-white');
+            });
+        });
+    </script>
+</body>
+</html>
