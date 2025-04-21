@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>网易云音乐AARRR用户增长模型分析</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Noto Sans SC', 'sans-serif'],
+                    },
+                    colors: {
+                        primary: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            200: '#bae6fd',
+                            300: '#7dd3fc',
+                            400: '#38bdf8',
+                            500: '#0ea5e9',
+                            600: '#0284c7',
+                            700: '#0369a1',
+                            800: '#075985',
+                            900: '#0c4a6e',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .smooth-scroll {
+            scroll-behavior: smooth;
+        }
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        .card-hover:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+        .btn-hover {
+            transition: all 0.2s ease;
+        }
+        .btn-hover:hover {
+            transform: scale(1.05);
+        }
+        .dark .dark\:bg-gray-800 {
+            background-color: #1f2937;
+        }
+        .dark .dark\:text-white {
+            color: #fff;
+        }
+        .dark .dark\:bg-gray-700 {
+            background-color: #374151;
+        }
+        .dark .dark\:text-gray-300 {
+            color: #d1d5db;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans smooth-scroll dark:bg-gray-900 dark:text-gray-200">
+    <!-- 主题切换按钮 -->
+    <div class="fixed bottom-6 right-6 z-50">
+        <button id="themeToggle" class="p-3 rounded-full bg-primary-500 text-white shadow-lg btn-hover dark:bg-primary-700">
+            <i class="fas fa-moon dark:hidden"></i>
+            <i class="fas fa-sun hidden dark:inline"></i>
+        </button>
+    </div>
+
+    <!-- 导航栏 -->
+    <nav class="sticky top-0 z-40 bg-white/80 backdrop-blur-sm shadow-sm dark:bg-gray-800/80">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <span class="text-xl font-bold text-primary-600 dark:text-primary-400">网易云音乐</span>
+                    <span class="ml-2 text-gray-600 dark:text-gray-300">AARRR用户增长模型分析</span>
+                </div>
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="#acquisition" class="text-gray-600 hover:text-primary-600 dark:text-gray-300 dark:hover:text-primary-400 transition">获客</a>
+                    <a href="#activation" class="text-gray-600 hover:text-primary-600 dark:text-gray-300 dark:hover:text-primary-400 transition">激活</a>
+                    <a href="#retention" class="text-gray-600 hover:text-primary-600 dark:text-gray-300 dark:hover:text-primary-400 transition">留存</a>
+                    <a href="#revenue" class="text-gray-600 hover:text-primary-600 dark:text-gray-300 dark:hover:text-primary-400 transition">收入</a>
+                    <a href="#referral" class="text-gray-600 hover:text-primary-600 dark:text-gray-300 dark:hover:text-primary-400 transition">传播</a>
+                </div>
+                <div class="flex items-center md:hidden">
+                    <button id="mobileMenuButton" class="text-gray-600 dark:text-gray-300">
+                        <i class="fas fa-bars text-xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <!-- 移动端菜单 -->
+        <div id="mobileMenu" class="hidden md:hidden bg-white dark:bg-gray-800 shadow-lg">
+            <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+                <a href="#acquisition" class="block px-3 py-2 rounded-md text-base font-medium text-gray-600 hover:text-primary-600 hover:bg-gray-50 dark:text-gray-300 dark:hover:text-primary-400 dark:hover:bg-gray-700">获客</a>
+                <a href="#activation" class="block px-3 py-2 rounded-md text-base font-medium text-gray-600 hover:text-primary-600 hover:bg-gray-50 dark:text-gray-300 dark:hover:text-primary-400 dark:hover:bg-gray-700">激活</a>
+                <a href="#retention" class="block px-3 py-2 rounded-md text-base font-medium text-gray-600 hover:text-primary-600 hover:bg-gray-50 dark:text-gray-300 dark:hover:text-primary-400 dark:hover:bg-gray-700">留存</a>
+                <a href="#revenue" class="block px-3 py-2 rounded-md text-base font-medium text-gray-600 hover:text-primary-600 hover:bg-gray-50 dark:text-gray-300 dark:hover:text-primary-400 dark:hover:bg-gray-700">收入</a>
+                <a href="#referral" class="block px-3 py-2 rounded-md text-base font-medium text-gray-600 hover:text-primary-600 hover:bg-gray-50 dark:text-gray-300 dark:hover:text-primary-400 dark:hover:bg-gray-700">传播</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 主内容区 -->
+    <main class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <!-- 标题部分 -->
+        <section class="mb-16 text-center fade-in">
+            <h1 class="text-4xl md:text-5xl font-bold mb-6 text-gray-900 dark:text-white">网易云音乐用户增长策略</h1>
+            <p class="text-xl text-gray-600 max-w-3xl mx-auto dark:text-gray-300">基于AARRR模型的全面分析</p>
+            
+            <!-- AARRR模型可视化 -->
+            <div class="mt-12 max-w-4xl mx-auto">
+                <div class="relative h-64 md:h-80">
+                    <!-- 模型图表 -->
+                    <div class="absolute inset-0 flex items-center justify-center">
+                        <div class="relative w-full h-full">
+                            <!-- 背景圆环 -->
+                            <svg viewBox="0 0 200 200" class="w-full h-full">
+                                <circle cx="100" cy="100" r="90" fill="none" stroke="#e5e7eb" stroke-width="10" class="dark:stroke-gray-700"/>
+                                <!-- 五个阶段的分割线 -->
+                                <line x1="100" y1="10" x2="100" y2="100" stroke="#e5e7eb" stroke-width="2" stroke-dasharray="5,5" class="dark:stroke-gray-600"/>
+                                <line x1="100" y1="100" x2="190" y2="100" stroke="#e5e7eb" stroke-width="2" stroke-dasharray="5,5" class="dark:stroke-gray-600"/>
+                                <line x1="100" y1="100" x2="55" y2="155" stroke="#e5e7eb" stroke-width="2" stroke-dasharray="5,5" class="dark:stroke-gray-600"/>
+                                <line x1="100" y1="100" x2="145" y2="155" stroke="#e5e7eb" stroke-width="2" stroke-dasharray="5,5" class="dark:stroke-gray-600"/>
+                                <!-- 五个阶段的扇形 -->
+                                <path d="M100,10 A90,90 0 0,1 190,100 L100,100 Z" fill="#93c5fd" class="animate-pulse opacity-80 hover:opacity-100 transition"/>
+                                <path d="M190,100 A90,90 0 0,1 100,190 L100,100 Z" fill="#60a5fa" class="animate-pulse opacity-80 hover:opacity-100 transition"/>
+                                <path d="M100,190 A90,90 0 0,1 10,100 L100,100 Z" fill="#3b82f6" class="animate-pulse opacity-80 hover:opacity-100 transition"/>
+                                <path d="M10,100 A90,90 0 0,1 55,45 L100,100 Z" fill="#2563eb" class="animate-pulse opacity-80 hover:opacity-100 transition"/>
+                                <path d="M55,45 A90,90 0 0,1 100,10 L100,100 Z" fill="#1d4ed8" class="animate-pulse opacity-80 hover:opacity-100 transition"/>
+                            </svg>
+                            <!-- 五个阶段的标签 -->
+                            <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-32 h-32 rounded-full bg-white shadow-md flex items-center justify-center dark:bg-gray-800">
+                                <span class="text-sm font-medium text-gray-700 dark:text-gray-300">AARRR</span>
+                            </div>
+                            <div class="absolute top-4 left-1/2 transform -translate-x-1/2 text-center">
+                                <div class="bg-primary-100 text-primary-800 px-3 py-1 rounded-full text-sm font-medium dark:bg-primary-900 dark:text-primary-200">获客</div>
+                            </div>
+                            <div class="absolute right-4 top-1/2 transform -translate-y-1/2 text-center">
+                                <div class="bg-primary-100 text-primary-800 px-3 py-1 rounded-full text-sm font-medium dark:bg-primary-900 dark:text-primary-200">激活</div>
+                            </div>
+                            <div class="absolute bottom-4 left-1/2 transform -translate-x-1/2 text-center">
+                                <div class="bg-primary-100 text-primary-800 px-3 py-1 rounded-full text-sm font-medium dark:bg-primary-900 dark:text-primary-200">留存</div>
+                            </div>
+                            <div class="absolute left-4 top-1/2 transform -translate-y-1/2 text-center">
+                                <div class="bg-primary-100 text-primary-800 px-3 py-1 rounded-full text-sm font-medium dark:bg-primary-900 dark:text-primary-200">收入</div>
+                            </div>
+                            <div class="absolute top-1/3 left-1/3 transform -translate-x-1/2 -translate-y-1/2 text-center">
+                                <div class="bg-primary-100 text-primary-800 px-3 py-1 rounded-full text-sm font-medium dark:bg-primary-900 dark:text-primary-200">传播</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 获客部分 -->
+        <section id="acquisition" class="mb-16 fade-in">
+            <div class="flex items-center mb-8">
+                <div class="flex-shrink-0 bg-primary-500 rounded-full w-12 h-12 flex items-center justify-center text-white mr-4">
+                    <i class="fas fa-users text-xl"></i>
+                </div>
+                <h2 class="text-3xl font-bold text-gray-900 dark:text-white">获客 (Acquisition)</h2>
+            </div>
+            
+            <div class="grid md:grid-cols-2 gap-6">
+                <div class="bg-white p-6 rounded-xl shadow-sm card-hover dark:bg-gray-800">
+                    <div class="flex items-center mb-4">
+                        <div class="bg-primary-100 text-primary-800 rounded-full w-8 h-8 flex items-center justify-center mr-3 dark:bg-primary-900 dark:text-primary-200">
+                            <i class="fas fa-ad text-sm"></i>
+                        </div>
+                        <h3 class="text-xl font-semibold text-gray-800 dark:text-white">信息流推广</h3>
+                    </div>
+                    <p class="text-gray-600 dark:text-gray-300">网易云音乐在各大平台投放信息流广告，通过精准投放让潜在用户了解APP的存在和价值。</p>
+                </div>
+                
+                <div class="bg-white p-6 rounded-xl shadow-sm card-hover dark:bg-gray-800">
+                    <div class="flex items-center mb-4">
+                        <div class="bg-primary-100 text-primary-800 rounded-full w-8 h-8 flex items-center justify-center mr-3 dark:bg-primary-900 dark:text-primary-200">
+                            <i class="fas fa-handshake text-sm"></i>
+                        </div>
+                        <h3 class="text-xl font-semibold text-gray-800 dark:text-white">联合营销</h3>
+                    </div>
+                    <p class="text-gray-600 dark:text-gray-300">与不同品牌进行联合营销，例如与海马体合作，通过跨界合作扩大品牌影响力和用户覆盖面。</p>
+                </div>
+                
+                <div class="bg-white p-6 rounded-xl shadow-sm card-hover dark:bg-gray-800">
+                    <div class="flex items-center mb-4">
+                        <div class="bg-primary-100 text-primary-800 rounded-full w-8 h-8 flex items-center justify-center mr-3 dark:bg-primary-900 dark:text-primary-200">
+                            <i class="fas fa-user-tie text-sm"></i>
+                        </div>
+                        <h3 class="text-xl font-semibold text-gray-800 dark:text-white">KOL合作</h3>
+                    </div>
+                    <p class="text-gray-600 dark:text-gray-300">与微博、抖音等平台的大V合作推广，利用意见领袖的影响力获取流量和用户信任。</p>
+                </div>
+                
+                <div class="bg-white p-6 rounded-xl shadow-sm card-hover dark:bg-gray-800">
+                    <div class="flex items-center mb-4">
+                        <div class="bg-primary-100 text-primary-800 rounded-full w-8 h-8 flex items-center justify-center mr-3 dark:bg-primary-900 dark:text-primary-200">
+                            <i class="fas fa-share-alt text-sm"></i>
+                        </div>
+                        <h3 class="text-xl font-semibold text-gray-800 dark:text-white">老带新活动</h3>
+                    </div>
+                    <p class="text-gray-600 dark:text-gray-300">设计带有分享传播性质的平台活动，通过老用户邀请新用户的方式实现病毒式增长。</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 激活部分 -->
+        <section id="activation" class="mb-16 fade-in">
+            <div class="flex items-center mb-8">
+                <div class="flex-shrink-0 bg-primary-500 rounded-full w-12 h-12 flex items-center justify-center text-white mr-4">
+                    <i class="fas fa-bolt text-xl"></i>
+                </div>
+                <h2 class="text-3xl font-bold text-gray-900 dark:text-white">激活 (Activation)</h2>
+            </div>
+            
+            <div class="bg-white rounded-xl shadow-sm overflow-hidden dark:bg-gray-800">
+                <div class="p-6">
+                    <h3 class="text-xl font-semibold mb-4 text-gray-800 dark:text-white">激活指标定义</h3>
+                    <p class="text-gray-600 mb-6 dark:text-gray-300">对于音乐类产品，网易云音乐将"播放音乐"作为用户激活的核心指标。用户只要在APP内播放音乐，即被视为已激活用户。</p>
+                    
+                    <h3 class="text-xl font-semibold mb-4 text-gray-800 dark:text-white">激活策略</h3>
+                    <div class="space-y-4">
+                        <div class="flex items-start">
+                            <div class="flex-shrink-0 bg-primary-100 text-primary-800 rounded-full w-6 h-6 flex items-center justify-center mt-1 mr-3 dark:bg-primary-900 dark:text-primary-200">
+                                <i class="fas fa-check text-xs"></i>
+                            </div>
+                            <p class="text-gray-600 dark:text-gray-300"><span class="font-medium text-gray-800 dark:text-white">每日推荐:</span> 根据用户喜好每天推荐个性化歌单，降低用户选择成本</p>
+                        </div>
+                        <div class="flex items-start">
+                            <div class="flex-shrink-0 bg-primary-100 text-primary-800 rounded-full w-6 h-6 flex items-center justify-center mt-1 mr-3 dark:bg-primary-900 dark:text-primary-200">
+                                <i class="fas fa-check text-xs"></i>
+                            </div>
+                            <p class="text-gray-600 dark:text-gray-300"><span class="font-medium text-gray-800 dark:text-white">智能歌单:</span> 基于用户历史行为和偏好推荐相关歌单，提高点击率</p>
+                        </div>
+                        <div class="flex items-start">
+                            <div class="flex-shrink-0 bg-primary-100 text-primary-800 rounded-full w-6 h-6 flex items-center justify-center mt-1 mr-3 dark:bg-primary-900 dark:text-primary-200">
+                                <i class="fas fa-check text-xs"></i>
+                            </div>
+                            <p class="text-gray-600 dark:text-gray-300"><span class="font-medium text-gray-800 dark:text-white">一键播放:</span> 优化播放流程，减少操作步骤，让用户能快速开始听歌</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 激活流程可视化 -->
+                <div class="bg-gray-50 px-6 py-8 border-t border-gray-200 dark:bg-gray-700 dark:border-gray-600">
+                    <h3 class="text-xl font-semibold mb-6 text-center text-gray-800 dark:text-white">用户激活流程</h3>
+                    <div class="max-w-3xl mx-auto">
+                        <div class="flex flex-col md:flex-row items-center justify-between space-y-4 md:space-y-0">
+                            <div class="flex flex-col items-center text-center w-1/5">
+                                <div class="bg-primary-100 text-primary-800 rounded-full w-12 h-12 flex items-center justify-center mb-2 dark:bg-primary-900 dark:text-primary-200">
+                                    <i class="fas fa-sign-in-alt"></i>
+                                </div>
+                                <p class="text-sm font-medium text-gray-700 dark:text-gray-300">打开APP</p>
+                            </div>
+                            <div class="hidden md:block">
+                                <i class="fas fa-arrow-right text-gray-400"></i>
+                            </div>
+                            <div class="flex flex-col items-center text-center w-1/5">
+                                <div class="bg-primary-100 text-primary-800 rounded-full w-12 h-12 flex items-center justify-center mb-2 dark:bg-primary-900 dark:text-primary-200">
+                                    <i class="fas fa-music"></i>
+                                </div>
+                                <p class="text-sm font-medium text-gray-700 dark:text-gray-300">发现音乐</p>
+                            </div>
+                            <div class="hidden md:block">
+                                <i class="fas fa-arrow-right text-gray-400"></i>
+                            </div>
+                            <div class="flex flex-col items-center text-center w-1/5">
+                                <div class="bg-primary-100 text-primary-800 rounded-full w-12 h-12 flex items-center justify-center mb-2 dark:bg-primary-900 dark:text-primary-200">
+                                    <i class="fas fa-play"></i>
+                                </div>
+                                <p class="text-sm font-medium text-gray-700 dark:text-gray-300">点击播放</p>
+                            </div>
+                            <div class="hidden md:block">
+                                <i class="fas fa-arrow-right text-gray-400"></i>
+                            </div>
+                            <div class="flex flex-col items-center text-center w-1/5">
+                                <div class="bg-primary-500 text-white rounded-full w-12 h-12 flex items-center justify-center mb-2">
+                                    <i class="fas fa-check"></i>
+                                </div>
+                                <p class="text-sm font-medium text-gray-700 dark:text-gray-300">激活完成</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 留存部分 -->
+        <section id="retention" class="mb-16 fade-in">
+            <div class="flex items-center mb-8">
+                <div class="flex-shrink-0 bg-primary-500 rounded-full w-12 h-12 flex items-center justify-center text-white mr-4">
+                    <i class="fas fa-anchor text-xl"></i>
+                </div>
+                <h2 class="text-3xl font-bold text-gray-900 dark:text-white">留存 (Retention)</h2>
+            </div>
+            
+            <div class="bg-white rounded-xl shadow-sm overflow-hidden dark:bg-gray-800">
+                <div class="p-6">
+                    <div class="flex flex-col md:flex-row">
+                        <div class="md:w-1/2 md:pr-6 mb-6 md:mb-0">
+                            <h3 class="text-xl font-semibold mb-4 text-gray-800 dark:text-white">留存与活跃的区别</h3>
+                            <p class="text-gray-600 dark:text-gray-300">活跃是满足用户当下的需求，而留存是建立长期的用户体验和依赖。网易云音乐通过会员活动等方式培养用户长期使用习惯。</p>
+                        </div>
+                        <div class="md:w-1/2 md:pl-6">
+                            <h3 class="text-xl font-semibold mb-4 text-gray-800 dark:text-white">核心留存策略</h3>
+                            <div class="space-y-4">
+                                <div class="flex items-start">
+                                    <div class="flex-shrink-0 bg-primary-100 text-primary-800 rounded-full w-6 h-6 flex items-center justify-center mt-1 mr-3 dark:bg-primary-900 dark:text-primary-200">
+                                        <i class="fas fa-gift text-xs"></i>
+                                    </div>
+                                    <p class="text-gray-600 dark:text-gray-300"><span class="font-medium text-gray-800 dark:text-white">免费体验周卡:</span> 为新用户提供免费会员体验，展示会员价值</p>
+                                </div>
+                                <div class="flex items-start">
+                                    <div class="flex-shrink-0 bg-primary-100 text-primary-800 rounded-full w-6 h-6 flex items-center justify-center mt-1 mr-3 dark:bg-primary-900 dark:text-primary-200">
+                                        <i class="fas fa-crown text-xs"></i>
+                                    </div>
+                                    <p class="text-gray-600 dark:text-gray-300"><span class="font-medium text-gray-800 dark:text-white">会员特权:</span> 高品质音乐、无广告、专属皮肤等增值服务</p>
+                                </div>
+                                <div class="flex items-start">
+                                    <div class="flex-shrink-0 bg-primary-100 text-primary-800 rounded-full w-6 h-6 flex items-center justify-center mt-1 mr-3 dark:bg-primary-900 dark:text-primary-200">
+                                        <i class="fas fa-calendar-check text-xs"></i>
+                                    </div>
+                                    <p class="text-gray-600 dark:text-gray-300"><span class="font-medium text-gray-800 dark:text-white">订阅周期:</span> 提供月付、季付、年付等多种选择，满足不同需求</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 留存数据可视化 -->
+                <div class="bg-gray-50 px-6 py-8 border-t border-gray-200 dark:bg-gray-700 dark:border-gray-600">
+                    <h3 class="text-xl font-semibold mb-6 text-center text-gray-800 dark:text-white">会员留存效果</h3>
+                    <div class="max-w-2xl mx-auto">
+                        <div class="flex items-end justify-between h-48 mb-4">
+                            <div class="flex flex-col items-center w-1/4">
+                                <div class="bg-primary-500 h-16 w-full rounded-t-sm mb-2 relative">
+                                    <div class="absolute bottom-full left-1/2 transform -translate-x-1/2 bg-primary-700 text-white text-xs px-2 py-1 rounded whitespace-nowrap">试用周</div>
+                                </div>
+                                <p class="text-xs text-gray-600 dark:text-gray-300">试用期</p>
+                            </div>
+                            <div class="flex flex-col items-center w-1/4">
+                                <div class="bg-primary-400 h-24 w-full rounded-t-sm mb-2 relative">
+                                    <div class="absolute bottom-full left-1/2 transform -translate-x-1/2 bg-primary-600 text-white text-xs px-2 py-1 rounded whitespace-nowrap">首月</div>
+                                </div>
+                                <p class="text-xs text-gray-600 dark:text-gray-300">首月</p>
+                            </div>
+                            <div class="flex flex-col items-center w-1/4">
+                                <div class="bg-primary-300 h-20 w-full rounded-t-sm mb-2 relative">
+                                    <div class="absolute bottom-full left-1/2 transform -translate-x-1/2 bg-primary-500 text-white text-xs px-2 py-1 rounded whitespace-nowrap">第三月</div>
+                                </div>
+                                <p class="text-xs text-gray-600 dark:text-gray-300">第三月</p>
+                            </div>
+                            <div class="flex flex-col items-center w-1/4">
+                                <div class="bg-primary-200 h-28 w-full rounded-t-sm mb-2 relative">
+                                    <div class="absolute bottom-full left-1/2 transform -translate-x-1/2 bg-primary-400 text-white text-xs px-2 py-1 rounded whitespace-nowrap">半年后</div>
+                                </div>
+                                <p class="text-xs text-gray-600 dark:text-gray-300">半年后</p>
+                            </div>
+                        </div>
+                        <div class="text-center text-sm text-gray-600 dark:text-gray-400">
+                            <p>免费试用后，优质会员服务能有效提升长期留存率</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 收入部分 -->
+        <section id="revenue" class="mb-16 fade-in">
+            <div class="flex items-center mb-8">
+                <div class="flex-shrink-0 bg-primary-500 rounded-full w-12 h-12 flex items-center justify-center text-white mr-4">
+                    <i class="fas fa-dollar-sign text-xl"></i>
+                </div>
+                <h2 class="text-3xl font-bold text-gray-900 dark:text-white">收入 (Revenue)</h2>
+            </div>
+            
+            <div class="grid md:grid-cols-2 gap-6">
+                <div class="bg-white p-6 rounded-xl shadow-sm card-hover dark:bg-gray-800">
+                    <div class="flex items-center mb-4">
+                        <div class="bg-primary-100 text-primary-800 rounded-full w-8 h-8 flex items-center justify-center mr-3 dark:bg-primary-900 dark:text-primary-200">
+                            <i class="fas fa-crown text-sm"></i>
+                        </div>
+                        <h3 class="text-xl font-semibold text-gray-800 dark:text-white">会员订阅</h3>
+                    </div>
+                    <ul class="space-y-2 text-gray-600 dark:text-gray-300">
+                        <li class="flex items-start">
+                            <i class="fas fa-circle text-xs text-primary-500 mt-1 mr-2"></i>
+                            <span>黑胶VIP会员</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-circle text-xs text-primary-500 mt-1 mr-2"></i>
+                            <span>音乐包会员</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-circle text-xs text-primary-500 mt-1 mr-2"></i>
+                            <span>按季度/年度订阅</span>
+                        </li>
+                    </ul>
+                </div>
+                
+                <div class="bg-white p-6 rounded-xl shadow-sm card-hover dark:bg-gray-800">
+                    <div class="flex items-center mb-4">
+                        <div class="bg-primary-100 text-primary-800 rounded-full w-8 h-8 flex items-center justify-center mr-3 dark:bg-primary-900 dark:text-primary-200">
+                            <i class="fas fa-headphones text-sm"></i>
+                        </div>
+                        <h3 class="text-xl font-semibold text-gray-800 dark:text-white">数字内容</h3>
+                    </div>
+                    <ul class="space-y-2 text-gray-600 dark:text-gray-300">
+                        <li class="flex items-start">
+                            <i class="fas fa-circle text-xs text-primary-500 mt-1 mr-2"></i>
+                            <span>单曲购买</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-circle text-xs text-primary-500 mt-1 mr-2"></i>
+                            <span>数字专辑</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-circle text-xs text-primary-500 mt-1 mr-2"></i>
+                            <span>付费听书</span>
+                        </li>
+                    </ul>
+                </div>
+                
+                <div class="bg-white p-6 rounded-xl shadow-sm card-hover dark:bg-gray-800">
+                    <div class="flex items-center mb-4">
+                        <div class="bg-primary-100 text-primary-800 rounded-full w-8 h-8 flex items-center justify-center mr-3 dark:bg-primary-900 dark:text-primary-200">
+                            <i class="fas fa-ad text-sm"></i>
+                        </div>
+                        <h3 class="text-xl font-semibold text-gray-800 dark:text-white">广告收入</h3>
+                    </div>
+                    <ul class="space-y-2 text-gray-600 dark:text-gray-300">
+                        <li class="flex items-start">
+                            <i class="fas fa-circle text-xs text-primary-500 mt-1 mr-2"></i>
+                            <span>开屏广告</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-circle text-xs text-primary-500 mt-1 mr-2"></i>
+                            <span>信息流广告</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-circle text-xs text-primary-500 mt-1 mr-2"></i>
+                            <span>品牌定制广告</span>
+                        </li>
+                    </ul>
+                </div>
+                
+                <div class="bg-white p-6 rounded-xl shadow-sm card-hover dark:bg-gray-800">
+                    <div class="flex items-center mb-4">
+                        <div class="bg-primary-100 text-primary-800 rounded-full w-8 h-8 flex items-center justify-center mr-3 dark:bg-primary-900 dark:text-primary-200">
+                            <i class="fas fa-store text-sm"></i>
+                        </div>
+                        <h3 class="text-xl font-semibold text-gray-800 dark:text-white">其他收入</h3>
+                    </div>
+                    <ul class="space-y-2 text-gray-600 dark:text-gray-300">
+                        <li class="flex items-start">
+                            <i class="fas fa-circle text-xs text-primary-500 mt-1 mr-2"></i>
+                            <span>周边商品(如保温杯)</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-circle text-xs text-primary-500 mt-1 mr-2"></i>
+                            <span>云村有票(演出票务)</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-circle text-xs text-primary-500 mt-1 mr-2"></i>
+                            <span>直播打赏分成</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- 传播部分 -->
+        <section id="referral" class="mb-16 fade-in">
+            <div class="flex items-center mb-8">
+                <div class="flex-shrink-0 bg-primary-500 rounded-full w-12 h-12 flex items-center justify-center text-white mr-4">
+                    <i class="fas fa-share-alt text-xl"></i>
+                </div>
+                <h2 class="text-3xl font-bold text-gray-900 dark:text-white">传播 (Referral)</h2>
+            </div>
+            
+            <div class="bg-white rounded-xl shadow-sm overflow-hidden dark:bg-gray-800">
+                <div class="p-6">
+                    <h3 class="text-xl font-semibold mb-4 text-gray-800 dark:text-white">自传播机制</h3>
+                    <p class="text-gray-600 mb-6 dark:text-gray-300">网易云音乐通过设计具有分享价值的活动和内容，鼓励用户自发传播，实现老带新的增长。</p>
+                    
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div>
+                            <h4 class="text-lg font-medium mb-3 text-gray-800 dark:text-white">自然分享</h4>
+                            <div class="flex items-start mb-4">
+                                <div class="flex-shrink-0 bg-primary-100 text-primary-800 rounded-full w-6 h-6 flex items-center justify-center mt-1 mr-3 dark:bg-primary-900 dark:text-primary-200">
+                                    <i class="fas fa-music text-xs"></i>
+                                </div>
+                                <p class="text-gray-600 dark:text-gray-300">用户发现喜欢的歌曲后，主动分享到朋友圈等社交平台</p>
+                            </div>
+                        </div>
+                        <div>
+                            <h4 class="text-lg font-medium mb-3 text-gray-800 dark:text-white">营销活动</h4>
+                            <div class="flex items-start">
+                                <div class="flex-shrink-0 bg-primary-100 text-primary-800 rounded-full w-6 h-6 flex items-center justify-center mt-1 mr-3 dark:bg-primary-900 dark:text-primary-200">
+                                    <i class="fas fa-chart-line text-xs"></i>
+                                </div>
+                                <p class="text-gray-600 dark:text-gray-300">年度听歌报告展示用户个性化数据，激发分享欲望</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 年度报告案例 -->
+                <div class="bg-gray-50 px-6 py-8 border-t border-gray-200 dark:bg-gray-700 dark:border-gray-600">
+                    <h3 class="text-xl font-semibold mb-6 text-center text-gray-800 dark:text-white">年度听歌报告案例</h3>
+                    <div class="max-w-3xl mx-auto bg-white rounded-lg shadow-xs p-6 dark:bg-gray-800">
+                        <div class="flex items-center mb-4">
+                            <div class="bg-primary-500 text-white rounded-full w-10 h-10 flex items-center justify-center mr-3">
+                                <i class="fas fa-calendar-alt"></i>
+                            </div>
+                            <h4 class="text-lg font-medium text-gray-800 dark:text-white">2022年度听歌报告</h4>
+                        </div>
+                        <div class="space-y-4 text-gray-600 dark:text-gray-300">
+                            <p>"这一年，你一共听了<span class="font-bold text-primary-600 dark:text-primary-400">2,843</span>首歌"</p>
+                            <p>"你最喜欢在<span class="font-bold text-primary-600 dark:text-primary-400">深夜23点</span>听歌"</p>
+                            <p>"<span class="font-bold text-primary-600 dark:text-primary-400">米津玄师</span>是你的年度歌手，你在某周听了他的歌<span class="font-bold text-primary-600 dark:text-primary-400">37次</span>"</p>
+                            <p>"<span class="font-bold text-primary-600 dark:text-primary-400">《Lemon》</span>是你的年度歌曲，你听了<span class="font-bold text-primary-600 dark:text-primary-400">86次</span>"</p>
+                        </div>
+                        <div class="mt-6 pt-4 border-t border-gray-200 dark:border-gray-700">
+                            <p class="text-sm text-gray-500 dark:text-gray-400">这样的个性化数据报告极易引发用户共鸣和分享欲望，形成病毒式传播。</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 总结部分 -->
+        <section class="fade-in">
+            <div class="bg-primary-50 rounded-xl p-8 text-center dark:bg-gray-800">
+                <h2 class="text-2xl font-bold mb-4 text-primary-800 dark:text-primary-200">AARRR模型应用总结</h2>
+                <p class="text-gray-700 max-w-3xl mx-auto mb-6 dark:text-gray-300">网易云音乐通过系统化的AARRR模型应用，在各个用户生命周期阶段采取针对性策略，实现了可持续的用户增长和商业成功。</p>
+                <div class="max-w-4xl mx-auto">
+                    <div class="grid md:grid-cols-5 gap-4">
+                        <div class="bg-white p-4 rounded-lg shadow-xs dark:bg-gray-700">
+                            <div class="text-primary-600 mb-2 dark:text-primary-400">
+                                <i class="fas fa-users text-2xl"></i>
+                            </div>
+                            <h3 class="font-medium text-gray-800 mb-1 dark:text-white">获客</h3>
+                            <p class="text-xs text-gray-600 dark:text-gray-300">多渠道精准获取用户</p>
+                        </div>
+                        <div class="bg-white p-4 rounded-lg shadow-xs dark:bg-gray-700">
+                            <div class="text-primary-600 mb-2 dark:text-primary-400">
+                                <i class="fas fa-bolt text-2xl"></i>
+                            </div>
+                            <h3 class="font-medium text-gray-800 mb-1 dark:text-white">激活</h3>
+                            <p class="text-xs text-gray-600 dark:text-gray-300">优化首次体验流程</p>
+                        </div>
+                        <div class="bg-white p-4 rounded-lg shadow-xs dark:bg-gray-700">
+                            <div class="text-primary-600 mb-2 dark:text-primary-400">
+                                <i class="fas fa-anchor text-2xl"></i>
+                            </div>
+                            <h3 class="font-medium text-gray-800 mb-1 dark:text-white">留存</h3>
+                            <p class="text-xs text-gray-600 dark:text-gray-300">建立长期使用习惯</p>
+                        </div>
+                        <div class="bg-white p-4 rounded-lg shadow-xs dark:bg-gray-700">
+                            <div class="text-primary-600 mb-2 dark:text-primary-400">
+                                <i class="fas fa-dollar-sign text-2xl"></i>
+                            </div>
+                            <h3 class="font-medium text-gray-800 mb-1 dark:text-white">收入</h3>
+                            <p class="text-xs text-gray-600 dark:text-gray-300">多元化变现模式</p>
+                        </div>
+                        <div class="bg-white p-4 rounded-lg shadow-xs dark:bg-gray-700">
+                            <div class="text-primary-600 mb-2 dark:text-primary-400">
+                                <i class="fas fa-share-alt text-2xl"></i>
+                            </div>
+                            <h3 class="font-medium text-gray-800 mb-1 dark:text-white">传播</h3>
+                            <p class="text-xs text-gray-600 dark:text-gray-300">激发用户自发分享</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- 页脚 -->
+    <footer class="bg-white py-8 border-t border-gray-200 dark:bg-gray-800 dark:border-gray-700">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center">
+                <p class="text-gray-600 dark:text-gray-400">© 2023 网易云音乐AARRR模型分析. 仅供学习参考.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // 主题切换功能
+        const themeToggle = document.getElementById('themeToggle');
+        const html = document.documentElement;
+        
+        // 检查本地存储或系统偏好
+        if (localStorage.getItem('theme') === 'dark' || 
+            (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            html.classList.add('dark');
+        }
+        
+        themeToggle.addEventListener('click', () => {
+            html.classList.toggle('dark');
+            localStorage.setItem('theme', html.classList.contains('dark') ? 'dark' : 'light');
+        });
+        
+        // 移动端菜单切换
+        const mobileMenuButton = document.getElementById('mobileMenuButton');
+        const mobileMenu = document.getElementById('mobileMenu');
+        
+        mobileMenuButton.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+        });
+        
+        // 平滑滚动
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                
+                const targetId = this.getAttribute('href');
+                const targetElement = document.querySelector(targetId);
+                
+                if (targetElement) {
+                    targetElement.scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                    
+                    // 如果是移动端菜单，点击后隐藏菜单
+                    if (!mobileMenu.classList.contains('hidden')) {
+                        mobileMenu.classList.add('hidden');
+                    }
+                }
+            });
+        });
+        
+        // 页面加载动画
+        document.addEventListener('DOMContentLoaded', () => {
+            const fadeElements = document.querySelectorAll('.fade-in');
+            fadeElements.forEach((el, index) => {
+                setTimeout(() => {
+                    el.style.opacity = '1';
+                }, index * 100);
+            });
+        });
+    </script>
+</body>
+</html>

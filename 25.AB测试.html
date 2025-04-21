@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AB测试起源与应用分析</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Noto Sans SC', 'sans-serif'],
+                    },
+                    colors: {
+                        primary: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            200: '#bae6fd',
+                            300: '#7dd3fc',
+                            400: '#38bdf8',
+                            500: '#0ea5e9',
+                            600: '#0284c7',
+                            700: '#0369a1',
+                            800: '#075985',
+                            900: '#0c4a6e',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .smooth-scroll {
+            scroll-behavior: smooth;
+        }
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        .card-hover:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+        .btn-hover {
+            transition: all 0.2s ease;
+        }
+        .btn-hover:hover {
+            transform: scale(1.05);
+        }
+        .dark .dark\:bg-gray-800 {
+            background-color: #1f2937;
+        }
+        .dark .dark\:text-white {
+            color: #fff;
+        }
+        .dark .dark\:bg-gray-700 {
+            background-color: #374151;
+        }
+        .dark .dark\:text-gray-300 {
+            color: #d1d5db;
+        }
+        .timeline-item:not(:last-child):after {
+            content: '';
+            position: absolute;
+            left: 1.25rem;
+            top: 2.5rem;
+            height: calc(100% - 2.5rem);
+            width: 2px;
+            background-color: #e5e7eb;
+        }
+        .dark .timeline-item:not(:last-child):after {
+            background-color: #4b5563;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans smooth-scroll dark:bg-gray-900 dark:text-gray-200">
+    <!-- 主题切换按钮 -->
+    <div class="fixed bottom-6 right-6 z-50">
+        <button id="themeToggle" class="p-3 rounded-full bg-primary-500 text-white shadow-lg btn-hover dark:bg-primary-700">
+            <i class="fas fa-moon dark:hidden"></i>
+            <i class="fas fa-sun hidden dark:inline"></i>
+        </button>
+    </div>
+
+    <!-- 导航栏 -->
+    <nav class="sticky top-0 z-40 bg-white/80 backdrop-blur-sm shadow-sm dark:bg-gray-800/80">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <span class="text-xl font-bold text-primary-600 dark:text-primary-400">AB测试</span>
+                    <span class="ml-2 text-gray-600 dark:text-gray-300">起源与应用分析</span>
+                </div>
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="#introduction" class="text-gray-600 hover:text-primary-600 dark:text-gray-300 dark:hover:text-primary-400 transition">AB测试简介</a>
+                    <a href="#origin" class="text-gray-600 hover:text-primary-600 dark:text-gray-300 dark:hover:text-primary-400 transition">历史起源</a>
+                    <a href="#application" class="text-gray-600 hover:text-primary-600 dark:text-gray-300 dark:hover:text-primary-400 transition">应用场景</a>
+                    <a href="#cases" class="text-gray-600 hover:text-primary-600 dark:text-gray-300 dark:hover:text-primary-400 transition">经典案例</a>
+                </div>
+                <div class="flex items-center md:hidden">
+                    <button id="mobileMenuButton" class="text-gray-600 dark:text-gray-300">
+                        <i class="fas fa-bars text-xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <!-- 移动端菜单 -->
+        <div id="mobileMenu" class="hidden md:hidden bg-white dark:bg-gray-800 shadow-lg">
+            <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+                <a href="#introduction" class="block px-3 py-2 rounded-md text-base font-medium text-gray-600 hover:text-primary-600 hover:bg-gray-50 dark:text-gray-300 dark:hover:text-primary-400 dark:hover:bg-gray-700">AB测试简介</a>
+                <a href="#origin" class="block px-3 py-2 rounded-md text-base font-medium text-gray-600 hover:text-primary-600 hover:bg-gray-50 dark:text-gray-300 dark:hover:text-primary-400 dark:hover:bg-gray-700">历史起源</a>
+                <a href="#application" class="block px-3 py-2 rounded-md text-base font-medium text-gray-600 hover:text-primary-600 hover:bg-gray-50 dark:text-gray-300 dark:hover:text-primary-400 dark:hover:bg-gray-700">应用场景</a>
+                <a href="#cases" class="block px-3 py-2 rounded-md text-base font-medium text-gray-600 hover:text-primary-600 hover:bg-gray-50 dark:text-gray-300 dark:hover:text-primary-400 dark:hover:bg-gray-700">经典案例</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 主内容区 -->
+    <main class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <!-- 标题部分 -->
+        <section class="mb-16 text-center fade-in">
+            <h1 class="text-4xl md:text-5xl font-bold mb-6 text-gray-900 dark:text-white">AB测试：从科学实验到商业利器</h1>
+            <p class="text-xl text-gray-600 max-w-3xl mx-auto dark:text-gray-300">探索对照实验的历史演变与现代应用</p>
+            
+            <!-- AB测试简介 -->
+            <div class="mt-12 bg-white rounded-xl shadow-sm p-8 dark:bg-gray-800" id="introduction">
+                <div class="flex items-center mb-8">
+                    <div class="flex-shrink-0 bg-primary-500 rounded-full w-12 h-12 flex items-center justify-center text-white mr-4">
+                        <i class="fas fa-flask text-xl"></i>
+                    </div>
+                    <h2 class="text-3xl font-bold text-gray-900 dark:text-white">什么是AB测试？</h2>
+                </div>
+                
+                <div class="grid md:grid-cols-2 gap-8">
+                    <div>
+                        <p class="text-gray-600 mb-6 dark:text-gray-300">AB测试是一种科学的实验方法，通过将用户随机分为两组（A组和B组），分别展示不同版本的产品或服务，然后比较两组的表现数据，从而确定哪个版本更有效。</p>
+                        
+                        <div class="bg-primary-50 rounded-lg p-6 mb-6 dark:bg-gray-700">
+                            <h3 class="text-xl font-semibold mb-4 text-primary-800 dark:text-primary-200">AB测试的核心原则</h3>
+                            <ul class="space-y-3 text-gray-700 dark:text-gray-300">
+                                <li class="flex items-start">
+                                    <i class="fas fa-check-circle text-primary-600 mt-1 mr-2 dark:text-primary-400"></i>
+                                    <span>随机分组确保公平比较</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <i class="fas fa-check-circle text-primary-600 mt-1 mr-2 dark:text-primary-400"></i>
+                                    <span>控制变量，只改变一个因素</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <i class="fas fa-check-circle text-primary-600 mt-1 mr-2 dark:text-primary-400"></i>
+                                    <span>足够大的样本量确保统计显著性</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <i class="fas fa-check-circle text-primary-600 mt-1 mr-2 dark:text-primary-400"></i>
+                                    <span>明确的评估指标衡量效果</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <div class="bg-white border border-gray-200 rounded-lg p-6 shadow-xs dark:bg-gray-700 dark:border-gray-600">
+                            <h3 class="text-xl font-semibold mb-4 text-gray-800 dark:text-white">AB测试基本流程</h3>
+                            <div class="space-y-4">
+                                <div class="flex items-start">
+                                    <div class="flex-shrink-0 bg-primary-100 text-primary-800 rounded-full w-6 h-6 flex items-center justify-center mt-1 mr-3 dark:bg-primary-900 dark:text-primary-200">
+                                        <span class="text-xs">1</span>
+                                    </div>
+                                    <p class="text-gray-600 dark:text-gray-300">确定测试目标和假设</p>
+                                </div>
+                                <div class="flex items-start">
+                                    <div class="flex-shrink-0 bg-primary-100 text-primary-800 rounded-full w-6 h-6 flex items-center justify-center mt-1 mr-3 dark:bg-primary-900 dark:text-primary-200">
+                                        <span class="text-xs">2</span>
+                                    </div>
+                                    <p class="text-gray-600 dark:text-gray-300">创建实验版本和对照版本</p>
+                                </div>
+                                <div class="flex items-start">
+                                    <div class="flex-shrink-0 bg-primary-100 text-primary-800 rounded-full w-6 h-6 flex items-center justify-center mt-1 mr-3 dark:bg-primary-900 dark:text-primary-200">
+                                        <span class="text-xs">3</span>
+                                    </div>
+                                    <p class="text-gray-600 dark:text-gray-300">随机分配用户到不同组</p>
+                                </div>
+                                <div class="flex items-start">
+                                    <div class="flex-shrink-0 bg-primary-100 text-primary-800 rounded-full w-6 h-6 flex items-center justify-center mt-1 mr-3 dark:bg-primary-900 dark:text-primary-200">
+                                        <span class="text-xs">4</span>
+                                    </div>
+                                    <p class="text-gray-600 dark:text-gray-300">收集和分析数据</p>
+                                </div>
+                                <div class="flex items-start">
+                                    <div class="flex-shrink-0 bg-primary-100 text-primary-800 rounded-full w-6 h-6 flex items-center justify-center mt-1 mr-3 dark:bg-primary-900 dark:text-primary-200">
+                                        <span class="text-xs">5</span>
+                                    </div>
+                                    <p class="text-gray-600 dark:text-gray-300">得出结论并实施优化</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 历史起源部分 -->
+        <section id="origin" class="mb-16 fade-in">
+            <div class="flex items-center mb-8">
+                <div class="flex-shrink-0 bg-primary-500 rounded-full w-12 h-12 flex items-center justify-center text-white mr-4">
+                    <i class="fas fa-history text-xl"></i>
+                </div>
+                <h2 class="text-3xl font-bold text-gray-900 dark:text-white">AB测试的历史起源</h2>
+            </div>
+            
+            <div class="bg-white rounded-xl shadow-sm overflow-hidden dark:bg-gray-800">
+                <div class="p-6">
+                    <h3 class="text-xl font-semibold mb-6 text-gray-800 dark:text-white">从科学实验到商业应用</h3>
+                    
+                    <div class="relative">
+                        <!-- 时间线 -->
+                        <div class="space-y-8">
+                            <div class="timeline-item relative pl-12">
+                                <div class="absolute left-0 top-0 bg-primary-500 text-white rounded-full w-10 h-10 flex items-center justify-center">
+                                    <i class="fas fa-seedling"></i>
+                                </div>
+                                <h4 class="text-xl font-semibold mb-2 text-gray-800 dark:text-white">达尔文的光照实验 (19世纪)</h4>
+                                <p class="text-gray-600 dark:text-gray-300">达尔文研究植物生长与光照关系，设置垂直光和斜光两组对照，发现植物的向光性。这是对照实验的早期应用。</p>
+                            </div>
+                            
+                            <div class="timeline-item relative pl-12">
+                                <div class="absolute left-0 top-0 bg-primary-500 text-white rounded-full w-10 h-10 flex items-center justify-center">
+                                    <i class="fas fa-syringe"></i>
+                                </div>
+                                <h4 class="text-xl font-semibold mb-2 text-gray-800 dark:text-white">坏血病治疗实验 (1740年)</h4>
+                                <p class="text-gray-600 dark:text-gray-300">外科医生测试6种不同药方治疗坏血病，发现新鲜橘子类水果最有效（后来知道是维生素C的作用）。</p>
+                            </div>
+                            
+                            <div class="timeline-item relative pl-12">
+                                <div class="absolute left-0 top-0 bg-primary-500 text-white rounded-full w-10 h-10 flex items-center justify-center">
+                                    <i class="fas fa-pills"></i>
+                                </div>
+                                <h4 class="text-xl font-semibold mb-2 text-gray-800 dark:text-white">双盲实验 (20世纪)</h4>
+                                <p class="text-gray-600 dark:text-gray-300">医学领域发展出双盲实验方法，实验组使用真实药物，对照组使用安慰剂，患者和医生都不知道分组情况。</p>
+                            </div>
+                            
+                            <div class="timeline-item relative pl-12">
+                                <div class="absolute left-0 top-0 bg-primary-500 text-white rounded-full w-10 h-10 flex items-center justify-center">
+                                    <i class="fas fa-laptop-code"></i>
+                                </div>
+                                <h4 class="text-xl font-semibold mb-2 text-gray-800 dark:text-white">互联网时代 (21世纪)</h4>
+                                <p class="text-gray-600 dark:text-gray-300">对照实验方法被互联网公司广泛采用，演变为AB测试，用于优化网页设计、产品功能、营销策略等。</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 达尔文实验可视化 -->
+                <div class="bg-gray-50 px-6 py-8 border-t border-gray-200 dark:bg-gray-700 dark:border-gray-600">
+                    <h3 class="text-xl font-semibold mb-6 text-center text-gray-800 dark:text-white">达尔文光照实验示意图</h3>
+                    <div class="max-w-2xl mx-auto">
+                        <div class="grid grid-cols-2 gap-8">
+                            <div class="text-center">
+                                <div class="bg-white p-4 rounded-lg shadow-xs mb-3 dark:bg-gray-800">
+                                    <div class="h-32 flex items-center justify-center">
+                                        <div class="relative">
+                                            <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto dark:bg-green-900">
+                                                <i class="fas fa-leaf text-green-600 text-2xl dark:text-green-400"></i>
+                                            </div>
+                                            <div class="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-6">
+                                                <i class="fas fa-sun text-yellow-400 text-xl"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <h4 class="font-medium text-gray-800 dark:text-white">垂直光照射</h4>
+                                <p class="text-sm text-gray-600 dark:text-gray-400">植物直立生长</p>
+                            </div>
+                            <div class="text-center">
+                                <div class="bg-white p-4 rounded-lg shadow-xs mb-3 dark:bg-gray-800">
+                                    <div class="h-32 flex items-center justify-center">
+                                        <div class="relative">
+                                            <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto transform rotate-12 dark:bg-green-900">
+                                                <i class="fas fa-leaf text-green-600 text-2xl dark:text-green-400"></i>
+                                            </div>
+                                            <div class="absolute top-0 left-1/4 transform -translate-y-6">
+                                                <i class="fas fa-sun text-yellow-400 text-xl"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <h4 class="font-medium text-gray-800 dark:text-white">斜光照射</h4>
+                                <p class="text-sm text-gray-600 dark:text-gray-400">植物向光源方向弯曲</p>
+                            </div>
+                        </div>
+                        <div class="mt-6 text-center text-gray-600 dark:text-gray-400">
+                            <p>达尔文通过对照实验发现了植物的向光性，这是AB测试思想的早期应用</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 应用场景部分 -->
+        <section id="application" class="mb-16 fade-in">
+            <div class="flex items-center mb-8">
+                <div class="flex-shrink-0 bg-primary-500 rounded-full w-12 h-12 flex items-center justify-center text-white mr-4">
+                    <i class="fas fa-laptop text-xl"></i>
+                </div>
+                <h2 class="text-3xl font-bold text-gray-900 dark:text-white">AB测试的应用场景</h2>
+            </div>
+            
+            <div class="grid md:grid-cols-2 gap-6">
+                <div class="bg-white p-6 rounded-xl shadow-sm card-hover dark:bg-gray-800">
+                    <div class="flex items-center mb-4">
+                        <div class="bg-primary-100 text-primary-800 rounded-full w-8 h-8 flex items-center justify-center mr-3 dark:bg-primary-900 dark:text-primary-200">
+                            <i class="fas fa-globe text-sm"></i>
+                        </div>
+                        <h3 class="text-xl font-semibold text-gray-800 dark:text-white">网页设计优化</h3>
+                    </div>
+                    <ul class="space-y-2 text-gray-600 dark:text-gray-300">
+                        <li class="flex items-start">
+                            <i class="fas fa-circle text-xs text-primary-500 mt-1 mr-2"></i>
+                            <span>测试不同布局对转化率的影响</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-circle text-xs text-primary-500 mt-1 mr-2"></i>
+                            <span>比较不同颜色按钮的点击率</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-circle text-xs text-primary-500 mt-1 mr-2"></i>
+                            <span>评估导航菜单结构的效果</span>
+                        </li>
+                    </ul>
+                </div>
+                
+                <div class="bg-white p-6 rounded-xl shadow-sm card-hover dark:bg-gray-800">
+                    <div class="flex items-center mb-4">
+                        <div class="bg-primary-100 text-primary-800 rounded-full w-8 h-8 flex items-center justify-center mr-3 dark:bg-primary-900 dark:text-primary-200">
+                            <i class="fas fa-envelope text-sm"></i>
+                        </div>
+                        <h3 class="text-xl font-semibold text-gray-800 dark:text-white">营销策略测试</h3>
+                    </div>
+                    <ul class="space-y-2 text-gray-600 dark:text-gray-300">
+                        <li class="flex items-start">
+                            <i class="fas fa-circle text-xs text-primary-500 mt-1 mr-2"></i>
+                            <span>不同邮件主题的打开率比较</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-circle text-xs text-primary-500 mt-1 mr-2"></i>
+                            <span>广告文案的效果测试</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-circle text-xs text-primary-500 mt-1 mr-2"></i>
+                            <span>促销活动形式的有效性</span>
+                        </li>
+                    </ul>
+                </div>
+                
+                <div class="bg-white p-6 rounded-xl shadow-sm card-hover dark:bg-gray-800">
+                    <div class="flex items-center mb-4">
+                        <div class="bg-primary-100 text-primary-800 rounded-full w-8 h-8 flex items-center justify-center mr-3 dark:bg-primary-900 dark:text-primary-200">
+                            <i class="fas fa-mobile-alt text-sm"></i>
+                        </div>
+                        <h3 class="text-xl font-semibold text-gray-800 dark:text-white">产品功能测试</h3>
+                    </div>
+                    <ul class="space-y-2 text-gray-600 dark:text-gray-300">
+                        <li class="flex items-start">
+                            <i class="fas fa-circle text-xs text-primary-500 mt-1 mr-2"></i>
+                            <span>新功能对用户留存的影响</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-circle text-xs text-primary-500 mt-1 mr-2"></i>
+                            <span>不同交互方式的效果比较</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-circle text-xs text-primary-500 mt-1 mr-2"></i>
+                            <span>功能布局对使用率的影响</span>
+                        </li>
+                    </ul>
+                </div>
+                
+                <div class="bg-white p-6 rounded-xl shadow-sm card-hover dark:bg-gray-800">
+                    <div class="flex items-center mb-4">
+                        <div class="bg-primary-100 text-primary-800 rounded-full w-8 h-8 flex items-center justify-center mr-3 dark:bg-primary-900 dark:text-primary-200">
+                            <i class="fas fa-shopping-cart text-sm"></i>
+                        </div>
+                        <h3 class="text-xl font-semibold text-gray-800 dark:text-white">价格策略测试</h3>
+                    </div>
+                    <ul class="space-y-2 text-gray-600 dark:text-gray-300">
+                        <li class="flex items-start">
+                            <i class="fas fa-circle text-xs text-primary-500 mt-1 mr-2"></i>
+                            <span>不同定价对转化率的影响</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-circle text-xs text-primary-500 mt-1 mr-2"></i>
+                            <span>订阅套餐组合的效果测试</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-circle text-xs text-primary-500 mt-1 mr-2"></i>
+                            <span>折扣展示方式对购买决策的影响</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- 经典案例部分 -->
+        <section id="cases" class="mb-16 fade-in">
+            <div class="flex items-center mb-8">
+                <div class="flex-shrink-0 bg-primary-500 rounded-full w-12 h-12 flex items-center justify-center text-white mr-4">
+                    <i class="fas fa-book-open text-xl"></i>
+                </div>
+                <h2 class="text-3xl font-bold text-gray-900 dark:text-white">AB测试经典案例</h2>
+            </div>
+            
+            <div class="bg-white rounded-xl shadow-sm overflow-hidden dark:bg-gray-800">
+                <div class="p-6">
+                    <div class="grid md:grid-cols-2 gap-8">
+                        <div>
+                            <h3 class="text-xl font-semibold mb-4 text-gray-800 dark:text-white">坏血病治疗实验 (1740年)</h3>
+                            <div class="flex items-start mb-4">
+                                <div class="flex-shrink-0 bg-primary-100 text-primary-800 rounded-full w-6 h-6 flex items-center justify-center mt-1 mr-3 dark:bg-primary-900 dark:text-primary-200">
+                                    <i class="fas fa-flask text-xs"></i>
+                                </div>
+                                <p class="text-gray-600 dark:text-gray-300">外科医生测试了6种不同药方治疗坏血病，包括苹果醋、大麦水、橘子青宁等。</p>
+                            </div>
+                            <div class="flex items-start mb-4">
+                                <div class="flex-shrink-0 bg-primary-100 text-primary-800 rounded-full w-6 h-6 flex items-center justify-center mt-1 mr-3 dark:bg-primary-900 dark:text-primary-200">
+                                    <i class="fas fa-check text-xs"></i>
+                                </div>
+                                <p class="text-gray-600 dark:text-gray-300">最终发现新鲜橘子类水果对治疗坏血病最有效（后来知道是维生素C的作用）。</p>
+                            </div>
+                            <div class="flex items-start">
+                                <div class="flex-shrink-0 bg-primary-100 text-primary-800 rounded-full w-6 h-6 flex items-center justify-center mt-1 mr-3 dark:bg-primary-900 dark:text-primary-200">
+                                    <i class="fas fa-lightbulb text-xs"></i>
+                                </div>
+                                <p class="text-gray-600 dark:text-gray-300">这是医学史上早期对照实验的典范，为现代AB测试奠定了基础。</p>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <h3 class="text-xl font-semibold mb-4 text-gray-800 dark:text-white">双盲药物测试 (现代)</h3>
+                            <div class="flex items-start mb-4">
+                                <div class="flex-shrink-0 bg-primary-100 text-primary-800 rounded-full w-6 h-6 flex items-center justify-center mt-1 mr-3 dark:bg-primary-900 dark:text-primary-200">
+                                    <i class="fas fa-user-shield text-xs"></i>
+                                </div>
+                                <p class="text-gray-600 dark:text-gray-300">将志愿者随机分为两组：实验组使用真实药物，对照组使用安慰剂。</p>
+                            </div>
+                            <div class="flex items-start mb-4">
+                                <div class="flex-shrink-0 bg-primary-100 text-primary-800 rounded-full w-6 h-6 flex items-center justify-center mt-1 mr-3 dark:bg-primary-900 dark:text-primary-200">
+                                    <i class="fas fa-blind text-xs"></i>
+                                </div>
+                                <p class="text-gray-600 dark:text-gray-300">患者和医生都不知道分组情况，避免主观偏见影响实验结果。</p>
+                            </div>
+                            <div class="flex items-start">
+                                <div class="flex-shrink-0 bg-primary-100 text-primary-800 rounded-full w-6 h-6 flex items-center justify-center mt-1 mr-3 dark:bg-primary-900 dark:text-primary-200">
+                                    <i class="fas fa-virus text-xs"></i>
+                                </div>
+                                <p class="text-gray-600 dark:text-gray-300">新冠疫苗研发也采用了这种方法，确保疫苗安全有效后才投入使用。</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 互联网公司应用案例 -->
+                <div class="bg-gray-50 px-6 py-8 border-t border-gray-200 dark:bg-gray-700 dark:border-gray-600">
+                    <h3 class="text-xl font-semibold mb-6 text-center text-gray-800 dark:text-white">互联网公司的AB测试实践</h3>
+                    <div class="max-w-3xl mx-auto">
+                        <div class="bg-white rounded-lg shadow-xs p-6 dark:bg-gray-800">
+                            <div class="flex items-center mb-4">
+                                <div class="bg-primary-500 text-white rounded-full w-10 h-10 flex items-center justify-center mr-3">
+                                    <i class="fas fa-building"></i>
+                                </div>
+                                <h4 class="text-lg font-medium text-gray-800 dark:text-white">字节跳动的AB测试文化</h4>
+                            </div>
+                            <div class="space-y-4 text-gray-600 dark:text-gray-300">
+                                <p>字节跳动将AB测试作为产品决策的核心方法，每天运行数千个AB测试。</p>
+                                <p>通过AB测试优化推荐算法、界面设计、广告投放等各个环节。</p>
+                                <p>例如，测试发现将"点赞"按钮从心形改为大拇指形状，提升了互动率15%。</p>
+                                <p>另一个测试发现调整视频封面图尺寸，显著提高了用户观看时长。</p>
+                            </div>
+                            <div class="mt-6 pt-4 border-t border-gray-200 dark:border-gray-700">
+                                <p class="text-sm text-gray-500 dark:text-gray-400">互联网大厂通过大规模AB测试不断优化产品，实现数据驱动的决策。</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 总结部分 -->
+        <section class="fade-in">
+            <div class="bg-primary-50 rounded-xl p-8 text-center dark:bg-gray-800">
+                <h2 class="text-2xl font-bold mb-4 text-primary-800 dark:text-primary-200">AB测试的价值总结</h2>
+                <p class="text-gray-700 max-w-3xl mx-auto mb-6 dark:text-gray-300">从科学实验到商业应用，AB测试已成为数据驱动决策的重要工具，帮助组织基于证据而非直觉做出更优选择。</p>
+                <div class="max-w-4xl mx-auto">
+                    <div class="grid md:grid-cols-3 gap-4">
+                        <div class="bg-white p-4 rounded-lg shadow-xs dark:bg-gray-700">
+                            <div class="text-primary-600 mb-2 dark:text-primary-400">
+                                <i class="fas fa-chart-line text-2xl"></i>
+                            </div>
+                            <h3 class="font-medium text-gray-800 mb-1 dark:text-white">科学决策</h3>
+                            <p class="text-xs text-gray-600 dark:text-gray-300">基于数据而非直觉做决策</p>
+                        </div>
+                        <div class="bg-white p-4 rounded-lg shadow-xs dark:bg-gray-700">
+                            <div class="text-primary-600 mb-2 dark:text-primary-400">
+                                <i class="fas fa-user-check text-2xl"></i>
+                            </div>
+                            <h3 class="font-medium text-gray-800 mb-1 dark:text-white">用户体验</h3>
+                            <p class="text-xs text-gray-600 dark:text-gray-300">持续优化提升用户满意度</p>
+                        </div>
+                        <div class="bg-white p-4 rounded-lg shadow-xs dark:bg-gray-700">
+                            <div class="text-primary-600 mb-2 dark:text-primary-400">
+                                <i class="fas fa-hand-holding-usd text-2xl"></i>
+                            </div>
+                            <h3 class="font-medium text-gray-800 mb-1 dark:text-white">商业价值</h3>
+                            <p class="text-xs text-gray-600 dark:text-gray-300">提高转化率和商业效益</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- 页脚 -->
+    <footer class="bg-white py-8 border-t border-gray-200 dark:bg-gray-800 dark:border-gray-700">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center">
+                <p class="text-gray-600 dark:text-gray-400">© 2025 AB测试起源与应用分析. 仅供学习参考.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // 主题切换功能
+        const themeToggle = document.getElementById('themeToggle');
+        const html = document.documentElement;
+        
+        // 检查本地存储或系统偏好
+        if (localStorage.getItem('theme') === 'dark' || 
+            (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            html.classList.add('dark');
+        }
+        
+        themeToggle.addEventListener('click', () => {
+            html.classList.toggle('dark');
+            localStorage.setItem('theme', html.classList.contains('dark') ? 'dark' : 'light');
+        });
+        
+        // 移动端菜单切换
+        const mobileMenuButton = document.getElementById('mobileMenuButton');
+        const mobileMenu = document.getElementById('mobileMenu');
+        
+        mobileMenuButton.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+        });
+        
+        // 平滑滚动
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                
+                const targetId = this.getAttribute('href');
+                const targetElement = document.querySelector(targetId);
+                
+                if (targetElement) {
+                    targetElement.scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                    
+                    // 如果是移动端菜单，点击后隐藏菜单
+                    if (!mobileMenu.classList.contains('hidden')) {
+                        mobileMenu.classList.add('hidden');
+                    }
+                }
+            });
+        });
+        
+        // 页面加载动画
+        document.addEventListener('DOMContentLoaded', () => {
+            const fadeElements = document.querySelectorAll('.fade-in');
+            fadeElements.forEach((el, index) => {
+                setTimeout(() => {
+                    el.style.opacity = '1';
+                }, index * 100);
+            });
+        });
+    </script>
+</body>
+</html>

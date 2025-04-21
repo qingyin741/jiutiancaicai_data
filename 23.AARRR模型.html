@@ -1,0 +1,864 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AARRR模型 - 用户增长方法论</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            200: '#bae6fd',
+                            300: '#7dd3fc',
+                            400: '#38bdf8',
+                            500: '#0ea5e9',
+                            600: '#0284c7',
+                            700: '#0369a1',
+                            800: '#075985',
+                            900: '#0c4a6e',
+                        }
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.5s ease-in-out',
+                        'fade-in-up': 'fadeInUp 0.5s ease-out',
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': { opacity: '0' },
+                            '100%': { opacity: '1' },
+                        },
+                        fadeInUp: {
+                            '0%': { opacity: '0', transform: 'translateY(20px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .prose {
+            max-width: 65ch;
+            font-size: 1rem;
+            line-height: 1.75;
+        }
+        .prose :where(p):not(:where([class~="not-prose"] *)) {
+            margin-top: 1.25em;
+            margin-bottom: 1.25em;
+        }
+        .prose :where(h1):not(:where([class~="not-prose"] *)) {
+            font-size: 2.25em;
+            margin-top: 0;
+            margin-bottom: 0.8888889em;
+            line-height: 1.1111111;
+            font-weight: 800;
+        }
+        .prose :where(h2):not(:where([class~="not-prose"] *)) {
+            font-size: 1.5em;
+            margin-top: 2em;
+            margin-bottom: 1em;
+            line-height: 1.3333333;
+            font-weight: 700;
+        }
+        .prose :where(h3):not(:where([class~="not-prose"] *)) {
+            font-size: 1.25em;
+            margin-top: 1.6em;
+            margin-bottom: 0.6em;
+            line-height: 1.6;
+            font-weight: 600;
+        }
+        .prose :where(blockquote):not(:where([class~="not-prose"] *)) {
+            font-weight: 500;
+            font-style: italic;
+            border-left-width: 0.25rem;
+            border-left-color: #e5e7eb;
+            quotes: "\201C""\201D""\2018""\2019";
+            margin-top: 1.6em;
+            margin-bottom: 1.6em;
+            padding-left: 1em;
+        }
+        .prose :where(ol):not(:where([class~="not-prose"] *)) {
+            list-style-type: decimal;
+            margin-top: 1.25em;
+            margin-bottom: 1.25em;
+            padding-left: 1.625em;
+        }
+        .prose :where(ul):not(:where([class~="not-prose"] *)) {
+            list-style-type: disc;
+            margin-top: 1.25em;
+            margin-bottom: 1.25em;
+            padding-left: 1.625em;
+        }
+        .prose :where(li):not(:where([class~="not-prose"] *)) {
+            margin-top: 0.5em;
+            margin-bottom: 0.5em;
+        }
+        .prose :where(a):not(:where([class~="not-prose"] *)) {
+            color: #0ea5e9;
+            text-decoration: underline;
+            font-weight: 500;
+        }
+        .prose :where(strong):not(:where([class~="not-prose"] *)) {
+            font-weight: 600;
+        }
+        
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+        .dark ::-webkit-scrollbar-track {
+            background: #1f2937;
+        }
+        .dark ::-webkit-scrollbar-thumb {
+            background: #4b5563;
+        }
+        .dark ::-webkit-scrollbar-thumb:hover {
+            background: #6b7280;
+        }
+        
+        /* Animation classes */
+        .animate-fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        .animate-fade-in-up {
+            animation: fadeInUp 0.5s ease-out;
+        }
+        
+        /* Custom transitions */
+        .transition-all-smooth {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        /* AARRR model visualization */
+        .aarrr-stage {
+            position: relative;
+            z-index: 1;
+        }
+        .aarrr-stage::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(14, 165, 233, 0.1) 0%, rgba(99, 102, 241, 0.1) 100%);
+            border-radius: 0.75rem;
+            z-index: -1;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .aarrr-stage:hover::before {
+            opacity: 1;
+        }
+        .dark .aarrr-stage::before {
+            background: linear-gradient(135deg, rgba(14, 165, 233, 0.2) 0%, rgba(99, 102, 241, 0.2) 100%);
+        }
+        
+        /* Timeline animation */
+        @keyframes drawLine {
+            to {
+                stroke-dashoffset: 0;
+            }
+        }
+        .timeline-path {
+            stroke-dasharray: 1000;
+            stroke-dashoffset: 1000;
+            animation: drawLine 2s ease-in-out forwards;
+        }
+        
+        /* Tooltip */
+        .tooltip {
+            position: relative;
+        }
+        .tooltip .tooltip-text {
+            visibility: hidden;
+            width: 200px;
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            border-radius: 6px;
+            padding: 5px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            transform: translateX(-50%);
+            opacity: 0;
+            transition: opacity 0.3s;
+            font-size: 0.875rem;
+        }
+        .tooltip:hover .tooltip-text {
+            visibility: visible;
+            opacity: 1;
+        }
+        .dark .tooltip .tooltip-text {
+            background-color: #f3f4f6;
+            color: #111827;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 dark:bg-gray-900 dark:text-gray-100 transition-colors duration-300">
+    <div class="min-h-screen">
+        <!-- Header -->
+        <header class="sticky top-0 z-10 bg-white/80 dark:bg-gray-900/80 backdrop-blur-md border-b border-gray-200 dark:border-gray-700">
+            <div class="container mx-auto px-4 py-4 flex justify-between items-center">
+                <div class="flex items-center space-x-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-primary-600 dark:text-primary-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                    </svg>
+                    <h1 class="text-xl font-bold text-gray-800 dark:text-white">AARRR模型</h1>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <button id="theme-toggle" class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">
+                        <i class="fas fa-moon dark:hidden"></i>
+                        <i class="fas fa-sun hidden dark:inline"></i>
+                    </button>
+                    <nav class="hidden md:flex space-x-6">
+                        <a href="#overview" class="text-sm font-medium hover:text-primary-600 dark:hover:text-primary-400 transition-colors">概述</a>
+                        <a href="#acquisition" class="text-sm font-medium hover:text-primary-600 dark:hover:text-primary-400 transition-colors">获取</a>
+                        <a href="#activation" class="text-sm font-medium hover:text-primary-600 dark:hover:text-primary-400 transition-colors">激活</a>
+                        <a href="#retention" class="text-sm font-medium hover:text-primary-600 dark:hover:text-primary-400 transition-colors">留存</a>
+                        <a href="#revenue" class="text-sm font-medium hover:text-primary-600 dark:hover:text-primary-400 transition-colors">收入</a>
+                        <a href="#referral" class="text-sm font-medium hover:text-primary-600 dark:hover:text-primary-400 transition-colors">传播</a>
+                    </nav>
+                    <button id="mobile-menu-button" class="md:hidden p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                </div>
+            </div>
+            <!-- Mobile menu -->
+            <div id="mobile-menu" class="hidden md:hidden bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700">
+                <div class="container mx-auto px-4 py-2 flex flex-col space-y-2">
+                    <a href="#overview" class="py-2 text-sm font-medium hover:text-primary-600 dark:hover:text-primary-400 transition-colors">概述</a>
+                    <a href="#acquisition" class="py-2 text-sm font-medium hover:text-primary-600 dark:hover:text-primary-400 transition-colors">获取</a>
+                    <a href="#activation" class="py-2 text-sm font-medium hover:text-primary-600 dark:hover:text-primary-400 transition-colors">激活</a>
+                    <a href="#retention" class="py-2 text-sm font-medium hover:text-primary-600 dark:hover:text-primary-400 transition-colors">留存</a>
+                    <a href="#revenue" class="py-2 text-sm font-medium hover:text-primary-600 dark:hover:text-primary-400 transition-colors">收入</a>
+                    <a href="#referral" class="py-2 text-sm font-medium hover:text-primary-600 dark:hover:text-primary-400 transition-colors">传播</a>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main content -->
+        <main class="container mx-auto px-4 py-8">
+            <!-- Hero section -->
+            <section class="mb-16 text-center animate-fade-in">
+                <h1 class="text-4xl md:text-5xl font-bold mb-6 text-gray-900 dark:text-white">AARRR用户增长模型</h1>
+                <p class="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto mb-8">互联网产品用户生命周期的五个关键阶段</p>
+                <div class="flex justify-center space-x-4">
+                    <a href="#overview" class="px-6 py-3 bg-primary-600 hover:bg-primary-700 text-white font-medium rounded-lg transition-colors shadow-md hover:shadow-lg">开始了解</a>
+                    <a href="#aarrr-model" class="px-6 py-3 border border-primary-600 text-primary-600 dark:text-primary-400 dark:border-primary-400 font-medium rounded-lg transition-colors hover:bg-primary-50 dark:hover:bg-gray-800">模型可视化</a>
+                </div>
+            </section>
+
+            <!-- Overview section -->
+            <section id="overview" class="mb-16 prose mx-auto animate-fade-in-up">
+                <h2>什么是AARRR模型？</h2>
+                <p>AARRR模型是五个英文单词首字母的缩写，分别代表：</p>
+                <ol>
+                    <li><strong>获取 (Acquisition)</strong> - 获取更多用户</li>
+                    <li><strong>激活 (Activation)</strong> - 让用户成为忠实用户</li>
+                    <li><strong>留存 (Retention)</strong> - 让用户留在产品中</li>
+                    <li><strong>收入 (Revenue)</strong> - 让用户消费变现</li>
+                    <li><strong>传播 (Referral)</strong> - 让用户自愿分享</li>
+                </ol>
+                <blockquote>
+                    AARRR模型本身是一个用户生命周期模型，最适合的领域是互联网产品。近年来随着增长黑客概念的流行，AARRR模型也被广泛关注和应用。
+                </blockquote>
+                <p>需要注意的是，虽然现在很多行业都想往AARRR模型上靠，但它最适合的还是互联网产品领域。</p>
+            </section>
+
+            <!-- AARRR Model Visualization -->
+            <section id="aarrr-model" class="mb-16">
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 animate-fade-in-up">
+                    <h2 class="text-2xl font-bold mb-6 text-center text-gray-800 dark:text-white">AARRR模型可视化</h2>
+                    
+                    <div class="relative max-w-4xl mx-auto">
+                        <!-- Timeline path -->
+                        <svg class="w-full h-auto" viewBox="0 0 800 200" preserveAspectRatio="xMidYMid meet">
+                            <path class="timeline-path" d="M50,100 Q200,100 250,50 Q300,0 350,50 Q400,100 550,100 Q600,100 650,150 Q700,200 750,150" 
+                                  stroke="#0ea5e9" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+                            
+                            <!-- Acquisition -->
+                            <g class="cursor-pointer transform hover:scale-110 transition-transform" onclick="location.href='#acquisition'">
+                                <circle cx="50" cy="100" r="20" fill="#0ea5e9" class="hover:fill-primary-700 transition-colors"/>
+                                <text x="50" y="100" text-anchor="middle" fill="white" font-weight="bold" font-size="14" dy="5">获</text>
+                                <text x="50" y="130" text-anchor="middle" fill="#0ea5e9" font-size="12">获取</text>
+                            </g>
+                            
+                            <!-- Activation -->
+                            <g class="cursor-pointer transform hover:scale-110 transition-transform" onclick="location.href='#activation'">
+                                <circle cx="250" cy="50" r="20" fill="#0ea5e9" class="hover:fill-primary-700 transition-colors"/>
+                                <text x="250" y="50" text-anchor="middle" fill="white" font-weight="bold" font-size="14" dy="5">激</text>
+                                <text x="250" y="80" text-anchor="middle" fill="#0ea5e9" font-size="12">激活</text>
+                            </g>
+                            
+                            <!-- Retention -->
+                            <g class="cursor-pointer transform hover:scale-110 transition-transform" onclick="location.href='#retention'">
+                                <circle cx="450" cy="100" r="20" fill="#0ea5e9" class="hover:fill-primary-700 transition-colors"/>
+                                <text x="450" y="100" text-anchor="middle" fill="white" font-weight="bold" font-size="14" dy="5">留</text>
+                                <text x="450" y="130" text-anchor="middle" fill="#0ea5e9" font-size="12">留存</text>
+                            </g>
+                            
+                            <!-- Revenue -->
+                            <g class="cursor-pointer transform hover:scale-110 transition-transform" onclick="location.href='#revenue'">
+                                <circle cx="650" cy="150" r="20" fill="#0ea5e9" class="hover:fill-primary-700 transition-colors"/>
+                                <text x="650" y="150" text-anchor="middle" fill="white" font-weight="bold" font-size="14" dy="5">收</text>
+                                <text x="650" y="180" text-anchor="middle" fill="#0ea5e9" font-size="12">收入</text>
+                            </g>
+                            
+                            <!-- Referral -->
+                            <g class="cursor-pointer transform hover:scale-110 transition-transform" onclick="location.href='#referral'">
+                                <circle cx="750" cy="150" r="20" fill="#0ea5e9" class="hover:fill-primary-700 transition-colors"/>
+                                <text x="750" y="150" text-anchor="middle" fill="white" font-weight="bold" font-size="14" dy="5">传</text>
+                                <text x="750" y="180" text-anchor="middle" fill="#0ea5e9" font-size="12">传播</text>
+                            </g>
+                        </svg>
+                    </div>
+                    
+                    <div class="mt-8 grid md:grid-cols-2 lg:grid-cols-5 gap-4">
+                        <div class="aarrr-stage p-4 rounded-lg border border-gray-200 dark:border-gray-700 transition-all-smooth hover:shadow-md">
+                            <div class="flex items-center mb-2">
+                                <div class="w-8 h-8 rounded-full bg-primary-100 dark:bg-primary-900 flex items-center justify-center mr-3">
+                                    <span class="text-primary-600 dark:text-primary-400 font-bold">获</span>
+                                </div>
+                                <h3 class="font-semibold">获取用户</h3>
+                            </div>
+                            <p class="text-sm text-gray-600 dark:text-gray-400">通过各种渠道获取新用户，增加产品曝光</p>
+                        </div>
+                        
+                        <div class="aarrr-stage p-4 rounded-lg border border-gray-200 dark:border-gray-700 transition-all-smooth hover:shadow-md">
+                            <div class="flex items-center mb-2">
+                                <div class="w-8 h-8 rounded-full bg-primary-100 dark:bg-primary-900 flex items-center justify-center mr-3">
+                                    <span class="text-primary-600 dark:text-primary-400 font-bold">激</span>
+                                </div>
+                                <h3 class="font-semibold">激活用户</h3>
+                            </div>
+                            <p class="text-sm text-gray-600 dark:text-gray-400">让新用户成为产品的忠实用户</p>
+                        </div>
+                        
+                        <div class="aarrr-stage p-4 rounded-lg border border-gray-200 dark:border-gray-700 transition-all-smooth hover:shadow-md">
+                            <div class="flex items-center mb-2">
+                                <div class="w-8 h-8 rounded-full bg-primary-100 dark:bg-primary-900 flex items-center justify-center mr-3">
+                                    <span class="text-primary-600 dark:text-primary-400 font-bold">留</span>
+                                </div>
+                                <h3 class="font-semibold">用户留存</h3>
+                            </div>
+                            <p class="text-sm text-gray-600 dark:text-gray-400">让用户持续使用产品，减少流失</p>
+                        </div>
+                        
+                        <div class="aarrr-stage p-4 rounded-lg border border-gray-200 dark:border-gray-700 transition-all-smooth hover:shadow-md">
+                            <div class="flex items-center mb-2">
+                                <div class="w-8 h-8 rounded-full bg-primary-100 dark:bg-primary-900 flex items-center justify-center mr-3">
+                                    <span class="text-primary-600 dark:text-primary-400 font-bold">收</span>
+                                </div>
+                                <h3 class="font-semibold">获取收入</h3>
+                            </div>
+                            <p class="text-sm text-gray-600 dark:text-gray-400">通过用户消费实现产品变现</p>
+                        </div>
+                        
+                        <div class="aarrr-stage p-4 rounded-lg border border-gray-200 dark:border-gray-700 transition-all-smooth hover:shadow-md">
+                            <div class="flex items-center mb-2">
+                                <div class="w-8 h-8 rounded-full bg-primary-100 dark:bg-primary-900 flex items-center justify-center mr-3">
+                                    <span class="text-primary-600 dark:text-primary-400 font-bold">传</span>
+                                </div>
+                                <h3 class="font-semibold">用户传播</h3>
+                            </div>
+                            <p class="text-sm text-gray-600 dark:text-gray-400">让用户自愿分享产品，带来新用户</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Acquisition section -->
+            <section id="acquisition" class="mb-16 prose mx-auto animate-fade-in-up">
+                <h2>1. 获取用户 (Acquisition)</h2>
+                <p>获取用户指的是通过各种渠道获取更多用户，让更多用户接触你的产品。这是扩大市场份额的基础。</p>
+                
+                <h3>互联网常用的两种拉新模式：</h3>
+                
+                <div class="grid md:grid-cols-2 gap-6 my-6 not-prose">
+                    <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md border border-gray-100 dark:border-gray-700 hover:shadow-lg transition-shadow">
+                        <div class="flex items-center mb-4">
+                            <div class="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center mr-4">
+                                <i class="fas fa-bullhorn text-blue-600 dark:text-blue-400"></i>
+                            </div>
+                            <h4 class="font-semibold text-lg">增加曝光</h4>
+                        </div>
+                        <ul class="space-y-2 text-gray-600 dark:text-gray-300">
+                            <li class="flex items-start">
+                                <i class="fas fa-check-circle text-green-500 mt-1 mr-2 flex-shrink-0"></i>
+                                <span>广告推广、媒体投放</span>
+                            </li>
+                            <li class="flex items-start">
+                                <i class="fas fa-check-circle text-green-500 mt-1 mr-2 flex-shrink-0"></i>
+                                <span>借助资本力量快速占领市场</span>
+                            </li>
+                            <li class="flex items-start">
+                                <i class="fas fa-check-circle text-green-500 mt-1 mr-2 flex-shrink-0"></i>
+                                <span>邀请明星/KOL入驻带来流量</span>
+                            </li>
+                        </ul>
+                        <div class="mt-4 p-3 bg-gray-50 dark:bg-gray-700 rounded-md">
+                            <p class="text-sm italic text-gray-600 dark:text-gray-300">
+                                <strong>案例：</strong>瑞幸咖啡曾投入10亿资本教育市场，通过补贴、明星代言和精准投放实现高强度曝光。
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md border border-gray-100 dark:border-gray-700 hover:shadow-lg transition-shadow">
+                        <div class="flex items-center mb-4">
+                            <div class="w-10 h-10 rounded-full bg-purple-100 dark:bg-purple-900 flex items-center justify-center mr-4">
+                                <i class="fas fa-share-alt text-purple-600 dark:text-purple-400"></i>
+                            </div>
+                            <h4 class="font-semibold text-lg">裂变营销</h4>
+                        </div>
+                        <ul class="space-y-2 text-gray-600 dark:text-gray-300">
+                            <li class="flex items-start">
+                                <i class="fas fa-check-circle text-green-500 mt-1 mr-2 flex-shrink-0"></i>
+                                <span>老用户带新用户</span>
+                            </li>
+                            <li class="flex items-start">
+                                <i class="fas fa-check-circle text-green-500 mt-1 mr-2 flex-shrink-0"></i>
+                                <span>通过奖励机制刺激分享</span>
+                            </li>
+                            <li class="flex items-start">
+                                <i class="fas fa-check-circle text-green-500 mt-1 mr-2 flex-shrink-0"></i>
+                                <span>降低获客成本</span>
+                            </li>
+                        </ul>
+                        <div class="mt-4 p-3 bg-gray-50 dark:bg-gray-700 rounded-md">
+                            <p class="text-sm italic text-gray-600 dark:text-gray-300">
+                                <strong>案例：</strong>拼多多的"砍价团"、"助力团"等裂变玩法，用户需要下载APP才能帮朋友"砍一刀"。
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Activation section -->
+            <section id="activation" class="mb-16 prose mx-auto animate-fade-in-up">
+                <h2>2. 激活用户 (Activation)</h2>
+                <p>激活是指让新用户成为产品的忠实用户，比如注册用户、付费用户等。拉新只是把用户带来，激活才是让用户真正使用产品。</p>
+                
+                <h3>激活用户的常用方法：</h3>
+                
+                <div class="not-prose my-6 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-gray-800 dark:to-gray-800 p-6 rounded-lg">
+                    <div class="flex items-start mb-4">
+                        <div class="flex-shrink-0 mt-1">
+                            <i class="fas fa-crown text-yellow-500"></i>
+                        </div>
+                        <div class="ml-3">
+                            <h4 class="font-semibold text-lg">会员特权体系</h4>
+                            <p class="text-gray-600 dark:text-gray-300 mt-1">通过会员专享权益吸引用户成为忠实用户</p>
+                        </div>
+                    </div>
+                    
+                    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <div class="bg-white dark:bg-gray-700 p-4 rounded-lg shadow-sm">
+                            <div class="flex items-center mb-2">
+                                <i class="fas fa-shipping-fast text-blue-500 mr-2"></i>
+                                <span class="font-medium">免运费</span>
+                            </div>
+                            <p class="text-sm text-gray-600 dark:text-gray-300">如京东Plus会员的免运费特权</p>
+                        </div>
+                        
+                        <div class="bg-white dark:bg-gray-700 p-4 rounded-lg shadow-sm">
+                            <div class="flex items-center mb-2">
+                                <i class="fas fa-tags text-green-500 mr-2"></i>
+                                <span class="font-medium">专享折扣</span>
+                            </div>
+                            <p class="text-sm text-gray-600 dark:text-gray-300">如小红书的会员专享价</p>
+                        </div>
+                        
+                        <div class="bg-white dark:bg-gray-700 p-4 rounded-lg shadow-sm">
+                            <div class="flex items-center mb-2">
+                                <i class="fas fa-gem text-purple-500 mr-2"></i>
+                                <span class="font-medium">增值服务</span>
+                            </div>
+                            <p class="text-sm text-gray-600 dark:text-gray-300">如网易云音乐会员可听更多歌曲</p>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-6 p-4 bg-white dark:bg-gray-700 rounded-lg">
+                        <p class="text-sm text-gray-600 dark:text-gray-300 italic">
+                            <strong>关键点：</strong>会员特权需要设计得既有吸引力，又能让用户感受到真正的价值，才能有效激活用户。
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Retention section -->
+            <section id="retention" class="mb-16 prose mx-auto animate-fade-in-up">
+                <h2>3. 用户留存 (Retention)</h2>
+                <p>留存是指让用户持续使用产品，减少流失。可以通过不断更新产品、创造新鲜感来留住用户。</p>
+                
+                <h3>提高留存率的策略：</h3>
+                
+                <div class="not-prose my-6">
+                    <div class="flex flex-col md:flex-row gap-6">
+                        <div class="flex-1 bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md border border-gray-100 dark:border-gray-700">
+                            <div class="flex items-center mb-4">
+                                <div class="w-10 h-10 rounded-full bg-green-100 dark:bg-green-900 flex items-center justify-center mr-4">
+                                    <i class="fas fa-sync-alt text-green-600 dark:text-green-400"></i>
+                                </div>
+                                <h4 class="font-semibold text-lg">持续创新</h4>
+                            </div>
+                            <p class="text-gray-600 dark:text-gray-300">
+                                定期推出新产品、新功能，保持用户的新鲜感和期待感。例如某奶茶品牌每月推出新品，每半年升级食材，每家店设计不同，让用户充满期待。
+                            </p>
+                        </div>
+                        
+                        <div class="flex-1 bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md border border-gray-100 dark:border-gray-700">
+                            <div class="flex items-center mb-4">
+                                <div class="w-10 h-10 rounded-full bg-orange-100 dark:bg-orange-900 flex items-center justify-center mr-4">
+                                    <i class="fas fa-heart text-orange-600 dark:text-orange-400"></i>
+                                </div>
+                                <h4 class="font-semibold text-lg">情感连接</h4>
+                            </div>
+                            <p class="text-gray-600 dark:text-gray-300">
+                                通过推送提醒用户过去的成就或回忆，如小红书提醒用户"过去收获了多少赞"，让用户想起在产品中付出的时间和精力，从而减少流失。
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-6 bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md border border-gray-100 dark:border-gray-700">
+                        <div class="flex items-center mb-4">
+                            <div class="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center mr-4">
+                                <i class="fas fa-link text-blue-600 dark:text-blue-400"></i>
+                            </div>
+                            <h4 class="font-semibold text-lg">构建社交链</h4>
+                        </div>
+                        <p class="text-gray-600 dark:text-gray-300">
+                            通过社交功能或游戏化设计沉淀用户关系链。例如支付宝的蚂蚁森林通过公益游戏建立社交连接，提高用户留存率。
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Revenue section -->
+            <section id="revenue" class="mb-16 prose mx-auto animate-fade-in-up">
+                <h2>4. 获取收入 (Revenue)</h2>
+                <p>收入阶段是指让用户在产品上消费，实现变现。商家会使用各种策略刺激用户消费。</p>
+                
+                <h3>常见的变现策略：</h3>
+                
+                <div class="not-prose my-6">
+                    <div class="relative">
+                        <!-- Progress bar background -->
+                        <div class="h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+                            <!-- Animated progress bar -->
+                            <div class="h-full bg-gradient-to-r from-blue-500 to-purple-500 rounded-full" style="width: 80%; animation: progressBar 2s ease-in-out;"></div>
+                        </div>
+                        
+                        <!-- Steps -->
+                        <div class="flex justify-between mt-4">
+                            <div class="text-center w-1/4">
+                                <div class="w-8 h-8 bg-blue-500 text-white rounded-full flex items-center justify-center mx-auto mb-2">1</div>
+                                <p class="text-sm font-medium">首次消费</p>
+                            </div>
+                            <div class="text-center w-1/4">
+                                <div class="w-8 h-8 bg-blue-500 text-white rounded-full flex items-center justify-center mx-auto mb-2">2</div>
+                                <p class="text-sm font-medium">重复购买</p>
+                            </div>
+                            <div class="text-center w-1/4">
+                                <div class="w-8 h-8 bg-blue-500 text-white rounded-full flex items-center justify-center mx-auto mb-2">3</div>
+                                <p class="text-sm font-medium">升级会员</p>
+                            </div>
+                            <div class="text-center w-1/4">
+                                <div class="w-8 h-8 bg-blue-500 text-white rounded-full flex items-center justify-center mx-auto mb-2">4</div>
+                                <p class="text-sm font-medium">忠诚消费</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-8 grid md:grid-cols-2 gap-6">
+                        <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md border border-gray-100 dark:border-gray-700">
+                            <h4 class="font-semibold text-lg mb-3">会员升级策略</h4>
+                            <p class="text-gray-600 dark:text-gray-300">
+                                星巴克会在用户快用完优惠券时提示："如果再买一杯，就可以升级为更高级别会员，获得更多优惠"，刺激用户继续消费。
+                            </p>
+                        </div>
+                        
+                        <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md border border-gray-100 dark:border-gray-700">
+                            <h4 class="font-semibold text-lg mb-3">限时优惠</h4>
+                            <p class="text-gray-600 dark:text-gray-300">
+                                通过"买一赠一"、"限时折扣"等促销活动，创造紧迫感，促使用户立即消费。
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                
+                <blockquote>
+                    在变现阶段，各商家会使用层出不穷的套路刺激用户消费，关键是让用户感觉"占了便宜"或"获得了额外价值"。
+                </blockquote>
+            </section>
+
+            <!-- Referral section -->
+            <section id="referral" class="mb-16 prose mx-auto animate-fade-in-up">
+                <h2>5. 用户传播 (Referral)</h2>
+                <p>传播是指让用户自愿分享产品，带来新用户。可以通过优惠策略或产品本身的设计促使用户分享。</p>
+                
+                <h3>促进用户传播的方法：</h3>
+                
+                <div class="not-prose my-6">
+                    <div class="flex flex-col md:flex-row gap-6 mb-6">
+                        <div class="flex-1 bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md border border-gray-100 dark:border-gray-700">
+                            <div class="flex items-center mb-4">
+                                <div class="w-10 h-10 rounded-full bg-purple-100 dark:bg-purple-900 flex items-center justify-center mr-4">
+                                    <i class="fas fa-gift text-purple-600 dark:text-purple-400"></i>
+                                </div>
+                                <h4 class="font-semibold text-lg">奖励驱动</h4>
+                            </div>
+                            <p class="text-gray-600 dark:text-gray-300">
+                                通过转发打折、分享得优惠券等奖励机制，短期内刺激用户分享。例如"分享给3个好友，获得20元优惠券"。
+                            </p>
+                        </div>
+                        
+                        <div class="flex-1 bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md border border-gray-100 dark:border-gray-700">
+                            <div class="flex items-center mb-4">
+                                <div class="w-10 h-10 rounded-full bg-pink-100 dark:bg-pink-900 flex items-center justify-center mr-4">
+                                    <i class="fas fa-heart text-pink-600 dark:text-pink-400"></i>
+                                </div>
+                                <h4 class="font-semibold text-lg">产品驱动</h4>
+                            </div>
+                            <p class="text-gray-600 dark:text-gray-300">
+                                通过超出用户预期的产品设计，让用户因为喜爱而自发分享。这是更可持续的传播方式。
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md border border-gray-100 dark:border-gray-700">
+                        <h4 class="font-semibold text-lg mb-4">案例：三只松鼠的传播设计</h4>
+                        <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
+                            <div class="text-center">
+                                <div class="w-12 h-12 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center mx-auto mb-2">
+                                    <i class="fas fa-box-open text-blue-600 dark:text-blue-400"></i>
+                                </div>
+                                <p class="text-sm font-medium">快递箱设计</p>
+                                <p class="text-xs text-gray-500 dark:text-gray-400">内置开箱器，方便开启</p>
+                            </div>
+                            <div class="text-center">
+                                <div class="w-12 h-12 bg-green-100 dark:bg-green-900 rounded-full flex items-center justify-center mx-auto mb-2">
+                                    <i class="fas fa-paw text-green-600 dark:text-green-400"></i>
+                                </div>
+                                <p class="text-sm font-medium">可爱包装</p>
+                                <p class="text-xs text-gray-500 dark:text-gray-400">激发用户喜爱</p>
+                            </div>
+                            <div class="text-center">
+                                <div class="w-12 h-12 bg-yellow-100 dark:bg-yellow-900 rounded-full flex items-center justify-center mx-auto mb-2">
+                                    <i class="fas fa-gift text-yellow-600 dark:text-yellow-400"></i>
+                                </div>
+                                <p class="text-sm font-medium">贴心赠品</p>
+                                <p class="text-xs text-gray-500 dark:text-gray-400">封口夹、湿纸巾等</p>
+                            </div>
+                            <div class="text-center">
+                                <div class="w-12 h-12 bg-red-100 dark:bg-red-900 rounded-full flex items-center justify-center mx-auto mb-2">
+                                    <i class="fas fa-utensils text-red-600 dark:text-red-400"></i>
+                                </div>
+                                <p class="text-sm font-medium">产品品质</p>
+                                <p class="text-xs text-gray-500 dark:text-gray-400">零食美味是基础</p>
+                            </div>
+                        </div>
+                        <div class="mt-4 p-3 bg-gray-50 dark:bg-gray-700 rounded-md">
+                            <p class="text-sm text-gray-600 dark:text-gray-300">
+                                这些超出用户预期的细节设计，让用户感到惊喜和愉悦，从而自发分享形成口碑传播。
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                
+                <blockquote>
+                    长期来看，只有产品足够好，才能真正让用户心甘情愿地分享。优惠策略只是短期刺激手段。
+                </blockquote>
+            </section>
+
+            <!-- Conclusion -->
+            <section class="prose mx-auto animate-fade-in-up">
+                <h2>总结</h2>
+                <p>AARRR模型完整描述了互联网产品的用户生命周期，从获取用户到最终实现用户自发传播。五个阶段环环相扣，每个阶段都需要有针对性的策略：</p>
+                
+                <div class="not-prose my-6">
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                            <thead class="bg-gray-50 dark:bg-gray-800">
+                                <tr>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">阶段</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">目标</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">关键策略</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">衡量指标</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                                <tr class="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                                    <td class="px-6 py-4 whitespace-nowrap font-medium">获取</td>
+                                    <td class="px-6 py-4 whitespace-nowrap">增加用户基数</td>
+                                    <td class="px-6 py-4">广告投放、裂变营销</td>
+                                    <td class="px-6 py-4 whitespace-nowrap">新增用户数、获客成本</td>
+                                </tr>
+                                <tr class="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                                    <td class="px-6 py-4 whitespace-nowrap font-medium">激活</td>
+                                    <td class="px-6 py-4 whitespace-nowrap">转化忠实用户</td>
+                                    <td class="px-6 py-4">会员特权、新手引导</td>
+                                    <td class="px-6 py-4 whitespace-nowrap">激活率、注册转化率</td>
+                                </tr>
+                                <tr class="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                                    <td class="px-6 py-4 whitespace-nowrap font-medium">留存</td>
+                                    <td class="px-6 py-4 whitespace-nowrap">减少用户流失</td>
+                                    <td class="px-6 py-4">持续创新、情感连接</td>
+                                    <td class="px-6 py-4 whitespace-nowrap">留存率、流失率</td>
+                                </tr>
+                                <tr class="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                                    <td class="px-6 py-4 whitespace-nowrap font-medium">收入</td>
+                                    <td class="px-6 py-4 whitespace-nowrap">实现商业变现</td>
+                                    <td class="px-6 py-4">会员升级、限时优惠</td>
+                                    <td class="px-6 py-4 whitespace-nowrap">ARPU、付费转化率</td>
+                                </tr>
+                                <tr class="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                                    <td class="px-6 py-4 whitespace-nowrap font-medium">传播</td>
+                                    <td class="px-6 py-4 whitespace-nowrap">带来新用户</td>
+                                    <td class="px-6 py-4">产品惊喜、分享奖励</td>
+                                    <td class="px-6 py-4 whitespace-nowrap">推荐率、病毒系数</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <p>需要注意的是，AARRR模型最适合互联网产品领域，虽然现在很多行业都想应用这个模型，但需要根据行业特点进行调整。</p>
+            </section>
+        </main>
+
+        <!-- Footer -->
+        <footer class="bg-gray-100 dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700">
+            <div class="container mx-auto px-4 py-8">
+                <div class="flex flex-col md:flex-row justify-between items-center">
+                    <div class="mb-4 md:mb-0">
+                        <div class="flex items-center space-x-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-primary-600 dark:text-primary-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                            </svg>
+                            <span class="font-semibold">AARRR模型</span>
+                        </div>
+                        <p class="text-sm text-gray-600 dark:text-gray-400 mt-2">互联网产品用户增长方法论</p>
+                    </div>
+                    <div class="flex space-x-6">
+                        <a href="#" class="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 transition-colors">
+                            <i class="fab fa-github"></i>
+                        </a>
+                        <a href="#" class="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 transition-colors">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                        <a href="#" class="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 transition-colors">
+                            <i class="fab fa-linkedin"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="mt-8 pt-8 border-t border-gray-200 dark:border-gray-700 text-center text-sm text-gray-500 dark:text-gray-400">
+                    <p>© 2025 AARRR模型可视化. 保留所有权利.</p>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Back to top button -->
+    <button id="back-to-top" class="fixed bottom-8 right-8 p-3 bg-primary-600 text-white rounded-full shadow-lg hover:bg-primary-700 transition-colors opacity-0 invisible">
+        <i class="fas fa-arrow-up"></i>
+    </button>
+
+    <script>
+        // Dark mode toggle
+        const themeToggle = document.getElementById('theme-toggle');
+        const html = document.documentElement;
+        
+        // Check for saved user preference or use system preference
+        const savedTheme = localStorage.getItem('theme') || 
+                         (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+        html.classList.add(savedTheme);
+        
+        themeToggle.addEventListener('click', () => {
+            html.classList.toggle('dark');
+            const theme = html.classList.contains('dark') ? 'dark' : 'light';
+            localStorage.setItem('theme', theme);
+        });
+        
+        // Mobile menu toggle
+        const mobileMenuButton = document.getElementById('mobile-menu-button');
+        const mobileMenu = document.getElementById('mobile-menu');
+        
+        mobileMenuButton.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+        });
+        
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                
+                const targetId = this.getAttribute('href');
+                const targetElement = document.querySelector(targetId);
+                
+                if (targetElement) {
+                    window.scrollTo({
+                        top: targetElement.offsetTop - 80,
+                        behavior: 'smooth'
+                    });
+                    
+                    // Close mobile menu if open
+                    if (!mobileMenu.classList.contains('hidden')) {
+                        mobileMenu.classList.add('hidden');
+                    }
+                }
+            });
+        });
+        
+        // Back to top button
+        const backToTopButton = document.getElementById('back-to-top');
+        
+        window.addEventListener('scroll', () => {
+            if (window.pageYOffset > 300) {
+                backToTopButton.classList.remove('opacity-0', 'invisible');
+                backToTopButton.classList.add('opacity-100', 'visible');
+            } else {
+                backToTopButton.classList.remove('opacity-100', 'visible');
+                backToTopButton.classList.add('opacity-0', 'invisible');
+            }
+        });
+        
+        backToTopButton.addEventListener('click', () => {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        });
+        
+        // Animation for progress bar
+        const style = document.createElement('style');
+        style.innerHTML = `
+            @keyframes progressBar {
+                from { width: 0%; }
+                to { width: 80%; }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>
