@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>用户画像体系搭建流程 - 业务模型</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Noto Sans SC', 'sans-serif'],
+                    },
+                    colors: {
+                        primary: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            200: '#bae6fd',
+                            300: '#7dd3fc',
+                            400: '#38bdf8',
+                            500: '#0ea5e9',
+                            600: '#0284c7',
+                            700: '#0369a1',
+                            800: '#075985',
+                            900: '#0c4a6e',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        .card-hover:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        .link-hover {
+            transition: all 0.2s ease;
+        }
+        .link-hover:hover {
+            color: #0284c7;
+            transform: scale(1.02);
+        }
+        html {
+            scroll-behavior: smooth;
+        }
+        .process-step {
+            position: relative;
+            padding-left: 2.5rem;
+            margin-bottom: 2rem;
+        }
+        .process-step:before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0.25rem;
+            width: 1.5rem;
+            height: 1.5rem;
+            border-radius: 50%;
+            background-color: #0ea5e9;
+        }
+        .process-step:after {
+            content: '';
+            position: absolute;
+            left: 0.75rem;
+            top: 1.75rem;
+            bottom: -2rem;
+            width: 2px;
+            background-color: #e5e7eb;
+        }
+        .process-step:last-child:after {
+            display: none;
+        }
+        .dark .process-step:after {
+            background-color: #4b5563;
+        }
+        .role-card {
+            transition: all 0.3s ease;
+        }
+        .role-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        .timeline-item {
+            position: relative;
+            padding-left: 2rem;
+            margin-bottom: 2rem;
+        }
+        .timeline-item:before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0.25rem;
+            width: 1rem;
+            height: 1rem;
+            border-radius: 50%;
+            background-color: #0ea5e9;
+        }
+        .timeline-item:after {
+            content: '';
+            position: absolute;
+            left: 0.5rem;
+            top: 1.25rem;
+            bottom: -2rem;
+            width: 2px;
+            background-color: #e5e7eb;
+        }
+        .timeline-item:last-child:after {
+            display: none;
+        }
+        .dark .timeline-item:after {
+            background-color: #4b5563;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 dark:bg-gray-900 dark:text-gray-200 font-sans transition-colors duration-300">
+    <div class="min-h-screen">
+        <!-- 导航栏 -->
+        <nav class="bg-white dark:bg-gray-800 shadow-sm sticky top-0 z-10 transition-colors duration-300">
+            <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex justify-between h-16">
+                    <div class="flex items-center">
+                        <span class="text-xl font-bold text-primary-600 dark:text-primary-400">业务模型</span>
+                        <span class="ml-2 text-gray-500 dark:text-gray-400">用户画像体系搭建</span>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        <button id="theme-toggle" type="button" class="text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none rounded-lg text-sm p-2.5">
+                            <i class="fas fa-moon dark:hidden"></i>
+                            <i class="fas fa-sun hidden dark:block"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <!-- 主要内容 -->
+        <main class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <!-- 标题部分 -->
+            <section class="mb-12 fade-in">
+                <h1 class="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4">用户画像体系搭建流程</h1>
+                <div class="mt-6 bg-primary-50 dark:bg-gray-800 p-4 rounded-lg border-l-4 border-primary-500">
+                    <p class="text-gray-700 dark:text-gray-300">用户画像体系的搭建是一个复杂的大型项目，需要多方协同配合才能完成。本指南将详细介绍从业务框架到产品架构再到落地计划的完整流程。</p>
+                </div>
+            </section>
+
+            <!-- 内容导航 -->
+            <section class="mb-12 fade-in">
+                <h2 class="text-2xl font-semibold text-gray-800 dark:text-white mb-6">内容导航</h2>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <a href="#framework" class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm card-hover transition-all duration-300 flex items-center">
+                        <div class="bg-primary-100 dark:bg-primary-900 p-3 rounded-full mr-4">
+                            <i class="fas fa-sitemap text-primary-600 dark:text-primary-400"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-medium text-gray-800 dark:text-white">业务框架搭建</h3>
+                            <p class="text-sm text-gray-500 dark:text-gray-400">明确需求和资源</p>
+                        </div>
+                    </a>
+                    <a href="#architecture" class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm card-hover transition-all duration-300 flex items-center">
+                        <div class="bg-primary-100 dark:bg-primary-900 p-3 rounded-full mr-4">
+                            <i class="fas fa-project-diagram text-primary-600 dark:text-primary-400"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-medium text-gray-800 dark:text-white">产品架构设计</h3>
+                            <p class="text-sm text-gray-500 dark:text-gray-400">从数据采集到服务层</p>
+                        </div>
+                    </a>
+                    <a href="#implementation" class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm card-hover transition-all duration-300 flex items-center">
+                        <div class="bg-primary-100 dark:bg-primary-900 p-3 rounded-full mr-4">
+                            <i class="fas fa-tasks text-primary-600 dark:text-primary-400"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-medium text-gray-800 dark:text-white">落地实施计划</h3>
+                            <p class="text-sm text-gray-500 dark:text-gray-400">版本规划和项目管理</p>
+                        </div>
+                    </a>
+                </div>
+            </section>
+
+            <!-- 业务框架搭建部分 -->
+            <section id="framework" class="mb-12 fade-in">
+                <div class="flex items-center mb-6">
+                    <div class="bg-primary-100 dark:bg-primary-900 p-2 rounded-full mr-4">
+                        <i class="fas fa-sitemap text-primary-600 dark:text-primary-400"></i>
+                    </div>
+                    <h2 class="text-2xl font-semibold text-gray-800 dark:text-white">第一步：业务框架搭建</h2>
+                </div>
+                <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 card-hover">
+                    <p class="mb-4 text-gray-700 dark:text-gray-300">用户画像体系的搭建是一个复杂的大型项目，不是一个人或一个部门能够独立完成的，需要多方协同配合。能够搭建用户画像体系的企业通常已经具备一定规模。</p>
+                    
+                    <h3 class="text-xl font-medium text-gray-800 dark:text-white mb-4">业务框架的两个核心方面</h3>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                        <div class="bg-blue-50 dark:bg-blue-900/20 p-5 rounded-lg border-l-4 border-blue-400 dark:border-blue-600">
+                            <h4 class="font-bold text-blue-700 dark:text-blue-300 mb-3">用户需求</h4>
+                            <ul class="list-disc pl-5 text-blue-700 dark:text-blue-300 space-y-2">
+                                <li>明确用户在什么场景下使用画像服务</li>
+                                <li>解决什么问题，带来什么价值</li>
+                                <li>是企业自用还是为其他企业搭建</li>
+                                <li>个性化推荐、精准营销等具体需求</li>
+                            </ul>
+                        </div>
+                        <div class="bg-green-50 dark:bg-green-900/20 p-5 rounded-lg border-l-4 border-green-400 dark:border-green-600">
+                            <h4 class="font-bold text-green-700 dark:text-green-300 mb-3">产品实现</h4>
+                            <ul class="list-disc pl-5 text-green-700 dark:text-green-300 space-y-2">
+                                <li>需要哪些资源和部门协同</li>
+                                <li>产品和服务层：数据采集、标签体系等</li>
+                                <li>运营管理层：组织、绩效、流程等</li>
+                                <li>资源层：服务器、数据来源等</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <h4 class="font-medium text-gray-800 dark:text-white mb-2">用户场景分析</h4>
+                    <p class="mb-4 text-gray-700 dark:text-gray-300">明确用户画像体系的目标用户和使用场景：</p>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+                        <div class="bg-gray-100 dark:bg-gray-700 p-3 rounded-lg text-center">
+                            <p class="font-medium">精准营销人员</p>
+                        </div>
+                        <div class="bg-gray-100 dark:bg-gray-700 p-3 rounded-lg text-center">
+                            <p class="font-medium">产品经理</p>
+                        </div>
+                        <div class="bg-gray-100 dark:bg-gray-700 p-3 rounded-lg text-center">
+                            <p class="font-medium">研发人员</p>
+                        </div>
+                        <div class="bg-gray-100 dark:bg-gray-700 p-3 rounded-lg text-center">
+                            <p class="font-medium">客户服务</p>
+                        </div>
+                    </div>
+                    
+                    <h4 class="font-medium text-gray-800 dark:text-white mb-2">典型应用场景</h4>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                        <div class="bg-purple-50 dark:bg-purple-900/20 p-3 rounded-lg text-center">
+                            <p class="font-medium text-purple-700 dark:text-purple-300">精准广告投放</p>
+                        </div>
+                        <div class="bg-purple-50 dark:bg-purple-900/20 p-3 rounded-lg text-center">
+                            <p class="font-medium text-purple-700 dark:text-purple-300">智能运营</p>
+                        </div>
+                        <div class="bg-purple-50 dark:bg-purple-900/20 p-3 rounded-lg text-center">
+                            <p class="font-medium text-purple-700 dark:text-purple-300">个性化推荐</p>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-yellow-50 dark:bg-yellow-900/20 p-4 rounded-lg border-l-4 border-yellow-400 dark:border-yellow-600">
+                        <p class="text-yellow-700 dark:text-yellow-300">业务框架搭建是用户画像体系的基础，需要充分考虑企业现状和未来发展方向，确保画像体系能够真正服务于业务需求。</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 产品架构设计部分 -->
+            <section id="architecture" class="mb-12 fade-in">
+                <div class="flex items-center mb-6">
+                    <div class="bg-primary-100 dark:bg-primary-900 p-2 rounded-full mr-4">
+                        <i class="fas fa-project-diagram text-primary-600 dark:text-primary-400"></i>
+                    </div>
+                    <h2 class="text-2xl font-semibold text-gray-800 dark:text-white">第二步：产品架构设计</h2>
+                </div>
+                <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 card-hover">
+                    <p class="mb-4 text-gray-700 dark:text-gray-300">产品架构设计需要自下而上地盘点数据现状，搭建用户画像体系，确保能够满足核心业务场景需求。</p>
+                    
+                    <h3 class="text-xl font-medium text-gray-800 dark:text-white mb-4">用户画像产品架构层次</h3>
+                    
+                    <div class="process-step">
+                        <h4 class="text-lg font-semibold text-gray-800 dark:text-white mb-2">1. 数据采集层</h4>
+                        <p class="mb-3 text-gray-700 dark:text-gray-300">收集尽可能全面的用户相关数据：</p>
+                        <ul class="list-disc pl-5 mb-3 text-gray-700 dark:text-gray-300 space-y-1">
+                            <li><strong>业务数据</strong>：用户基础信息、购买记录、评价等</li>
+                            <li><strong>埋点行为数据</strong>：浏览时间、点击行为、停留时长等</li>
+                            <li><strong>日志数据</strong>：Web端日志记录</li>
+                            <li><strong>第三方数据</strong>：补充业务数据不足</li>
+                        </ul>
+                        <div class="bg-blue-50 dark:bg-blue-900/20 p-3 rounded-lg mb-3">
+                            <p class="text-blue-700 dark:text-blue-300">数据采集原则：大而全，尽可能收集所有可能与用户相关的数据</p>
+                        </div>
+                    </div>
+                    
+                    <div class="process-step">
+                        <h4 class="text-lg font-semibold text-gray-800 dark:text-white mb-2">2. 数据预处理</h4>
+                        <p class="mb-3 text-gray-700 dark:text-gray-300">对收集的数据进行清洗和转换：</p>
+                        <ul class="list-disc pl-5 mb-3 text-gray-700 dark:text-gray-300 space-y-1">
+                            <li>数据清洗：去除无效、错误数据</li>
+                            <li>数据转换：格式标准化</li>
+                            <li>数据整合：多源数据合并</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="process-step">
+                        <h4 class="text-lg font-semibold text-gray-800 dark:text-white mb-2">3. 数据分析与挖掘</h4>
+                        <p class="mb-3 text-gray-700 dark:text-gray-300">对预处理后的数据进行标签建模：</p>
+                        
+                        <h5 class="font-medium text-gray-800 dark:text-white mb-2">有价值的标签类型</h5>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-3">
+                            <div class="bg-green-50 dark:bg-green-900/20 p-3 rounded-lg">
+                                <h6 class="font-bold text-green-700 dark:text-green-300 mb-1">用户ID标识</h6>
+                                <p class="text-green-700 dark:text-green-300 text-sm">统一账号体系，跨产品线打通</p>
+                            </div>
+                            <div class="bg-green-50 dark:bg-green-900/20 p-3 rounded-lg">
+                                <h6 class="font-bold text-green-700 dark:text-green-300 mb-1">用户档案</h6>
+                                <p class="text-green-700 dark:text-green-300 text-sm">基础信息表、行为表、交易表等</p>
+                            </div>
+                            <div class="bg-green-50 dark:bg-green-900/20 p-3 rounded-lg">
+                                <h6 class="font-bold text-green-700 dark:text-green-300 mb-1">标签建模</h6>
+                                <p class="text-green-700 dark:text-green-300 text-sm">事实类、规则类、预测类标签</p>
+                            </div>
+                        </div>
+                        
+                        <h5 class="font-medium text-gray-800 dark:text-white mb-2">标签存储</h5>
+                        <ul class="list-disc pl-5 mb-3 text-gray-700 dark:text-gray-300 space-y-1">
+                            <li>用户基础信息宽表</li>
+                            <li>用户行为宽表</li>
+                            <li>用户偏好宽表</li>
+                        </ul>
+                        
+                        <div class="bg-purple-50 dark:bg-purple-900/20 p-3 rounded-lg">
+                            <p class="text-purple-700 dark:text-purple-300">分析师参与程度取决于技能水平：SQL（预处理）、数据分析方法（分析挖掘）、算法（预测标签）</p>
+                        </div>
+                    </div>
+                    
+                    <div class="process-step">
+                        <h4 class="text-lg font-semibold text-gray-800 dark:text-white mb-2">4. 服务层</h4>
+                        <p class="mb-3 text-gray-700 dark:text-gray-300">用户画像体系对外提供的服务：</p>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-3">
+                            <div class="bg-yellow-50 dark:bg-yellow-900/20 p-3 rounded-lg">
+                                <h5 class="font-bold text-yellow-700 dark:text-yellow-300 mb-2">业务服务</h5>
+                                <ul class="list-disc pl-5 text-yellow-700 dark:text-yellow-300 space-y-1 text-sm">
+                                    <li>画像看板</li>
+                                    <li>单用户/群体画像</li>
+                                    <li>相似人群</li>
+                                    <li>标签市场</li>
+                                    <li>人群洞察</li>
+                                    <li>标签管理</li>
+                                </ul>
+                            </div>
+                            <div class="bg-blue-50 dark:bg-blue-900/20 p-3 rounded-lg">
+                                <h5 class="font-bold text-blue-700 dark:text-blue-300 mb-2">系统服务</h5>
+                                <ul class="list-disc pl-5 text-blue-700 dark:text-blue-300 space-y-1 text-sm">
+                                    <li>广告投放系统接口</li>
+                                    <li>营销系统接口</li>
+                                    <li>推荐系统接口</li>
+                                    <li>用户分析平台接口</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-primary-50 dark:bg-primary-900/20 p-4 rounded-lg border-l-4 border-primary-500">
+                        <p class="text-primary-700 dark:text-primary-300">产品架构设计需要从底层数据采集到顶层服务应用进行全面规划，确保各层次之间无缝衔接，最终服务于业务需求。</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 落地实施计划部分 -->
+            <section id="implementation" class="mb-12 fade-in">
+                <div class="flex items-center mb-6">
+                    <div class="bg-primary-100 dark:bg-primary-900 p-2 rounded-full mr-4">
+                        <i class="fas fa-tasks text-primary-600 dark:text-primary-400"></i>
+                    </div>
+                    <h2 class="text-2xl font-semibold text-gray-800 dark:text-white">第三步：落地实施计划</h2>
+                </div>
+                <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 card-hover">
+                    <p class="mb-4 text-gray-700 dark:text-gray-300">用户画像体系的搭建是一个循序渐进的过程，需要制定详细的版本计划和项目执行方案。</p>
+                    
+                    <h3 class="text-xl font-medium text-gray-800 dark:text-white mb-4">版本计划</h3>
+                    <p class="mb-4 text-gray-700 dark:text-gray-300">分阶段实施，每个版本都能在业务上有所应用：</p>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                        <div class="bg-green-50 dark:bg-green-900/20 p-4 rounded-lg">
+                            <h4 class="font-bold text-green-700 dark:text-green-300 mb-2">1.0 版本</h4>
+                            <ul class="list-disc pl-5 text-green-700 dark:text-green-300 space-y-1 text-sm">
+                                <li>基础数据采集</li>
+                                <li>核心标签建设</li>
+                                <li>简单画像展示</li>
+                            </ul>
+                        </div>
+                        <div class="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg">
+                            <h4 class="font-bold text-blue-700 dark:text-blue-300 mb-2">2.0 版本</h4>
+                            <ul class="list-disc pl-5 text-blue-700 dark:text-blue-300 space-y-1 text-sm">
+                                <li>扩展数据源</li>
+                                <li>预测标签开发</li>
+                                <li>群体画像功能</li>
+                            </ul>
+                        </div>
+                        <div class="bg-purple-50 dark:bg-purple-900/20 p-4 rounded-lg">
+                            <h4 class="font-bold text-purple-700 dark:text-purple-300 mb-2">3.0 版本</h4>
+                            <ul class="list-disc pl-5 text-purple-700 dark:text-purple-300 space-y-1 text-sm">
+                                <li>全渠道数据整合</li>
+                                <li>高级分析功能</li>
+                                <li>系统全面对接</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <h3 class="text-xl font-medium text-gray-800 dark:text-white mb-4">项目执行流程</h3>
+                    
+                    <div class="timeline-item">
+                        <h4 class="text-lg font-semibold text-gray-800 dark:text-white mb-2">1. 立项评审</h4>
+                        <p class="mb-3 text-gray-700 dark:text-gray-300">项目经理/数据产品经理准备立项材料：</p>
+                        <ul class="list-disc pl-5 mb-3 text-gray-700 dark:text-gray-300 space-y-1">
+                            <li>业务背景和需求描述</li>
+                            <li>业务架构和产品架构</li>
+                            <li>版本计划和项目计划</li>
+                            <li>所需资源清单</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="timeline-item">
+                        <h4 class="text-lg font-semibold text-gray-800 dark:text-white mb-2">2. 需求评审</h4>
+                        <p class="mb-3 text-gray-700 dark:text-gray-300">数据产品经理输出详细需求文档：</p>
+                        <ul class="list-disc pl-5 mb-3 text-gray-700 dark:text-gray-300 space-y-1">
+                            <li>需求背景和产品流程</li>
+                            <li>功能需求和数据需求</li>
+                            <li>原型设计</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="timeline-item">
+                        <h4 class="text-lg font-semibold text-gray-800 dark:text-white mb-2">3. 提测演示</h4>
+                        <p class="mb-3 text-gray-700 dark:text-gray-300">产品经理演示开发成果：</p>
+                        <ul class="list-disc pl-5 mb-3 text-gray-700 dark:text-gray-300 space-y-1">
+                            <li>确保业务流程通畅</li>
+                            <li>数据上报流程完整</li>
+                            <li>无重大问题</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="timeline-item">
+                        <h4 class="text-lg font-semibold text-gray-800 dark:text-white mb-2">4. 产品发布</h4>
+                        <p class="mb-3 text-gray-700 dark:text-gray-300">运营团队跟进：</p>
+                        <ul class="list-disc pl-5 mb-3 text-gray-700 dark:text-gray-300 space-y-1">
+                            <li>输出运营计划</li>
+                            <li>介绍产品功能和使用方式</li>
+                            <li>收集用户反馈</li>
+                        </ul>
+                    </div>
+                    
+                    <h3 class="text-xl font-medium text-gray-800 dark:text-white mb-4">人员配合流程</h3>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
+                        <div class="role-card bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 border border-gray-200 dark:border-gray-700">
+                            <div class="flex items-center mb-3">
+                                <div class="bg-blue-100 dark:bg-blue-900 p-2 rounded-full mr-3">
+                                    <i class="fas fa-user-tie text-blue-600 dark:text-blue-400"></i>
+                                </div>
+                                <h4 class="font-bold text-gray-800 dark:text-white">产品经理</h4>
+                            </div>
+                            <ul class="list-disc pl-5 text-gray-700 dark:text-gray-300 space-y-1 text-sm">
+                                <li>提出画像需求</li>
+                                <li>明确目标用户场景</li>
+                                <li>提供数据需求</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="role-card bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 border border-gray-200 dark:border-gray-700">
+                            <div class="flex items-center mb-3">
+                                <div class="bg-green-100 dark:bg-green-900 p-2 rounded-full mr-3">
+                                    <i class="fas fa-chart-line text-green-600 dark:text-green-400"></i>
+                                </div>
+                                <h4 class="font-bold text-gray-800 dark:text-white">数据产品经理</h4>
+                            </div>
+                            <ul class="list-disc pl-5 text-gray-700 dark:text-gray-300 space-y-1 text-sm">
+                                <li>分析业务需求</li>
+                                <li>输出产品方案</li>
+                                <li>设计标签和画像</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="role-card bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 border border-gray-200 dark:border-gray-700">
+                            <div class="flex items-center mb-3">
+                                <div class="bg-purple-100 dark:bg-purple-900 p-2 rounded-full mr-3">
+                                    <i class="fas fa-database text-purple-600 dark:text-purple-400"></i>
+                                </div>
+                                <h4 class="font-bold text-gray-800 dark:text-white">数仓工程师</h4>
+                            </div>
+                            <ul class="list-disc pl-5 text-gray-700 dark:text-gray-300 space-y-1 text-sm">
+                                <li>数仓结构建设</li>
+                                <li>数据表设计</li>
+                                <li>标签计算</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="role-card bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 border border-gray-200 dark:border-gray-700">
+                            <div class="flex items-center mb-3">
+                                <div class="bg-yellow-100 dark:bg-yellow-900 p-2 rounded-full mr-3">
+                                    <i class="fas fa-brain text-yellow-600 dark:text-yellow-400"></i>
+                                </div>
+                                <h4 class="font-bold text-gray-800 dark:text-white">算法工程师</h4>
+                            </div>
+                            <ul class="list-disc pl-5 text-gray-700 dark:text-gray-300 space-y-1 text-sm">
+                                <li>预测类标签计算</li>
+                                <li>模型开发和优化</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="role-card bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 border border-gray-200 dark:border-gray-700">
+                            <div class="flex items-center mb-3">
+                                <div class="bg-red-100 dark:bg-red-900 p-2 rounded-full mr-3">
+                                    <i class="fas fa-code text-red-600 dark:text-red-400"></i>
+                                </div>
+                                <h4 class="font-bold text-gray-800 dark:text-white">前后端工程师</h4>
+                            </div>
+                            <ul class="list-disc pl-5 text-gray-700 dark:text-gray-300 space-y-1 text-sm">
+                                <li>画像系统搭建</li>
+                                <li>接口开发</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="role-card bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 border border-gray-200 dark:border-gray-700">
+                            <div class="flex items-center mb-3">
+                                <div class="bg-indigo-100 dark:bg-indigo-900 p-2 rounded-full mr-3">
+                                    <i class="fas fa-bug text-indigo-600 dark:text-indigo-400"></i>
+                                </div>
+                                <h4 class="font-bold text-gray-800 dark:text-white">测试工程师</h4>
+                            </div>
+                            <ul class="list-disc pl-5 text-gray-700 dark:text-gray-300 space-y-1 text-sm">
+                                <li>系统测试</li>
+                                <li>标签数据测试</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-orange-50 dark:bg-orange-900/20 p-4 rounded-lg border-l-4 border-orange-400 dark:border-orange-600">
+                        <p class="text-orange-700 dark:text-orange-300">用户画像体系的搭建需要跨部门协作，涉及产品、技术、运营等多个团队，只有各方紧密配合才能确保项目成功落地。</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 总结部分 -->
+            <section class="fade-in">
+                <div class="bg-primary-50 dark:bg-primary-900/20 rounded-lg p-6 border border-primary-200 dark:border-primary-800">
+                    <h2 class="text-xl font-semibold text-primary-800 dark:text-primary-200 mb-4">用户画像体系搭建要点总结</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                        <div class="bg-white dark:bg-gray-800 p-4 rounded-lg">
+                            <h3 class="font-medium text-gray-800 dark:text-white mb-2">复杂系统工程</h3>
+                            <p class="text-gray-700 dark:text-gray-300">不是单人或单部门能完成，需要多方协同</p>
+                        </div>
+                        <div class="bg-white dark:bg-gray-800 p-4 rounded-lg">
+                            <h3 class="font-medium text-gray-800 dark:text-white mb-2">循序渐进过程</h3>
+                            <p class="text-gray-700 dark:text-gray-300">分版本迭代，每个版本都有业务价值</p>
+                        </div>
+                        <div class="bg-white dark:bg-gray-800 p-4 rounded-lg">
+                            <h3 class="font-medium text-gray-800 dark:text-white mb-2">企业规模要求</h3>
+                            <p class="text-gray-700 dark:text-gray-300">通常只有具备一定规模的企业才会搭建</p>
+                        </div>
+                    </div>
+                    <p class="text-primary-700 dark:text-primary-300">用户画像体系的搭建从业务框架到产品架构再到落地实施，是一个系统化的过程，需要企业投入大量资源和人力，但一旦建成将为企业带来巨大的业务价值。</p>
+                </div>
+            </section>
+        </main>
+
+        <!-- 页脚 -->
+        <footer class="bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 py-8 mt-12 transition-colors duration-300">
+            <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex flex-col md:flex-row justify-between items-center">
+                    <div class="mb-4 md:mb-0">
+                        <p class="text-gray-500 dark:text-gray-400">业务模型 · 用户画像体系搭建</p>
+                    </div>
+                    <div class="flex space-x-6">
+                        <a href="#" class="text-gray-500 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 link-hover">
+                            <i class="fas fa-home"></i>
+                        </a>
+                        <a href="#" class="text-gray-500 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 link-hover">
+                            <i class="fas fa-info-circle"></i>
+                        </a>
+                        <a href="#" class="text-gray-500 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 link-hover">
+                            <i class="fas fa-envelope"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        // 主题切换功能
+        const themeToggle = document.getElementById('theme-toggle');
+        const html = document.documentElement;
+
+        // 检查本地存储或系统偏好
+        if (localStorage.getItem('theme') === 'dark' || (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            html.classList.add('dark');
+        } else {
+            html.classList.remove('dark');
+        }
+
+        // 切换主题
+        themeToggle.addEventListener('click', () => {
+            html.classList.toggle('dark');
+            localStorage.setItem('theme', html.classList.contains('dark') ? 'dark' : 'light');
+        });
+
+        // 动画效果
+        document.addEventListener('DOMContentLoaded', () => {
+            const fadeElements = document.querySelectorAll('.fade-in');
+            
+            const fadeInObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.opacity = 1;
+                        entry.target.style.transform = 'translateY(0)';
+                        fadeInObserver.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.1 });
+
+            fadeElements.forEach(el => {
+                el.style.opacity = 0;
+                el.style.transform = 'translateY(10px)';
+                el.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+                fadeInObserver.observe(el);
+            });
+        });
+    </script>
+</body>
+</html>

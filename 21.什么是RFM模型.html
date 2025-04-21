@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RFM模型- 业务模型</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Noto Sans SC', 'sans-serif'],
+                    },
+                    colors: {
+                        primary: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            200: '#bae6fd',
+                            300: '#7dd3fc',
+                            400: '#38bdf8',
+                            500: '#0ea5e9',
+                            600: '#0284c7',
+                            700: '#0369a1',
+                            800: '#075985',
+                            900: '#0c4a6e',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        .card-hover:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        .link-hover {
+            transition: all 0.2s ease;
+        }
+        .link-hover:hover {
+            color: #0284c7;
+            transform: scale(1.02);
+        }
+        html {
+            scroll-behavior: smooth;
+        }
+        .model-icon {
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 12px;
+            margin-right: 16px;
+            flex-shrink: 0;
+        }
+        .rfm-indicator {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 12px;
+        }
+        .indicator-icon {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            margin-right: 12px;
+            flex-shrink: 0;
+        }
+        .example-card {
+            border-left: 4px solid;
+            padding: 12px;
+            margin-bottom: 16px;
+            border-radius: 0 8px 8px 0;
+        }
+        .bar-chart {
+            display: flex;
+            height: 200px;
+            align-items: flex-end;
+            margin: 20px 0;
+        }
+        .bar {
+            flex: 1;
+            margin: 0 5px;
+            position: relative;
+            transition: height 0.5s ease;
+        }
+        .bar-label {
+            position: absolute;
+            bottom: -25px;
+            width: 100%;
+            text-align: center;
+            font-size: 12px;
+        }
+        .bar-value {
+            position: absolute;
+            top: -25px;
+            width: 100%;
+            text-align: center;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 dark:bg-gray-900 dark:text-gray-200 font-sans transition-colors duration-300">
+    <div class="min-h-screen">
+        <!-- 导航栏 -->
+        <nav class="bg-white dark:bg-gray-800 shadow-sm sticky top-0 z-10 transition-colors duration-300">
+            <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex justify-between h-16">
+                    <div class="flex items-center">
+                        <span class="text-xl font-bold text-primary-600 dark:text-primary-400">业务模型</span>
+                        <span class="ml-2 text-gray-500 dark:text-gray-400">RFM分析模型</span>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        <button id="theme-toggle" type="button" class="text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none rounded-lg text-sm p-2.5">
+                            <i class="fas fa-moon dark:hidden"></i>
+                            <i class="fas fa-sun hidden dark:block"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <!-- 主要内容 -->
+        <main class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <!-- 标题部分 -->
+            <section class="mb-12 fade-in">
+                <h1 class="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4">高级业务分析模型</h1>
+                <div class="mt-6 bg-primary-50 dark:bg-gray-800 p-4 rounded-lg border-l-4 border-primary-500">
+                    <p class="text-gray-700 dark:text-gray-300">从数据指标分析到用户行为分析，再到更高维度的业务分析模型，帮助企业从战略层面理解业务和行业发展模式。</p>
+                </div>
+            </section>
+
+            <!-- 学习路径 -->
+            <section class="mb-12 fade-in">
+                <h2 class="text-2xl font-semibold text-gray-800 dark:text-white mb-6">业务分析方法学习路径</h2>
+                <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 card-hover">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div class="bg-blue-50 dark:bg-blue-900/20 p-5 rounded-lg">
+                            <h3 class="font-bold text-blue-700 dark:text-blue-300 mb-3">第一天</h3>
+                            <p class="text-blue-700 dark:text-blue-300">基础数据分析方法</p>
+                            <ul class="list-disc pl-5 mt-2 text-blue-700 dark:text-blue-300 space-y-1 text-sm">
+                                <li>对比分析法</li>
+                                <li>多维度分析法</li>
+                                <li>基础数据指标</li>
+                            </ul>
+                        </div>
+                        <div class="bg-green-50 dark:bg-green-900/20 p-5 rounded-lg">
+                            <h3 class="font-bold text-green-700 dark:text-green-300 mb-3">第二天</h3>
+                            <p class="text-green-700 dark:text-green-300">用户行为分析方法</p>
+                            <ul class="list-disc pl-5 mt-2 text-green-700 dark:text-green-300 space-y-1 text-sm">
+                                <li>用户行为分析</li>
+                                <li>用户留存分析</li>
+                                <li>同期群分析</li>
+                                <li>用户画像</li>
+                            </ul>
+                        </div>
+                        <div class="bg-purple-50 dark:bg-purple-900/20 p-5 rounded-lg">
+                            <h3 class="font-bold text-purple-700 dark:text-purple-300 mb-3">第三天</h3>
+                            <p class="text-purple-700 dark:text-purple-300">高级业务分析模型</p>
+                            <ul class="list-disc pl-5 mt-2 text-purple-700 dark:text-purple-300 space-y-1 text-sm">
+                                <li>RFM模型</li>
+                                <li>AARRR模型</li>
+                                <li>4P营销理论</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- RFM模型部分 -->
+            <section id="rfm" class="mb-12 fade-in">
+                <div class="flex items-center mb-6">
+                    <div class="model-icon bg-red-100 dark:bg-red-900">
+                        <i class="fas fa-users text-red-600 dark:text-red-400 text-2xl"></i>
+                    </div>
+                    <h2 class="text-2xl font-semibold text-gray-800 dark:text-white">RFM模型 - 客户价值分析</h2>
+                </div>
+                <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 card-hover">
+                    <p class="mb-4 text-gray-700 dark:text-gray-300">RFM模型是用户细分领域常用的客户价值模型，用于衡量客户价值和客户创利能力。在流量为王的互联网时代，有效的用户管理能创造巨大价值。</p>
+                    
+                    <h3 class="text-xl font-medium text-gray-800 dark:text-white mb-4">RFM模型三大指标</h3>
+                    
+                    <div class="rfm-indicator bg-red-50 dark:bg-red-900/10">
+                        <div class="indicator-icon bg-red-100 dark:bg-red-900">
+                            <span class="text-red-600 dark:text-red-400 font-bold">R</span>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-gray-800 dark:text-white">最近一次消费 (Recency)</h4>
+                            <p class="text-gray-700 dark:text-gray-300">客户上一次消费距离现在的时间间隔，反映用户活跃程度</p>
+                        </div>
+                    </div>
+                    
+                    <div class="rfm-indicator bg-blue-50 dark:bg-blue-900/10">
+                        <div class="indicator-icon bg-blue-100 dark:bg-blue-900">
+                            <span class="text-blue-600 dark:text-blue-400 font-bold">F</span>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-gray-800 dark:text-white">消费频率 (Frequency)</h4>
+                            <p class="text-gray-700 dark:text-gray-300">顾客在固定时间内的购买次数，反映顾客忠诚度</p>
+                        </div>
+                    </div>
+                    
+                    <div class="rfm-indicator bg-green-50 dark:bg-green-900/10">
+                        <div class="indicator-icon bg-green-100 dark:bg-green-900">
+                            <span class="text-green-600 dark:text-green-400 font-bold">M</span>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-gray-800 dark:text-white">消费金额 (Monetary)</h4>
+                            <p class="text-gray-700 dark:text-gray-300">一段时间内的交易金额，衡量用户贡献程度</p>
+                        </div>
+                    </div>
+                    
+                    <h4 class="font-medium text-gray-800 dark:text-white mb-2">R值 - 最近一次消费</h4>
+                    <p class="mb-4 text-gray-700 dark:text-gray-300">R值越大表明用户很久没有交易，可能快流失；R值越小代表用户最近有交易，价值越高。</p>
+                    
+                    <div class="bar-chart">
+                        <div class="bar bg-red-200 dark:bg-red-800" style="height: 20%">
+                            <div class="bar-value">100+</div>
+                            <div class="bar-label">1天</div>
+                        </div>
+                        <div class="bar bg-red-200 dark:bg-red-800" style="height: 18%">
+                            <div class="bar-value">90</div>
+                            <div class="bar-label">2天</div>
+                        </div>
+                        <div class="bar bg-red-200 dark:bg-red-800" style="height: 15%">
+                            <div class="bar-value">75</div>
+                            <div class="bar-label">3天</div>
+                        </div>
+                        <div class="bar bg-red-200 dark:bg-red-800" style="height: 10%">
+                            <div class="bar-value">50</div>
+                            <div class="bar-label">7天</div>
+                        </div>
+                        <div class="bar bg-red-200 dark:bg-red-800" style="height: 5%">
+                            <div class="bar-value">25</div>
+                            <div class="bar-label">30天</div>
+                        </div>
+                    </div>
+                    <p class="text-center text-sm text-gray-500 dark:text-gray-400 mb-4">用户最近一次消费时间分布示例</p>
+                    
+                    <h4 class="font-medium text-gray-800 dark:text-white mb-2">F值 - 消费频率</h4>
+                    <p class="mb-4 text-gray-700 dark:text-gray-300">不同产品对固定时间的定义不同：快消品可能按月统计，耐用品可能按年统计。实际应用中常使用累计购买次数。</p>
+                    
+                    <div class="bar-chart">
+                        <div class="bar bg-blue-200 dark:bg-blue-800" style="height: 65%">
+                            <div class="bar-value">65%</div>
+                            <div class="bar-label">1次</div>
+                        </div>
+                        <div class="bar bg-blue-200 dark:bg-blue-800" style="height: 34%">
+                            <div class="bar-value">34%</div>
+                            <div class="bar-label">2次</div>
+                        </div>
+                        <div class="bar bg-blue-200 dark:bg-blue-800" style="height: 17%">
+                            <div class="bar-value">17%</div>
+                            <div class="bar-label">3次</div>
+                        </div>
+                        <div class="bar bg-blue-200 dark:bg-blue-800" style="height: 6%">
+                            <div class="bar-value">6%</div>
+                            <div class="bar-label">5次+</div>
+                        </div>
+                    </div>
+                    <p class="text-center text-sm text-gray-500 dark:text-gray-400 mb-4">零食网店用户购买频次分布示例</p>
+                    
+                    <h4 class="font-medium text-gray-800 dark:text-white mb-2">M值 - 消费金额</h4>
+                    <p class="mb-4 text-gray-700 dark:text-gray-300">M值越大用户价值越高，但实际应用中可能遇到产品价格单一、购买频次不高等问题。常用解决方案：</p>
+                    <ul class="list-disc pl-5 mb-4 text-gray-700 dark:text-gray-300 space-y-2">
+                        <li>计算累计购买金额</li>
+                        <li>使用平均客单价代替</li>
+                    </ul>
+                    
+                    <h3 class="text-xl font-medium text-gray-800 dark:text-white mb-4">RFM模型在不同行业的应用</h3>
+                    
+                    <div class="example-card bg-yellow-50 dark:bg-yellow-900/20 border-yellow-400 dark:border-yellow-600">
+                        <h4 class="font-bold text-yellow-700 dark:text-yellow-300 mb-2">电子邮件营销</h4>
+                        <ul class="list-disc pl-5 text-yellow-700 dark:text-yellow-300 space-y-1">
+                            <li>R: 上一次打开邮件的时间</li>
+                            <li>F: 一段时间内邮件打开次数</li>
+                            <li>M: 根据客户获利成本估算的价值</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="example-card bg-green-50 dark:bg-green-900/20 border-green-400 dark:border-green-600">
+                        <h4 class="font-bold text-green-700 dark:text-green-300 mb-2">社交产品</h4>
+                        <ul class="list-disc pl-5 text-green-700 dark:text-green-300 space-y-1">
+                            <li>R: 最近一次登录时间</li>
+                            <li>F: 一段时间内登录频率</li>
+                            <li>M: 一段时间内在线时长</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="example-card bg-blue-50 dark:bg-blue-900/20 border-blue-400 dark:border-blue-600">
+                        <h4 class="font-bold text-blue-700 dark:text-blue-300 mb-2">打车软件</h4>
+                        <ul class="list-disc pl-5 text-blue-700 dark:text-blue-300 space-y-1">
+                            <li>R: 上一次打车距离现在的天数</li>
+                            <li>F: 过去一个月内打车次数</li>
+                            <li>M: 过去一个月内打车总金额</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="bg-primary-50 dark:bg-primary-900/20 p-4 rounded-lg border-l-4 border-primary-500 mt-4">
+                        <p class="text-primary-700 dark:text-primary-300">RFM模型在实际应用中需要根据行业特性和业务目标进行调整，不能生搬硬套。只有经过本地化改造的模型才能真正发挥价值。</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- AARRR模型部分 -->
+            <section id="aarrr" class="mb-12 fade-in">
+                <div class="flex items-center mb-6">
+                    <div class="model-icon bg-purple-100 dark:bg-purple-900">
+                        <i class="fas fa-funnel-dollar text-purple-600 dark:text-purple-400 text-2xl"></i>
+                    </div>
+                    <h2 class="text-2xl font-semibold text-gray-800 dark:text-white">AARRR模型 - 增长黑客模型</h2>
+                </div>
+                <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 card-hover">
+                    <p class="mb-4 text-gray-700 dark:text-gray-300">AARRR模型又称海盗指标，是增长黑客(Growth Hacking)的核心模型，描述了用户生命周期的五个关键阶段。</p>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-5 gap-4 mb-6">
+                        <div class="bg-purple-50 dark:bg-purple-900/20 p-4 rounded-lg text-center">
+                            <div class="text-2xl font-bold text-purple-600 dark:text-purple-400 mb-2">A</div>
+                            <h4 class="font-bold text-gray-800 dark:text-white">获取</h4>
+                            <p class="text-sm text-gray-700 dark:text-gray-300">(Acquisition)</p>
+                        </div>
+                        <div class="bg-purple-50 dark:bg-purple-900/20 p-4 rounded-lg text-center">
+                            <div class="text-2xl font-bold text-purple-600 dark:text-purple-400 mb-2">A</div>
+                            <h4 class="font-bold text-gray-800 dark:text-white">激活</h4>
+                            <p class="text-sm text-gray-700 dark:text-gray-300">(Activation)</p>
+                        </div>
+                        <div class="bg-purple-50 dark:bg-purple-900/20 p-4 rounded-lg text-center">
+                            <div class="text-2xl font-bold text-purple-600 dark:text-purple-400 mb-2">R</div>
+                            <h4 class="font-bold text-gray-800 dark:text-white">留存</h4>
+                            <p class="text-sm text-gray-700 dark:text-gray-300">(Retention)</p>
+                        </div>
+                        <div class="bg-purple-50 dark:bg-purple-900/20 p-4 rounded-lg text-center">
+                            <div class="text-2xl font-bold text-purple-600 dark:text-purple-400 mb-2">R</div>
+                            <h4 class="font-bold text-gray-800 dark:text-white">收入</h4>
+                            <p class="text-sm text-gray-700 dark:text-gray-300">(Revenue)</p>
+                        </div>
+                        <div class="bg-purple-50 dark:bg-purple-900/20 p-4 rounded-lg text-center">
+                            <div class="text-2xl font-bold text-purple-600 dark:text-purple-400 mb-2">R</div>
+                            <h4 class="font-bold text-gray-800 dark:text-white">推荐</h4>
+                            <p class="text-sm text-gray-700 dark:text-gray-300">(Referral)</p>
+                        </div>
+                    </div>
+                    
+                    <h3 class="text-xl font-medium text-gray-800 dark:text-white mb-4">AARRR模型各阶段详解</h3>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
+                        <div class="bg-white dark:bg-gray-700 p-4 rounded-lg shadow">
+                            <h4 class="font-bold text-gray-800 dark:text-white mb-2">1. 获取 (Acquisition)</h4>
+                            <p class="text-gray-700 dark:text-gray-300">用户如何发现并来到你的产品？关注渠道来源、获客成本、用户质量等指标。</p>
+                        </div>
+                        <div class="bg-white dark:bg-gray-700 p-4 rounded-lg shadow">
+                            <h4 class="font-bold text-gray-800 dark:text-white mb-2">2. 激活 (Activation)</h4>
+                            <p class="text-gray-700 dark:text-gray-300">用户的第一次使用体验如何？关注激活率、新手引导完成率等指标。</p>
+                        </div>
+                        <div class="bg-white dark:bg-gray-700 p-4 rounded-lg shadow">
+                            <h4 class="font-bold text-gray-800 dark:text-white mb-2">3. 留存 (Retention)</h4>
+                            <p class="text-gray-700 dark:text-gray-300">用户是否会回访？关注次日留存率、7日留存率、30日留存率等。</p>
+                        </div>
+                        <div class="bg-white dark:bg-gray-700 p-4 rounded-lg shadow">
+                            <h4 class="font-bold text-gray-800 dark:text-white mb-2">4. 收入 (Revenue)</h4>
+                            <p class="text-gray-700 dark:text-gray-300">如何从用户身上赚钱？关注ARPU、转化率、付费率等指标。</p>
+                        </div>
+                        <div class="bg-white dark:bg-gray-700 p-4 rounded-lg shadow md:col-span-2">
+                            <h4 class="font-bold text-gray-800 dark:text-white mb-2">5. 推荐 (Referral)</h4>
+                            <p class="text-gray-700 dark:text-gray-300">用户是否会推荐他人？关注NPS(净推荐值)、分享率、邀请率等指标。</p>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-purple-50 dark:bg-purple-900/20 p-4 rounded-lg border-l-4 border-purple-400 dark:border-purple-600">
+                        <p class="text-purple-700 dark:text-purple-300">AARRR模型帮助企业在用户生命周期的每个阶段找到关键指标，通过数据驱动的方式实现用户增长和商业价值最大化。</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 4P营销理论部分 -->
+            <section id="4p" class="mb-12 fade-in">
+                <div class="flex items-center mb-6">
+                    <div class="model-icon bg-indigo-100 dark:bg-indigo-900">
+                        <i class="fas fa-bullseye text-indigo-600 dark:text-indigo-400 text-2xl"></i>
+                    </div>
+                    <h2 class="text-2xl font-semibold text-gray-800 dark:text-white">4P营销理论 - 经典营销框架</h2>
+                </div>
+                <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 card-hover">
+                    <p class="mb-4 text-gray-700 dark:text-gray-300">4P营销理论是营销学中的经典框架，从产品、价格、渠道和促销四个维度制定营销策略。</p>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                        <div class="bg-indigo-50 dark:bg-indigo-900/20 p-4 rounded-lg text-center">
+                            <div class="text-2xl font-bold text-indigo-600 dark:text-indigo-400 mb-2">P</div>
+                            <h4 class="font-bold text-gray-800 dark:text-white">产品</h4>
+                            <p class="text-sm text-gray-700 dark:text-gray-300">(Product)</p>
+                        </div>
+                        <div class="bg-indigo-50 dark:bg-indigo-900/20 p-4 rounded-lg text-center">
+                            <div class="text-2xl font-bold text-indigo-600 dark:text-indigo-400 mb-2">P</div>
+                            <h4 class="font-bold text-gray-800 dark:text-white">价格</h4>
+                            <p class="text-sm text-gray-700 dark:text-gray-300">(Price)</p>
+                        </div>
+                        <div class="bg-indigo-50 dark:bg-indigo-900/20 p-4 rounded-lg text-center">
+                            <div class="text-2xl font-bold text-indigo-600 dark:text-indigo-400 mb-2">P</div>
+                            <h4 class="font-bold text-gray-800 dark:text-white">渠道</h4>
+                            <p class="text-sm text-gray-700 dark:text-gray-300">(Place)</p>
+                        </div>
+                        <div class="bg-indigo-50 dark:bg-indigo-900/20 p-4 rounded-lg text-center">
+                            <div class="text-2xl font-bold text-indigo-600 dark:text-indigo-400 mb-2">P</div>
+                            <h4 class="font-bold text-gray-800 dark:text-white">促销</h4>
+                            <p class="text-sm text-gray-700 dark:text-gray-300">(Promotion)</p>
+                        </div>
+                    </div>
+                    
+                    <h3 class="text-xl font-medium text-gray-800 dark:text-white mb-4">4P营销理论详解</h3>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
+                        <div class="bg-white dark:bg-gray-700 p-4 rounded-lg shadow">
+                            <h4 class="font-bold text-gray-800 dark:text-white mb-2">1. 产品 (Product)</h4>
+                            <p class="text-gray-700 dark:text-gray-300">满足目标市场需求的产品或服务，包括产品功能、质量、设计、品牌等要素。</p>
+                            <ul class="list-disc pl-5 mt-2 text-gray-700 dark:text-gray-300 space-y-1 text-sm">
+                                <li>产品能满足什么需求？</li>
+                                <li>产品的差异化优势是什么？</li>
+                                <li>产品如何定位？</li>
+                            </ul>
+                        </div>
+                        <div class="bg-white dark:bg-gray-700 p-4 rounded-lg shadow">
+                            <h4 class="font-bold text-gray-800 dark:text-white mb-2">2. 价格 (Price)</h4>
+                            <p class="text-gray-700 dark:text-gray-300">产品的定价策略，考虑成本、竞争、目标用户支付能力等因素。</p>
+                            <ul class="list-disc pl-5 mt-2 text-gray-700 dark:text-gray-300 space-y-1 text-sm">
+                                <li>成本加成定价</li>
+                                <li>竞争导向定价</li>
+                                <li>价值导向定价</li>
+                                <li>动态定价策略</li>
+                            </ul>
+                        </div>
+                        <div class="bg-white dark:bg-gray-700 p-4 rounded-lg shadow">
+                            <h4 class="font-bold text-gray-800 dark:text-white mb-2">3. 渠道 (Place)</h4>
+                            <p class="text-gray-700 dark:text-gray-300">产品如何到达消费者手中，包括分销渠道、物流、库存管理等。</p>
+                            <ul class="list-disc pl-5 mt-2 text-gray-700 dark:text-gray-300 space-y-1 text-sm">
+                                <li>直销还是分销？</li>
+                                <li>线上渠道还是线下渠道？</li>
+                                <li>渠道覆盖范围和效率</li>
+                            </ul>
+                        </div>
+                        <div class="bg-white dark:bg-gray-700 p-4 rounded-lg shadow">
+                            <h4 class="font-bold text-gray-800 dark:text-white mb-2">4. 促销 (Promotion)</h4>
+                            <p class="text-gray-700 dark:text-gray-300">如何与目标市场沟通并推广产品，包括广告、公关、促销活动等。</p>
+                            <ul class="list-disc pl-5 mt-2 text-gray-700 dark:text-gray-300 space-y-1 text-sm">
+                                <li>广告投放策略</li>
+                                <li>社交媒体营销</li>
+                                <li>促销活动设计</li>
+                                <li>公关活动策划</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-indigo-50 dark:bg-indigo-900/20 p-4 rounded-lg border-l-4 border-indigo-400 dark:border-indigo-600">
+                        <p class="text-indigo-700 dark:text-indigo-300">4P营销理论为企业提供了一个全面的营销策略框架，四个要素需要协调一致，共同服务于企业的营销目标。</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 总结部分 -->
+            <section class="fade-in">
+                <div class="bg-primary-50 dark:bg-primary-900/20 rounded-lg p-6 border border-primary-200 dark:border-primary-800">
+                    <h2 class="text-xl font-semibold text-primary-800 dark:text-primary-200 mb-4">高级业务分析模型总结</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                        <div class="bg-white dark:bg-gray-800 p-4 rounded-lg">
+                            <h3 class="font-medium text-gray-800 dark:text-white mb-2">RFM模型</h3>
+                            <p class="text-gray-700 dark:text-gray-300">客户价值分析，基于最近一次消费、消费频率和消费金额</p>
+                        </div>
+                        <div class="bg-white dark:bg-gray-800 p-4 rounded-lg">
+                            <h3 class="font-medium text-gray-800 dark:text-white mb-2">AARRR模型</h3>
+                            <p class="text-gray-700 dark:text-gray-300">增长黑客模型，关注用户生命周期的五个关键阶段</p>
+                        </div>
+                        <div class="bg-white dark:bg-gray-800 p-4 rounded-lg">
+                            <h3 class="font-medium text-gray-800 dark:text-white mb-2">4P营销理论</h3>
+                            <p class="text-gray-700 dark:text-gray-300">经典营销框架，从产品、价格、渠道和促销四个维度制定策略</p>
+                        </div>
+                    </div>
+                    <p class="text-primary-700 dark:text-primary-300">这三种高级业务分析模型分别从客户价值、用户增长和营销策略三个不同角度，帮助企业从更高维度理解业务和行业发展模式，为战略决策提供数据支持。</p>
+                </div>
+            </section>
+        </main>
+
+        <!-- 页脚 -->
+        <footer class="bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 py-8 mt-12 transition-colors duration-300">
+            <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex flex-col md:flex-row justify-between items-center">
+                    <div class="mb-4 md:mb-0">
+                        <p class="text-gray-500 dark:text-gray-400">业务模型 · RFM模型</p>
+                    </div>
+                    <div class="flex space-x-6">
+                        <a href="#" class="text-gray-500 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 link-hover">
+                            <i class="fas fa-home"></i>
+                        </a>
+                        <a href="#" class="text-gray-500 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 link-hover">
+                            <i class="fas fa-info-circle"></i>
+                        </a>
+                        <a href="#" class="text-gray-500 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 link-hover">
+                            <i class="fas fa-envelope"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        // 主题切换功能
+        const themeToggle = document.getElementById('theme-toggle');
+        const html = document.documentElement;
+
+        // 检查本地存储或系统偏好
+        if (localStorage.getItem('theme') === 'dark' || (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            html.classList.add('dark');
+        } else {
+            html.classList.remove('dark');
+        }
+
+        // 切换主题
+        themeToggle.addEventListener('click', () => {
+            html.classList.toggle('dark');
+            localStorage.setItem('theme', html.classList.contains('dark') ? 'dark' : 'light');
+        });
+
+        // 动画效果
+        document.addEventListener('DOMContentLoaded', () => {
+            const fadeElements = document.querySelectorAll('.fade-in');
+            
+            const fadeInObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.opacity = 1;
+                        entry.target.style.transform = 'translateY(0)';
+                        fadeInObserver.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.1 });
+
+            fadeElements.forEach(el => {
+                el.style.opacity = 0;
+                el.style.transform = 'translateY(10px)';
+                el.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+                fadeInObserver.observe(el);
+            });
+        });
+    </script>
+</body>
+</html>

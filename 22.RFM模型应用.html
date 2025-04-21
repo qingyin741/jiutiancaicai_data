@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RFM模型应用指南</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Noto Sans SC', 'sans-serif'],
+                    },
+                    colors: {
+                        primary: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            200: '#bae6fd',
+                            300: '#7dd3fc',
+                            400: '#38bdf8',
+                            500: '#0ea5e9',
+                            600: '#0284c7',
+                            700: '#0369a1',
+                            800: '#075985',
+                            900: '#0c4a6e',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            transition: background-color 0.3s, color 0.3s;
+        }
+        .fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .hover-scale {
+            transition: transform 0.2s ease;
+        }
+        .hover-scale:hover {
+            transform: scale(1.02);
+        }
+        .card-hover {
+            transition: box-shadow 0.3s ease, border-color 0.3s ease;
+        }
+        .card-hover:hover {
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            border-color: rgba(59, 130, 246, 0.5);
+        }
+        .rfm-cube {
+            width: 200px;
+            height: 200px;
+            position: relative;
+            transform-style: preserve-3d;
+            animation: rotate 20s infinite linear;
+        }
+        @keyframes rotate {
+            0% { transform: rotateX(-20deg) rotateY(0deg); }
+            100% { transform: rotateX(-20deg) rotateY(360deg); }
+        }
+        .face {
+            position: absolute;
+            width: 200px;
+            height: 200px;
+            opacity: 0.8;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: white;
+        }
+        .front { transform: translateZ(100px); background-color: rgba(14, 165, 233, 0.7); }
+        .back { transform: rotateY(180deg) translateZ(100px); background-color: rgba(220, 38, 38, 0.7); }
+        .right { transform: rotateY(90deg) translateZ(100px); background-color: rgba(5, 150, 105, 0.7); }
+        .left { transform: rotateY(-90deg) translateZ(100px); background-color: rgba(167, 139, 250, 0.7); }
+        .top { transform: rotateX(90deg) translateZ(100px); background-color: rgba(234, 179, 8, 0.7); }
+        .bottom { transform: rotateX(-90deg) translateZ(100px); background-color: rgba(244, 63, 94, 0.7); }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 dark:bg-gray-900 dark:text-gray-200 font-sans antialiased">
+    <header class="bg-white dark:bg-gray-800 shadow-sm">
+        <div class="container mx-auto px-4 py-6 flex justify-between items-center">
+            <h1 class="text-2xl font-bold text-primary-600 dark:text-primary-400">RFM模型应用指南</h1>
+            <button id="theme-toggle" class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">
+                <i class="fas fa-moon dark:hidden"></i>
+                <i class="fas fa-sun hidden dark:inline"></i>
+            </button>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-4 py-8">
+        <section class="max-w-4xl mx-auto mb-12 fade-in">
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden card-hover">
+                <div class="p-6 md:p-8">
+                    <h2 class="text-xl font-semibold mb-4 text-primary-700 dark:text-primary-400">什么是RFM模型？</h2>
+                    <p class="mb-4 leading-relaxed">RFM模型是一种客户价值分析工具，通过三个关键指标对客户进行细分：</p>
+                    <div class="grid md:grid-cols-3 gap-4 mb-6">
+                        <div class="bg-primary-50 dark:bg-gray-700 p-4 rounded-lg hover-scale">
+                            <h3 class="font-medium text-primary-700 dark:text-primary-300 mb-2"><i class="fas fa-clock mr-2"></i>R (Recency)</h3>
+                            <p class="text-sm text-gray-600 dark:text-gray-300">最近一次消费时间，反映客户活跃度</p>
+                        </div>
+                        <div class="bg-primary-50 dark:bg-gray-700 p-4 rounded-lg hover-scale">
+                            <h3 class="font-medium text-primary-700 dark:text-primary-300 mb-2"><i class="fas fa-sync-alt mr-2"></i>F (Frequency)</h3>
+                            <p class="text-sm text-gray-600 dark:text-gray-300">消费频率，反映客户忠诚度</p>
+                        </div>
+                        <div class="bg-primary-50 dark:bg-gray-700 p-4 rounded-lg hover-scale">
+                            <h3 class="font-medium text-primary-700 dark:text-primary-300 mb-2"><i class="fas fa-money-bill-wave mr-2"></i>M (Monetary)</h3>
+                            <p class="text-sm text-gray-600 dark:text-gray-300">消费金额，反映客户贡献价值</p>
+                        </div>
+                    </div>
+                    <p class="leading-relaxed">通过这三个维度的组合分析，可以将客户划分为不同群体，制定针对性的营销策略。</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="max-w-4xl mx-auto mb-12 fade-in">
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden card-hover">
+                <div class="p-6 md:p-8">
+                    <h2 class="text-xl font-semibold mb-4 text-primary-700 dark:text-primary-400">RFM模型应用步骤</h2>
+                    <div class="space-y-6">
+                        <div class="flex items-start">
+                            <div class="flex-shrink-0 bg-primary-100 dark:bg-primary-900 rounded-full w-8 h-8 flex items-center justify-center mr-4 mt-1">
+                                <span class="text-primary-700 dark:text-primary-300 font-bold">1</span>
+                            </div>
+                            <div>
+                                <h3 class="font-medium mb-2">提取三个关键指标</h3>
+                                <p class="text-gray-600 dark:text-gray-300">从现有数据中提取每个客户的R(最近消费时间)、F(消费频率)和M(消费金额)三个指标。</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-start">
+                            <div class="flex-shrink-0 bg-primary-100 dark:bg-primary-900 rounded-full w-8 h-8 flex items-center justify-center mr-4 mt-1">
+                                <span class="text-primary-700 dark:text-primary-300 font-bold">2</span>
+                            </div>
+                            <div>
+                                <h3 class="font-medium mb-2">客户群体划分</h3>
+                                <p class="text-gray-600 dark:text-gray-300">根据指标对客户进行划分，常用的划分方法有两种：</p>
+                                <div class="mt-3 space-y-3">
+                                    <div class="bg-gray-50 dark:bg-gray-700 p-3 rounded-lg">
+                                        <h4 class="font-medium text-sm mb-1"><i class="fas fa-industry mr-2 text-primary-600 dark:text-primary-400"></i>行业规则划分</h4>
+                                        <ul class="text-sm text-gray-600 dark:text-gray-300 list-disc pl-5 space-y-1">
+                                            <li>R值：间隔天数分段，如>90天未购买属低价值</li>
+                                            <li>F值：按购买次数分段，如>2次属高价值</li>
+                                            <li>M值：按客单价分段，平均以上属高价值</li>
+                                        </ul>
+                                    </div>
+                                    <div class="bg-gray-50 dark:bg-gray-700 p-3 rounded-lg">
+                                        <h4 class="font-medium text-sm mb-1"><i class="fas fa-chart-pie mr-2 text-primary-600 dark:text-primary-400"></i>百分位规则划分</h4>
+                                        <ul class="text-sm text-gray-600 dark:text-gray-300 list-disc pl-5 space-y-1">
+                                            <li>按20%、40%、60%、80%分位数划分</li>
+                                            <li>F和M：分位数越高，取值越大</li>
+                                            <li>R：时间越短越好，小于20%分位数取最高值</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-start">
+                            <div class="flex-shrink-0 bg-primary-100 dark:bg-primary-900 rounded-full w-8 h-8 flex items-center justify-center mr-4 mt-1">
+                                <span class="text-primary-700 dark:text-primary-300 font-bold">3</span>
+                            </div>
+                            <div>
+                                <h3 class="font-medium mb-2">分值转换与客户分类</h3>
+                                <p class="text-gray-600 dark:text-gray-300">将每个指标的分值(如1-5)转换为0或1(低/高价值)，然后组合三个指标的0/1值，得到8种客户类型。</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="max-w-4xl mx-auto mb-12 fade-in">
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden card-hover">
+                <div class="p-6 md:p-8">
+                    <h2 class="text-xl font-semibold mb-6 text-primary-700 dark:text-primary-400">RFM客户类型三维可视化</h2>
+                    <div class="flex flex-col md:flex-row items-center justify-between">
+                        <div class="w-full md:w-1/2 mb-6 md:mb-0 md:pr-6">
+                            <div class="flex justify-center">
+                                <div class="rfm-cube">
+                                    <div class="face front">R</div>
+                                    <div class="face back">F</div>
+                                    <div class="face right">M</div>
+                                    <div class="face left">重要价值</div>
+                                    <div class="face top">重要发展</div>
+                                    <div class="face bottom">重要保持</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="w-full md:w-1/2">
+                            <p class="mb-4">RFM模型将客户划分为8种类型，每种类型对应不同的营销策略：</p>
+                            <div class="grid grid-cols-2 gap-3">
+                                <div class="bg-green-50 dark:bg-green-900/30 p-3 rounded-lg border border-green-200 dark:border-green-800/50">
+                                    <h3 class="font-medium text-sm mb-1 text-green-700 dark:text-green-300">重要价值客户</h3>
+                                    <p class="text-xs text-gray-600 dark:text-gray-300">RFM都高，优质客户需重点服务</p>
+                                </div>
+                                <div class="bg-blue-50 dark:bg-blue-900/30 p-3 rounded-lg border border-blue-200 dark:border-blue-800/50">
+                                    <h3 class="font-medium text-sm mb-1 text-blue-700 dark:text-blue-300">重要发展客户</h3>
+                                    <p class="text-xs text-gray-600 dark:text-gray-300">R和M高，F低，需维护</p>
+                                </div>
+                                <div class="bg-purple-50 dark:bg-purple-900/30 p-3 rounded-lg border border-purple-200 dark:border-purple-800/50">
+                                    <h3 class="font-medium text-sm mb-1 text-purple-700 dark:text-purple-300">重要保持客户</h3>
+                                    <p class="text-xs text-gray-600 dark:text-gray-300">F和M高，R低，需挽留</p>
+                                </div>
+                                <div class="bg-yellow-50 dark:bg-yellow-900/30 p-3 rounded-lg border border-yellow-200 dark:border-yellow-800/50">
+                                    <h3 class="font-medium text-sm mb-1 text-yellow-700 dark:text-yellow-300">重要挽留客户</h3>
+                                    <p class="text-xs text-gray-600 dark:text-gray-300">R和F低，M高，需主动交互</p>
+                                </div>
+                                <div class="bg-gray-100 dark:bg-gray-700 p-3 rounded-lg">
+                                    <h3 class="font-medium text-sm mb-1">一般价值客户</h3>
+                                    <p class="text-xs text-gray-600 dark:text-gray-300">F和R高，M低，需提升客单价</p>
+                                </div>
+                                <div class="bg-gray-100 dark:bg-gray-700 p-3 rounded-lg">
+                                    <h3 class="font-medium text-sm mb-1">一般发展客户</h3>
+                                    <p class="text-xs text-gray-600 dark:text-gray-300">R高，F和M低，新用户有潜力</p>
+                                </div>
+                                <div class="bg-gray-100 dark:bg-gray-700 p-3 rounded-lg">
+                                    <h3 class="font-medium text-sm mb-1">一般保持客户</h3>
+                                    <p class="text-xs text-gray-600 dark:text-gray-300">F高，R和M低，可一般维持</p>
+                                </div>
+                                <div class="bg-red-50 dark:bg-red-900/30 p-3 rounded-lg border border-red-200 dark:border-red-800/50">
+                                    <h3 class="font-medium text-sm mb-1 text-red-700 dark:text-red-300">流失客户</h3>
+                                    <p class="text-xs text-gray-600 dark:text-gray-300">RFM都低，资源有限可放弃</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="max-w-4xl mx-auto mb-12 fade-in">
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden card-hover">
+                <div class="p-6 md:p-8">
+                    <h2 class="text-xl font-semibold mb-4 text-primary-700 dark:text-primary-400">应用注意事项</h2>
+                    <div class="space-y-4">
+                        <div class="flex items-start">
+                            <div class="flex-shrink-0 mt-1 mr-3 text-primary-600 dark:text-primary-400">
+                                <i class="fas fa-exclamation-circle"></i>
+                            </div>
+                            <div>
+                                <p class="text-gray-600 dark:text-gray-300">RFM模型的划分标准具有一定主观性，需根据实际业务场景调整。例如电商行业与其他行业的划分标准可能不同。</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start">
+                            <div class="flex-shrink-0 mt-1 mr-3 text-primary-600 dark:text-primary-400">
+                                <i class="fas fa-exclamation-circle"></i>
+                            </div>
+                            <div>
+                                <p class="text-gray-600 dark:text-gray-300">可根据客户基数、商品数量、客户结构等因素灵活调整分类数量，如将每个指标分为4类而非2类。</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start">
+                            <div class="flex-shrink-0 mt-1 mr-3 text-primary-600 dark:text-primary-400">
+                                <i class="fas fa-exclamation-circle"></i>
+                            </div>
+                            <div>
+                                <p class="text-gray-600 dark:text-gray-300">不同客户类型应匹配相应的营销策略，如重要价值客户重点服务，重要挽留客户主动交互等。</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start">
+                            <div class="flex-shrink-0 mt-1 mr-3 text-primary-600 dark:text-primary-400">
+                                <i class="fas fa-exclamation-circle"></i>
+                            </div>
+                            <div>
+                                <p class="text-gray-600 dark:text-gray-300">模型需定期更新，客户价值会随时间变化，静态分析可能导致策略失效。</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="max-w-4xl mx-auto fade-in">
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden card-hover">
+                <div class="p-6 md:p-8">
+                    <h2 class="text-xl font-semibold mb-4 text-primary-700 dark:text-primary-400">RFM模型应用总结</h2>
+                    <div class="prose dark:prose-invert max-w-none">
+                        <p>RFM模型通过三个简单但强大的指标，帮助企业系统化地分析客户价值，实现精准营销：</p>
+                        <ol>
+                            <li><strong>识别高价值客户</strong>：集中资源服务能带来最大回报的客户群体</li>
+                            <li><strong>发现潜在机会</strong>：找出有发展潜力的客户，针对性培育</li>
+                            <li><strong>预警流失风险</strong>：及时识别可能流失的高价值客户，采取措施挽留</li>
+                            <li><strong>优化资源配置</strong>：根据不同客户群体的价值分配营销资源，提高ROI</li>
+                        </ol>
+                        <p>实际应用中，建议结合企业自身数据和业务特点，对标准RFM模型进行适当调整，并定期更新分析结果，以保持模型的时效性和准确性。</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 mt-12">
+        <div class="container mx-auto px-4 py-6">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <p class="text-sm text-gray-600 dark:text-gray-300 mb-4 md:mb-0">© 2025 RFM模型应用指南</p>
+                <div class="flex space-x-4">
+                    <a href="#" class="text-sm text-primary-600 dark:text-primary-400 hover:underline">关于</a>
+                    <a href="#" class="text-sm text-primary-600 dark:text-primary-400 hover:underline">隐私政策</a>
+                    <a href="#" class="text-sm text-primary-600 dark:text-primary-400 hover:underline">联系我们</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // 主题切换
+        const themeToggle = document.getElementById('theme-toggle');
+        const html = document.documentElement;
+        
+        if (localStorage.getItem('theme') === 'dark' || (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            html.classList.add('dark');
+        } else {
+            html.classList.remove('dark');
+        }
+        
+        themeToggle.addEventListener('click', () => {
+            html.classList.toggle('dark');
+            localStorage.setItem('theme', html.classList.contains('dark') ? 'dark' : 'light');
+        });
+
+        // 滚动动画
+        const fadeElements = document.querySelectorAll('.fade-in');
+        
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = 1;
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, { threshold: 0.1 });
+        
+        fadeElements.forEach(el => {
+            el.style.opacity = 0;
+            el.style.transform = 'translateY(20px)';
+            el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+            observer.observe(el);
+        });
+    </script>
+</body>
+</html>
