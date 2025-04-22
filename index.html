@@ -5,50 +5,265 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="一个具有视觉冲击力的数据分析学习路径目录，探索数据世界的奥秘。">
     <title>数据分析学习之旅 | 探索数据奥秘</title>
-    <!-- Link to the NEW visually impactful CSS file -->
     <link rel="stylesheet" href="impact-style.css">
-    <!-- Optional: Link Google Fonts for more font choices -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
     <main class="container">
         <header>
             <h1>数据分析学习之旅</h1>
             <p class="subtitle">开启你的数据洞察探索之路</p>
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="搜索课程..." />
+                <i class="fas fa-search"></i>
+            </div>
         </header>
+        
+        <div class="category-nav">
+            <button class="category-btn active" data-category="all">全部</button>
+            <button class="category-btn" data-category="basic">基础概念</button>
+            <button class="category-btn" data-category="methods">分析方法</button>
+            <button class="category-btn" data-category="user">用户分析</button>
+            <button class="category-btn" data-category="model">模型应用</button>
+        </div>
+        
         <nav class="learning-path">
-            <ul>
-                <li><a href="1.拥有数据分析的具体表现.html"><span>01</span> 拥有数据分析的具体表现</a></li>
-                <li><a href="2.培养数据分析思维.html"><span>02</span> 培养数据分析思维</a></li>
-                <li><a href="3.数字，数据.html"><span>03</span> 数字与数据的区别</a></li>
-                <li><a href="4.分析师工作.html"><span>04</span> 数据分析师的工作内容</a></li>
-                <li><a href="5.数据分析的价值.html"><span>05</span> 数据分析的核心价值</a></li>
-                <li><a href="6.初级学习业务分析.html"><span>06</span> 初级业务分析入门</a></li>
-                <li><a href="7.对比分析.html"><span>07</span> 对比分析</a></li>
-                <li><a href="8.多维度拆解法.html"><span>08</span> 多维度拆解法</a></li>
-                <li><a href="9.漏斗分析法.html"><span>09</span> 漏斗分析法</a></li>
-                <li><a href="10.公式拆解法.html"><span>10</span> 公式拆解法</a></li>
-                <li><a href="11.矩阵分析法.html"><span>11</span> 矩阵分析法</a></li>
-                <li><a href="12.数据异常波动.html"><span>12</span> 数据异常波动</a></li>
-                <li><a href="13.用户行为序列分析.html"><span>13</span> 用户行为序列分析</a></li>
-                <li><a href="14.用户行为路径分析.html"><span>14</span> 用户行为路径分析</a></li>
-                <li><a href="15.用户留存分析.html"><span>15</span> 用户留存分析</a></li>
-                <li><a href="16.同期群分析.html"><span>16</span> 同期群分析</a></li>
-                <li><a href="17.用户画像分析.html"><span>17</span> 用户画像分析</a></li>
-                <li><a href="18.为什么要分析用户画像.html"><span>18</span> 为什么要分析用户画像</a></li>
-                <li><a href="19.不同行业用户画像.html"><span>19</span> 不同行业用户画像</a></li>
-                <li><a href="20.用户画像模型搭建.html"><span>20</span> 用户画像模型搭建</a></li>
-                <li><a href="21.什么是RFM模型.html"><span>21</span> 什么是RFM模型</a></li>
-                <li><a href="22.RFM模型应用.html"><span>22</span> RFM模型应用</a></li>
-                <li><a href="23.AARRR模型.html"><span>23</span> AARRR模型</a></li>
-                <li><a href="24.AARRR模型应用(网易云音乐).html"><span>24</span> AARRR模型应用(网易云音乐)</a></li>
-                <li><a href="25.AB测试.html"><span>25</span> AB测试</a></li>
-                <li><a href="26.AB测试发展.html"><span>26</span> AB测试发展</a></li>
-                <li><a href="27.为何大厂热衷于AB测试.html"><span>27</span> 为何大厂热衷于AB测试</a></li>
-            </ul>
+            <div class="lesson-grid">
+                <div class="lesson-card" data-category="basic">
+                    <a href="1.拥有数据分析的具体表现.html">
+                        <span class="lesson-number">01</span>
+                        <h3>拥有数据分析的具体表现</h3>
+                        <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+                <div class="lesson-card" data-category="basic">
+                    <a href="2.培养数据分析思维.html">
+                        <span class="lesson-number">02</span>
+                        <h3>培养数据分析思维</h3>
+                        <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+                <div class="lesson-card" data-category="basic">
+                    <a href="3.数字，数据.html">
+                        <span class="lesson-number">03</span>
+                        <h3>数字与数据的区别</h3>
+                        <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+                <div class="lesson-card" data-category="basic">
+                    <a href="4.分析师工作.html">
+                        <span class="lesson-number">04</span>
+                        <h3>数据分析师的工作内容</h3>
+                        <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+                <div class="lesson-card" data-category="basic">
+                    <a href="5.数据分析的价值.html">
+                        <span class="lesson-number">05</span>
+                        <h3>数据分析的核心价值</h3>
+                        <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+                <div class="lesson-card" data-category="basic">
+                    <a href="6.初级学习业务分析.html">
+                        <span class="lesson-number">06</span>
+                        <h3>初级业务分析入门</h3>
+                        <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+                <div class="lesson-card" data-category="methods">
+                    <a href="7.对比分析.html">
+                        <span class="lesson-number">07</span>
+                        <h3>对比分析</h3>
+                        <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+                <div class="lesson-card" data-category="methods">
+                    <a href="8.多维度拆解法.html">
+                        <span class="lesson-number">08</span>
+                        <h3>多维度拆解法</h3>
+                        <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+                <div class="lesson-card" data-category="methods">
+                    <a href="9.漏斗分析法.html">
+                        <span class="lesson-number">09</span>
+                        <h3>漏斗分析法</h3>
+                        <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+                <div class="lesson-card" data-category="methods">
+                    <a href="10.公式拆解法.html">
+                        <span class="lesson-number">10</span>
+                        <h3>公式拆解法</h3>
+                        <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+                <div class="lesson-card" data-category="methods">
+                    <a href="11.矩阵分析法.html">
+                        <span class="lesson-number">11</span>
+                        <h3>矩阵分析法</h3>
+                        <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+                <div class="lesson-card" data-category="methods">
+                    <a href="12.数据异常波动.html">
+                        <span class="lesson-number">12</span>
+                        <h3>数据异常波动</h3>
+                        <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+                <div class="lesson-card" data-category="user">
+                    <a href="13.用户行为序列分析.html">
+                        <span class="lesson-number">13</span>
+                        <h3>用户行为序列分析</h3>
+                        <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+                <div class="lesson-card" data-category="user">
+                    <a href="14.用户行为路径分析.html">
+                        <span class="lesson-number">14</span>
+                        <h3>用户行为路径分析</h3>
+                        <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+                <div class="lesson-card" data-category="user">
+                    <a href="15.用户留存分析.html">
+                        <span class="lesson-number">15</span>
+                        <h3>用户留存分析</h3>
+                        <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+                <div class="lesson-card" data-category="user">
+                    <a href="16.同期群分析.html">
+                        <span class="lesson-number">16</span>
+                        <h3>同期群分析</h3>
+                        <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+                <div class="lesson-card" data-category="user">
+                    <a href="17.用户画像分析.html">
+                        <span class="lesson-number">17</span>
+                        <h3>用户画像分析</h3>
+                        <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+                <div class="lesson-card" data-category="user">
+                    <a href="18.为什么要分析用户画像.html">
+                        <span class="lesson-number">18</span>
+                        <h3>为什么要分析用户画像</h3>
+                        <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+                <div class="lesson-card" data-category="user">
+                    <a href="19.不同行业用户画像.html">
+                        <span class="lesson-number">19</span>
+                        <h3>不同行业用户画像</h3>
+                        <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+                <div class="lesson-card" data-category="user">
+                    <a href="20.用户画像模型搭建.html">
+                        <span class="lesson-number">20</span>
+                        <h3>用户画像模型搭建</h3>
+                        <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+                <div class="lesson-card" data-category="model">
+                    <a href="21.什么是RFM模型.html">
+                        <span class="lesson-number">21</span>
+                        <h3>什么是RFM模型</h3>
+                        <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+                <div class="lesson-card" data-category="model">
+                    <a href="22.RFM模型应用.html">
+                        <span class="lesson-number">22</span>
+                        <h3>RFM模型应用</h3>
+                        <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+                <div class="lesson-card" data-category="model">
+                    <a href="23.AARRR模型.html">
+                        <span class="lesson-number">23</span>
+                        <h3>AARRR模型</h3>
+                        <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+                <div class="lesson-card" data-category="model">
+                    <a href="24.AARRR模型应用(网易云音乐).html">
+                        <span class="lesson-number">24</span>
+                        <h3>AARRR模型应用(网易云音乐)</h3>
+                        <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+                <div class="lesson-card" data-category="model">
+                    <a href="25.AB测试.html">
+                        <span class="lesson-number">25</span>
+                        <h3>AB测试</h3>
+                        <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+                <div class="lesson-card" data-category="model">
+                    <a href="26.AB测试发展.html">
+                        <span class="lesson-number">26</span>
+                        <h3>AB测试发展</h3>
+                        <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+                <div class="lesson-card" data-category="model">
+                    <a href="27.为何大厂热衷于AB测试.html">
+                        <span class="lesson-number">27</span>
+                        <h3>为何大厂热衷于AB测试</h3>
+                        <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
         </nav>
     </main>
+
+    <script>
+        // 搜索功能
+        const searchInput = document.getElementById('searchInput');
+        const lessonCards = document.querySelectorAll('.lesson-card');
+        
+        searchInput.addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase();
+            
+            lessonCards.forEach(card => {
+                const title = card.querySelector('h3').textContent.toLowerCase();
+                if (title.includes(searchTerm)) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        });
+        
+        // 分类筛选
+        const categoryBtns = document.querySelectorAll('.category-btn');
+        
+        categoryBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                // 移除所有按钮的活跃状态
+                categoryBtns.forEach(b => b.classList.remove('active'));
+                // 添加当前按钮的活跃状态
+                this.classList.add('active');
+                
+                const category = this.dataset.category;
+                
+                lessonCards.forEach(card => {
+                    if (category === 'all' || card.dataset.category === category) {
+                        card.style.display = 'block';
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+            });
+        });
+    </script>
 </body>
 </html>

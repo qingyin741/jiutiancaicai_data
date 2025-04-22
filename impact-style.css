@@ -1,5 +1,5 @@
 /* --- Global Styles & Font Import --- */
-@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&display=swap');
 
 *,
 *::before,
@@ -9,156 +9,234 @@
     padding: 0;
 }
 
+:root {
+    --primary-color: #4361ee;
+    --primary-light: #4895ef;
+    --primary-dark: #3a0ca3;
+    --accent-color: #f72585;
+    --text-light: #f8f9fa;
+    --text-dark: #212529;
+    --bg-dark: #121420;
+    --bg-card: rgba(255, 255, 255, 0.1);
+    --transition: all 0.3s ease;
+}
+
 html {
     font-size: 16px; /* Base font size */
+    scroll-behavior: smooth;
 }
 
 body {
-    font-family: 'Noto Sans SC', "Microsoft YaHei", sans-serif;
+    font-family: 'Noto Sans SC', sans-serif;
     line-height: 1.7;
     /* --- Impactful Background --- */
-    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
-    color: #e0e0e0; /* Light text for dark background */
+    background: linear-gradient(135deg, #121420 0%, #1B2030 50%, #232946 100%);
+    color: var(--text-light);
     display: flex;
     justify-content: center;
     align-items: center;
     min-height: 100vh;
-    padding: 30px 15px; /* Padding around the container */
+    padding: 30px 15px;
 }
 
 /* --- Main Container --- */
 .container {
-    max-width: 750px;
+    max-width: 1200px;
     width: 100%;
-    background-color: rgba(22, 33, 62, 0.7); /* Semi-transparent dark blue */
-    backdrop-filter: blur(8px); /* Glassmorphism effect (optional) */
+    background-color: rgba(35, 41, 70, 0.7);
+    backdrop-filter: blur(10px);
     border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 15px;
-    padding: 40px 50px;
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
-    text-align: center; /* Center header content */
+    border-radius: 20px;
+    padding: 40px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
 }
 
 /* --- Header Styles --- */
 header {
+    text-align: center;
     margin-bottom: 40px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.15);
     padding-bottom: 30px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    position: relative;
 }
 
 h1 {
-    /* --- Vibrant Title --- */
-    font-size: 2.8rem; /* Larger font size */
+    font-size: 3rem;
     font-weight: 700;
-    background: linear-gradient(90deg, #fca311, #e94560); /* Orange to Pink gradient */
+    background: linear-gradient(90deg, #4361ee, #f72585);
     -webkit-background-clip: text;
     background-clip: text;
-    color: transparent; /* Make text transparent to show gradient */
-    margin-bottom: 10px;
-    text-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    color: transparent;
+    margin-bottom: 15px;
+    text-shadow: 0 2px 10px rgba(0,0,0,0.3);
 }
 
 .subtitle {
-    font-size: 1.1rem;
-    color: #a0a0c0; /* Softer color for subtitle */
+    font-size: 1.2rem;
+    color: #b8c1ec;
     font-weight: 400;
+    margin-bottom: 25px;
 }
 
-/* --- Navigation / List Styles --- */
-.learning-path ul {
-    list-style: none;
-}
-
-.learning-path li {
-    background-color: rgba(255, 255, 255, 0.08);
-    margin-bottom: 15px;
-    border-radius: 8px;
-    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); /* Smoother transition */
-    border-left: 5px solid transparent; /* Placeholder for hover effect */
-    position: relative; /* For positioning potential pseudo-elements */
-    overflow: hidden; /* Ensure content respects border-radius */
-}
-
-.learning-path li:hover {
-    transform: translateX(10px) scale(1.03); /* Move right and slightly enlarge */
-    background-color: rgba(255, 255, 255, 0.15);
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
-    border-left-color: #fca311; /* Accent color on hover */
-}
-
-/* --- Link Styles --- */
-.learning-path a {
-    display: flex; /* Use flex for alignment */
-    align-items: center;
-    padding: 18px 25px;
-    color: #e5e5e5;
-    text-decoration: none;
-    font-size: 1.15rem; /* Slightly larger link text */
-    font-weight: 400;
-    transition: color 0.3s ease;
-    text-align: left; /* Align text to the left within the flex container */
-}
-
-.learning-path a:hover {
-    color: #ffffff; /* Brighter text on hover */
-}
-
-/* --- Number/Icon Span --- */
-.learning-path a span {
-    display: inline-block;
-    min-width: 30px; /* Ensure consistent spacing */
-    margin-right: 15px;
-    font-weight: 700;
-    color: #e94560; /* Accent color for numbers/icons */
-    font-size: 1rem;
-    text-align: center;
-}
-
-/* --- Special Item Style --- */
-.learning-path li.special-item {
-    background-color: rgba(252, 163, 17, 0.15); /* Use accent color background */
-    border-left-color: #e94560; /* Different accent border */
-}
-
-.learning-path li.special-item:hover {
-    border-left-color: #ffffff; /* White border on hover for special item */
-    background-color: rgba(252, 163, 17, 0.3);
-}
-
-.learning-path li.special-item a span {
-    color: #fca311; /* Match the orange accent */
-    font-size: 1.2rem; /* Make icon slightly larger */
-}
-
-/* --- Focus Styles for Accessibility --- */
-a:focus-visible { /* Use focus-visible for better UX */
-    outline: 3px solid #fca311;
-    outline-offset: 3px;
-    border-radius: 6px;
-    /* Ensure focus is visible inside the list item */
+/* Search Box */
+.search-box {
     position: relative;
-    z-index: 1;
+    max-width: 500px;
+    margin: 0 auto;
 }
 
-/* --- Responsive Adjustments (Optional Example) --- */
-@media (max-width: 600px) {
-    body {
-        padding: 15px 10px;
-    }
+.search-box input {
+    width: 100%;
+    padding: 15px 20px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 30px;
+    color: var(--text-light);
+    font-size: 1rem;
+    transition: var(--transition);
+}
+
+.search-box input:focus {
+    outline: none;
+    background: rgba(255, 255, 255, 0.15);
+    border-color: var(--primary-light);
+    box-shadow: 0 0 15px rgba(67, 97, 238, 0.3);
+}
+
+.search-box input::placeholder {
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.search-box i {
+    position: absolute;
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: rgba(255, 255, 255, 0.6);
+}
+
+/* Category Navigation */
+.category-nav {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 30px;
+}
+
+.category-btn {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--text-light);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 20px;
+    padding: 8px 20px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.category-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.category-btn.active {
+    background: var(--primary-color);
+    border-color: var(--primary-color);
+    box-shadow: 0 0 15px rgba(67, 97, 238, 0.5);
+}
+
+/* Lesson Grid */
+.lesson-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+}
+
+.lesson-card {
+    background: var(--bg-card);
+    border-radius: 15px;
+    overflow: hidden;
+    transition: var(--transition);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.lesson-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+    background: rgba(255, 255, 255, 0.15);
+    border-color: var(--primary-light);
+}
+
+.lesson-card a {
+    display: flex;
+    flex-direction: column;
+    padding: 25px;
+    color: var(--text-light);
+    text-decoration: none;
+    height: 100%;
+    position: relative;
+}
+
+.lesson-number {
+    color: var(--accent-color);
+    font-weight: 700;
+    font-size: 1.2rem;
+    margin-bottom: 10px;
+}
+
+.lesson-card h3 {
+    font-size: 1.1rem;
+    font-weight: 500;
+    margin-bottom: 15px;
+    flex-grow: 1;
+}
+
+.lesson-card i {
+    position: absolute;
+    right: 20px;
+    bottom: 20px;
+    color: var(--primary-light);
+    opacity: 0;
+    transform: translateX(-10px);
+    transition: var(--transition);
+}
+
+.lesson-card:hover i {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
     .container {
-        padding: 30px 25px;
+        padding: 25px;
     }
+    
     h1 {
         font-size: 2.2rem;
     }
-    .subtitle {
-        font-size: 1rem;
+    
+    .lesson-grid {
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
     }
-    .learning-path a {
-        padding: 15px 15px;
-        font-size: 1rem;
+}
+
+@media (max-width: 576px) {
+    .container {
+        padding: 20px 15px;
     }
-    .learning-path a span {
-        margin-right: 10px;
+    
+    .lesson-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .category-nav {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .category-btn {
+        width: 100%;
+        max-width: 250px;
     }
 }
